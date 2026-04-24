@@ -31,39 +31,71 @@ export default function Home() {
                 data-bs-target="#insuranceCarousel"
                 data-bs-slide-to="2"
               ></button>
+              <button
+                type="button"
+                data-bs-target="#insuranceCarousel"
+                data-bs-slide-to="3"
+              ></button>
+              <button
+                type="button"
+                data-bs-target="#insuranceCarousel"
+                data-bs-slide-to="4"
+              ></button>
             </div>
 
             <div className="carousel-inner">
               <div className="carousel-item active">
                 <img
-                  src="images/car-insurance.jpg"
+                  src="img1.png"
                   className="d-block w-100"
                   alt="Car Insurance"
                 />
                 <div className="carousel-caption d-none d-md-block">
                   <h5>Drive with Confidence</h5>
-                  <p>Comprehensive car insurance for every journey.</p>
+                  <p>Comprehensive two-wheeler insurance for every journey.</p>
                 </div>
               </div>
               <div className="carousel-item">
                 <img
-                  src="images/bike-insurance.jpg"
+                  src="img2.png"
                   className="d-block w-100"
                   alt="Bike Insurance"
                 />
                 <div className="carousel-caption d-none d-md-block">
                   <h5>Ride Protected</h5>
-                  <p>Motorcycle insurance designed for riders’ safety.</p>
+                  <p>Four-wheeler insurance designed for driver's safety.</p>
                 </div>
               </div>
               <div className="carousel-item">
                 <img
-                  src="images/commercial-vehicle.jpg"
+                  src="img3.png"
                   className="d-block w-100"
                   alt="Commercial Vehicle Insurance"
                 />
                 <div className="carousel-caption d-none d-md-block">
-                  <h5>Secure Your Fleet</h5>
+                  <h5>Importance of Renewal</h5>
+                  <p>Tailored coverage for business and commercial vehicles.</p>
+                </div>
+              </div>
+              <div className="carousel-item">
+                <img
+                  src="img4.png"
+                  className="d-block w-100"
+                  alt="Commercial Vehicle Insurance"
+                />
+                <div className="carousel-caption d-none d-md-block">
+                  <h5>Importance of Renewal</h5>
+                  <p>Tailored coverage for business and commercial vehicles.</p>
+                </div>
+              </div>
+              <div className="carousel-item">
+                <img
+                  src="img5.png"
+                  className="d-block w-100"
+                  alt="Commercial Vehicle Insurance"
+                />
+                <div className="carousel-caption d-none d-md-block">
+                  <h5>Importance of Renewal</h5>
                   <p>Tailored coverage for business and commercial vehicles.</p>
                 </div>
               </div>

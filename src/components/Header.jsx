@@ -6,7 +6,7 @@ export default function Header() {
   return (
     <header className="header">
       <div className="logo">
-        <h1>Insurance Portal</h1>
+        <h1>Shield General</h1>
         <p className="tagline">Secure your ride, secure your life</p>
       </div>
       <nav className="nav">
