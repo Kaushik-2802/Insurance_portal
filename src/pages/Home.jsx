@@ -124,7 +124,7 @@ export default function Home() {
       <div className="Home-about">
         <h1>About Us</h1>
         <p>
-          At Test, we specialize in protecting drivers and their vehicles.
+          At Shield General, we specialize in protecting drivers and their vehicles.
           Whether you own a car, bike, or commercial fleet, our mission is to
           keep you safe on the road and financially secure in case of accidents,
           theft, or damage.

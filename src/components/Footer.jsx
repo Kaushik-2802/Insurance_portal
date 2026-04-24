@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="footer-content">
         {/* Company Info */}
         <div className="footer-section about">
-          <h2>Insurance Portal</h2>
+          <h2>Shield General</h2>
           <p>
             Your trusted partner for Two-Wheeler and Four-Wheeler insurance.
             Protecting your journey, every mile of the way.
@@ -30,7 +30,7 @@ export default function Footer() {
         {/* Contact Info */}
         <div className="footer-section contact">
           <h3>Contact</h3>
-          <p>Email: support@insuranceportal.com</p>
+          <p>Email: support@shieldgeneral.com</p>
           <p>Phone: +91-9876543210</p>
           <p>Address: Coimbatore, Tamil Nadu, India</p>
         </div>
@@ -39,17 +39,17 @@ export default function Footer() {
         <div className="footer-section social">
           <h3>Follow Us</h3>
           <div className="social-icons">
-            <a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer">Twitter</a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a href="https://facebook.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-facebook"></i></a>
+            <a href="https://twitter.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-x-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-instagram"></i></a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-linkedin"></i></a>
           </div>
         </div>
       </div>
 
       {/* Copyright */}
       <div className="footer-bottom">
-        <p>&copy; 2026 Insurance Portal. All rights reserved.</p>
+        <p>&copy; 2026 Shield General. All rights reserved.</p>
       </div>
     </footer>
   );
