@@ -1,0 +1,126 @@
+/* General body styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f4f8fc;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Content wrapper */
+.content {
+  padding: 20px;
+}
+
+/* Carousel styling */
+.carousel {
+  max-width: 1200px;
+  margin: 20px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.carousel-caption h5 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+}
+
+.carousel-caption p {
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+
+/* About section */
+.Home-about {
+  background: #ffffff;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.Home-about h1 {
+  color: #004080;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.Home-about p {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+/* Contact section */
+.Home-contact {
+  background: #cce0ff;
+  padding: 60px 20px;
+}
+
+.Home-contact h1 {
+  color: #004080;
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 2rem;
+}
+
+.Home-contact form {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.Home-contact label {
+  font-weight: 600;
+  margin-top: 15px;
+  color: #004080;
+}
+
+.Home-contact input,
+.Home-contact textarea {
+  padding: 12px;
+  margin-top: 8px;
+  border: 1px solid #004080;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Home-contact input:focus,
+.Home-contact textarea:focus {
+  outline: none;
+  border-color: #ffcc00;
+  box-shadow: 0 0 6px rgba(255, 204, 0, 0.5);
+}
+
+/* Submit button */
+.submit-btn {
+  background: #ffcc00;
+  color: #004080;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: #e6b800;
+}
+
+/* Footer styling */
+footer {
+  background: #004080;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: 0;
+  font-size: 0.95rem;
+}
