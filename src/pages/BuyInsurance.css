@@ -1,0 +1,223 @@
+/* Buy Insurance Page Styling */
+
+/* General body styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f4f8fc;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Main container */
+.buy-insurance-container {
+  padding: 20px;
+}
+
+/* Header section */
+.buy-insurance-header {
+  background: #ffffff;
+  padding: 60px 20px;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 40px;
+}
+
+.buy-insurance-header h1 {
+  color: #004080;
+  margin-bottom: 15px;
+  font-size: 2.5rem;
+}
+
+.buy-insurance-header p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Vehicle selector buttons */
+.vehicle-selector {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.vehicle-btn {
+  background: #e8f0fc;
+  color: #004080;
+  padding: 20px 40px;
+  border: 2px solid #004080;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.vehicle-btn:hover {
+  background: #cce0ff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 64, 128, 0.2);
+}
+
+.vehicle-btn.active {
+  background: #004080;
+  color: #ffcc00;
+  box-shadow: 0 6px 16px rgba(0, 64, 128, 0.4);
+}
+
+/* Form section */
+.form-section {
+  background: #cce0ff;
+  padding: 60px 20px;
+  border-radius: 8px;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-section h2 {
+  color: #004080;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+/* Form styling */
+.form-section form {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Form group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #004080;
+}
+
+.form-group input {
+  padding: 12px;
+  border: 1px solid #004080;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ffcc00;
+  box-shadow: 0 0 6px rgba(255, 204, 0, 0.5);
+}
+
+.form-group input::placeholder {
+  color: #999;
+}
+
+/* Submit button */
+.submit-btn {
+  background: #ffcc00;
+  color: #004080;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-size: 1rem;
+}
+
+.submit-btn:hover {
+  background: #e6b800;
+  transform: translateY(-2px);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Placeholder section */
+.form-section.placeholder {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.form-section.placeholder p {
+  color: #004080;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .buy-insurance-header h1 {
+    font-size: 2rem;
+  }
+
+  .vehicle-selector {
+    gap: 15px;
+  }
+
+  .vehicle-btn {
+    padding: 15px 30px;
+    font-size: 1rem;
+  }
+
+  .form-section {
+    padding: 40px 15px;
+  }
+
+  .form-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .form-section form {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .buy-insurance-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .vehicle-selector {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .vehicle-btn {
+    width: 100%;
+    padding: 15px 20px;
+  }
+
+  .form-section {
+    padding: 30px 15px;
+  }
+
+  .form-section h2 {
+    font-size: 1.3rem;
+  }
+}
