@@ -1,0 +1,117 @@
+/* Container using your light theme background */
+.claim-container {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+  background-color: #f4f8fc; 
+}
+
+/* Card using a clean white background like your "About" section */
+.claim-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid #cce0ff;
+}
+
+/* Title matching your Home-about h1 */
+.claim-title {
+  color: #004080;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.claim-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Inputs matching your Home-contact styles */
+.claim-input {
+  padding: 12px;
+  border: 1px solid #004080;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-align: center;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.claim-input:focus {
+  outline: none;
+  border-color: #ffcc00;
+  box-shadow: 0 0 6px rgba(255, 204, 0, 0.5);
+}
+
+/* Reason section styling */
+.reason-section {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.reason-header {
+  color: #004080;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Box matching your Home-contact background */
+.reason-box {
+  background-color: #cce0ff;
+  border: 1px solid #004080;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Buttons using your primary Navy color */
+.reason-btn {
+  background-color: #004080;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.reason-btn:hover {
+  background-color: #002d5a;
+}
+
+/* Highlighted state using your accent Yellow */
+.reason-btn.active {
+  background-color: #ffcc00;
+  color: #004080;
+  font-weight: bold;
+  box-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
+}
+
+/* Submit button matching your .submit-btn */
+.claim-submit-btn {
+  background: #ffcc00;
+  color: #004080;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 20px auto 0;
+  width: fit-content;
+  min-width: 150px;
+  transition: background 0.3s ease;
+}
+
+.claim-submit-btn:hover {
+  background: #e6b800;
+}
