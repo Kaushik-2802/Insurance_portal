@@ -1,14 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Import this
 import "./InnerHeader.css";
 
 export default function InnerHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
+  const navigate = useNavigate(); // Initialize the navigate function
 
-  // Toggle menu visibility
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Close menu if clicking outside of the userMenu
+  const handleLogout = () => {
+    // Add any logout logic here (like clearing localStorage/tokens)
+    console.log("Logging out...");
+    
+    setIsOpen(false); // Close the menu
+    navigate("/");    // Smoothly navigate to the home/root route
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -27,18 +35,18 @@ export default function InnerHeader() {
       </div>
 
       <div className="userMenu" ref={menuRef}>
-        <i 
-          className="fa-solid fa-user userIcon" 
-          onClick={toggleMenu}
-        ></i>
+        <i className="fa-solid fa-user userIcon" onClick={toggleMenu}></i>
 
-        {/* Only show the dropdown if isOpen is true */}
         {isOpen && (
           <div className="userDropdown">
-            <div className="dropdownItem">Profile</div>
-            <div className="dropdownItem">My Insurance</div>
+            <div className="dropdownItem" onClick={() => navigate("/profile")}>Profile</div>
+            <div className="dropdownItem" onClick={() => navigate("/my-insurance")}>My Insurance</div>
             <hr className="divider" />
-            <div className="dropdownItem logout">Logout</div>
+            
+            {/* Kept as a div, navigating via the handleLogout function */}
+            <div className="dropdownItem logout" onClick={handleLogout}>
+              Logout
+            </div>
           </div>
         )}
       </div>
