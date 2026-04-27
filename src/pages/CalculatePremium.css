@@ -1,0 +1,122 @@
+.premium-wrapper {
+  padding: 60px 20px;
+  background-color: #f0f4f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+}
+
+.premium-card {
+  display: flex; /* THIS ALIGNS FORM AND RESULT SIDE-BY-SIDE */
+  background: white;
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 64, 128, 0.1);
+  overflow: hidden;
+}
+
+.form-side {
+  flex: 1.2;
+  padding: 50px;
+  text-align: left;
+}
+
+.title-navy {
+  color: #004080;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 40px;
+}
+
+/* FIXING THE GRID ALIGNMENT */
+.grid-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  color: #004080;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.input-group select, .input-group input {
+  padding: 14px;
+  border: 2px solid #e1e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334e68;
+  font-size: 1rem;
+}
+
+.btn-calculate {
+  margin-top: 40px;
+  width: 100%;
+  padding: 18px;
+  background: #ffcc00;
+  color: #004080;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* RIGHT SIDE STYLING */
+.result-side {
+  flex: 0.8;
+  background: #004080;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: white;
+}
+
+.placeholder-text {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+.amount-yellow {
+  color: #ffcc00;
+  font-size: 3.5rem;
+  margin: 10px 0;
+  font-weight: 900;
+}
+
+.breakdown-list {
+  text-align: left;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+.btn-buy-now {
+  margin-top: 30px;
+  background: white;
+  color: #004080;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  .premium-card { flex-direction: column; }
+}

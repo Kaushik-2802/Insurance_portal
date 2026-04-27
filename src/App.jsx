@@ -13,6 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import AdminDashboard from './Admin/AdminDashboard'
 import AdminLogin from './Admin/AdminLogin'
 import PolicyType from './pages/PolicyType'
+import CalculatePremium from './pages/CalculatePremium'
 import './App.css'
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/policy-type" element={<PolicyType />} />
+        <Route path="/calculate-premium" element={<CalculatePremium />} />
       </Routes>
     </BrowserRouter>
   )
