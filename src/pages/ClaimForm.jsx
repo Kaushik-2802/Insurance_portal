@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./ClaimForm.css";
+import InnerHeader from "../components/InnerHeader";
+import Footer from "../components/Footer";
 
 export default function ClaimForm() {
   // State to track which reason is selected
@@ -18,6 +20,8 @@ export default function ClaimForm() {
   };
 
   return (
+    <>
+    <InnerHeader />
     <div className="claim-container">
       <div className="claim-card">
         <h2 className="claim-title">Estimate Insurance Premium Calculation</h2>
@@ -59,5 +63,7 @@ export default function ClaimForm() {
         </form>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

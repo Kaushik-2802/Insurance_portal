@@ -14,7 +14,7 @@ export default function Login() {
           <label htmlFor="password">Password</label>
           <input type="password" id="password" placeholder="Enter your password" />
 
-          <button type="submit" className="login-btn">Submit</button>
+          <button type="submit" className="login-btn"><a href="/dashboard">Submit</a></button>
         </form>
         <p className="register-link">
           Don’t have an account? <a href="/register">Register here</a>
