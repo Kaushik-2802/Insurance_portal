@@ -1,82 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+
+:root {
+  --primary-blue: #004080;
+  --secondary-blue: #0056b3;
+  --light-bg: #f8fbff;
+  --text-dark: #1a2b3c;
+  --text-muted: #5a6d80;
+}
+
+.page-wrapper {
+  background: radial-gradient(circle at top right, #eef2f7 0%, #ffffff 100%);
+  min-height: 100vh;
+}
+
 .dashboard-container {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 50px 10%;
-  min-height: 70vh;
-  gap: 40px;
-  background-color: #f4f7f9;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 80px 10%;
+  gap: 60px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Left Section Styling */
+/* Left Section */
 .left-info {
   flex: 1;
-  max-width: 500px;
 }
 
-.left-info h1 {
-  color: #004080;
-  font-size: 2.5rem;
-  margin-bottom: 25px;
+.section-header .subtitle {
+  color: var(--secondary-blue);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  font-family: "Urbanist", sans-serif
+}
+
+.section-header h1 {
+  color: var(--text-dark);
+  font-size: 3rem;
+  margin: 10px 0 20px;
+  font-weight: 800;
+  font-family: "Urbanist", sans-serif
+}
+
+.section-header .description {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  font-family: "Urbanist", sans-serif
 }
 
 .info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
   background: white;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border-left: 5px solid #004080;
+  padding: 25px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 64, 128, 0.05);
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(0, 64, 128, 0.05);
+  font-family: "Urbanist", sans-serif
 }
 
-.info-card h3 {
-  margin: 0 0 8px 0;
-  color: #004080;
+.info-card:hover {
+  transform: translateY(-5px);
 }
 
-.info-card p {
+.card-icon {
+  background: rgba(0, 64, 128, 0.1);
+  color: var(--primary-blue);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 1.4rem;
+}
+
+.card-content h3 {
+  margin: 0 0 5px 0;
+  color: var(--text-dark);
+  font-size: 1.2rem;
+}
+
+.card-content p {
   margin: 0;
-  color: #555;
-  line-height: 1.5;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
-/* Right Section Styling */
+/* Right Section */
 .right-actions {
-  flex: 0 1 300px;
+  flex: 0 0 350px;
+  position: sticky;
+  top: 100px; /* Floats as you scroll */
+}
+
+.action-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eef2f7;
+}
+
+.action-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+  color: var(--text-dark);
+  text-align: center;
+  font-family: "Urbanist", sans-serif
+}
+
+.btn-group {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
 .action-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   text-decoration: none;
-  background: #004080;
-  color: white;
-  padding: 18px 25px;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.1rem;
+  background: #f1f5f9;
+  color: var(--text-dark);
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 64, 128, 0.2);
+  font-family: "Urbanist", sans-serif
+}
+
+.action-btn.primary {
+  background: var(--primary-blue);
+  color: white;
 }
 
 .action-btn:hover {
-  background: #002d5a;
-  transform: translateY(-3px); /* Lifts button slightly */
-  box-shadow: 0 6px 20px rgba(0, 64, 128, 0.3);
+  background: var(--secondary-blue);
+  color: white;
+  transform: scale(1.02);
 }
 
-/* Responsive Design for Mobile */
-@media (max-width: 768px) {
+.action-btn.outline {
+  background: transparent;
+  border: 2px solid var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.action-btn.outline:hover {
+  background: var(--primary-blue);
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
   .dashboard-container {
     flex-direction: column;
-    padding: 20px;
+    padding: 40px 5%;
   }
-  
-  .left-info, .right-actions {
-    max-width: 100%;
+  .right-actions {
+    flex: none;
     width: 100%;
+    position: static;
   }
 }

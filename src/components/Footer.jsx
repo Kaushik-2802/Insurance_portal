@@ -5,51 +5,78 @@ import "./Footer.css";
 export default function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-content">
-        {/* Company Info */}
-        <div className="footer-section about">
-          <h2>Shield General</h2>
-          <p>
-            Your trusted partner for Two-Wheeler and Four-Wheeler insurance.
-            Protecting your journey, every mile of the way.
+      <div className="footer-container">
+        <div className="footer-grid">
+          
+          {/* Brand & Purpose */}
+          <div className="footer-section footer-logo-box">
+            <h2>SHIELD GENERAL</h2>
+            <p className="footer-desc">
+              Redefining automotive security through smart insurance tech. 
+              Licensed and regulated by IRDAI.
+            </p>
+            <div className="social-icons" style={{ marginTop: '25px' }}>
+              <a href="#" className="social-link"><i className="fa-brands fa-linkedin-in"></i></a>
+              <a href="#" className="social-link"><i className="fa-brands fa-x-twitter"></i></a>
+              <a href="#" className="social-link"><i className="fa-brands fa-instagram"></i></a>
+            </div>
+          </div>
+
+          {/* Navigational Assets */}
+          <div className="footer-section">
+            <h3>Ecosystem</h3>
+            <ul>
+              <li><Link to="/buy">Policy Purchase</Link></li>
+              <li><Link to="/claims">FastTrack Claims</Link></li>
+              <li><Link to="/renew">Renewal Hub</Link></li>
+              <li><Link to="/partners">Garage Network</Link></li>
+            </ul>
+          </div>
+
+          {/* Contact Integration */}
+          <div className="footer-section">
+            <h3>HQ Support</h3>
+            <div className="contact-item">
+              <i className="fa-solid fa-phone-volume"></i>
+              <span> 1800 555 0199</span>
+            </div>
+            <div className="contact-item" style={{ margin: '15px 0' }}>
+              <i className="fa-solid fa-envelope-open-text"></i>
+              <span> help@shield.com</span>
+            </div>
+            <div className="contact-item">
+              <i className="fa-solid fa-map-pin"></i>
+              <span> Coimbatore, IN</span>
+            </div>
+          </div>
+
+          {/* The "Surprise" Newsletter Component */}
+          <div className="footer-section">
+            <div className="newsletter-box">
+              <h3>Secure Updates</h3>
+              <p style={{ fontSize: '0.85rem', color: '#8892b0' }}>
+                Join 50k+ drivers getting monthly safety insights.
+              </p>
+              <div className="newsletter-input-group">
+                <input type="email" placeholder="Work email..." />
+                <button className="newsletter-btn">Join</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Global Legal Bar */}
+        <div className="footer-bottom">
+          <p style={{ fontSize: '0.8rem', color: '#8892b0' }}>
+            &copy; {new Date().getFullYear()} Shield General Insurance Co. Ltd.
           </p>
-        </div>
-
-        {/* Quick Links
-        <div className="footer-section links">
-          <h3>Quick Links</h3>
-          <ul>
-            <li><Link to="/two-wheeler">Two-Wheeler Insurance</Link></li>
-            <li><Link to="/four-wheeler">Four-Wheeler Insurance</Link></li>
-            <li><Link to="/about">About Us</Link></li>
-            <li><Link to="/contact">Contact Us</Link></li>
-            <li><Link to="/help">Help</Link></li>
-          </ul>
-        </div> */}
-
-        {/* Contact Info */}
-        <div className="footer-section contact">
-          <h3>Contact</h3>
-          <p>Email: support@shieldgeneral.com</p>
-          <p>Phone: +91-9876543210</p>
-          <p>Address: Coimbatore, Tamil Nadu, India</p>
-        </div>
-
-        {/* Social Media */}
-        <div className="footer-section social">
-          <h3>Follow Us</h3>
-          <div className="social-icons">
-            <a href="https://facebook.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-facebook"></i></a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-x-twitter"></i></a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-instagram"></i></a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-linkedin"></i></a>
+          <div className="footer-legal">
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/compliance">Compliance</Link>
           </div>
         </div>
-      </div>
-
-      {/* Copyright */}
-      <div className="footer-bottom">
-        <p>&copy; 2026 Shield General. All rights reserved.</p>
       </div>
     </footer>
   );

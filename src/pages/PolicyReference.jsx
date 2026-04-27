@@ -1,111 +1,117 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Confetti from 'react-confetti'; // Optional: npm install react-confetti
 import './PolicyReference.css';
 
 const PolicyReference = () => {
   const [referenceNumber, setReferenceNumber] = useState('');
   const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if payment has been completed
     const paymentStatus = localStorage.getItem('paymentCompleted');
 
     if (paymentStatus === 'true') {
       setPaymentCompleted(true);
+      setShowConfetti(true);
+      // Stop confetti after 5 seconds
+      setTimeout(() => setShowConfetti(false), 5000);
 
-      // Check if reference number already exists in localStorage
       const storedReferenceNumber = localStorage.getItem('policyReferenceNumber');
-
       if (storedReferenceNumber) {
-        // Use existing reference number
         setReferenceNumber(storedReferenceNumber);
       } else {
-        // Generate a new unique 16-character alphanumeric reference number
-        const generateReferenceNumber = () => {
-          const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-          let uniqueNumber = '';
-
-          for (let i = 0; i < 16; i++) {
-            uniqueNumber += characters.charAt(Math.floor(Math.random() * characters.length));
-          }
-
-          // Store the new reference number in localStorage
-          localStorage.setItem('policyReferenceNumber', uniqueNumber);
-          setReferenceNumber(uniqueNumber);
-        };
-
-        generateReferenceNumber();
+        const uniqueNumber = Math.random().toString(36).substring(2, 10).toUpperCase() + 
+                             Math.random().toString(36).substring(2, 10).toUpperCase();
+        localStorage.setItem('policyReferenceNumber', uniqueNumber);
+        setReferenceNumber(uniqueNumber);
       }
     } else {
-      // Payment not completed, redirect to payment page after a short delay
-      setTimeout(() => {
-        navigate('/payment');
-      }, 3000);
+      setTimeout(() => navigate('/payment'), 3000);
     }
   }, [navigate]);
 
-  const handleNext = () => {
-    // You can navigate to the next page or perform any action here
-    navigate('/');
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(referenceNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="policy-reference-container">
-      {/* Header Section */}
-      <div className="policy-reference-header">
-        <h1>Policy Reference Number</h1>
-        <p>Your unique insurance policy reference number</p>
-      </div>
+    <div className="policy-root">
+      {showConfetti && <Confetti numberOfPieces={150} recycle={false} gravity={0.2} />}
+      
+      <div className="policy-container">
+        {!paymentCompleted ? (
+          <div className="redirect-card">
+            <div className="loader-ring"></div>
+            <h2>Verifying Payment...</h2>
+            <p>You'll be redirected to secure payment shortly.</p>
+          </div>
+        ) : (
+          <div className="success-wrapper animated-fade-in">
+            {/* Visual Header */}
+            <div className="status-badge">
+              <div className="checkmark-circle">
+                <i className="fa-solid fa-check"></i>
+              </div>
+              <h1>Success!</h1>
+              <p>Your policy is now active.</p>
+            </div>
 
-      {/* Content Section */}
-      <div className="policy-reference-content">
-        <div className="policy-reference-card">
-          {!paymentCompleted ? (
-            <div className="payment-pending">
-              <h2>Payment Required</h2>
-              <p>
-                To view your policy reference number, you need to complete the payment process first.
-              </p>
-              <div className="loading-indicator">
-                <p>Redirecting to payment page...</p>
-                <div className="spinner"></div>
+            {/* The Certificate Card */}
+            <div className="policy-certificate">
+              <div className="cert-header">
+                <i className="fa-solid fa-shield-halved"></i>
+                <span>OFFICIAL POLICY REFERENCE</span>
+              </div>
+              
+              <div className="cert-body">
+                <p className="cert-label">Your unique ID for claims & renewals:</p>
+                <div className="ref-display-group">
+                  <span className="ref-text">{referenceNumber}</span>
+                  <button className={`copy-btn ${copied ? 'copied' : ''}`} onClick={copyToClipboard}>
+                    <i className={copied ? "fa-solid fa-check" : "fa-solid fa-copy"}></i>
+                  </button>
+                </div>
+                {copied && <span className="copy-toast">Copied to clipboard!</span>}
+              </div>
+
+              <div className="cert-footer">
+                <div className="footer-item">
+                  <i className="fa-solid fa-calendar-check"></i>
+                  <span>Valid for: 1 Year</span>
+                </div>
+                <div className="footer-item">
+                  <i className="fa-solid fa-circle-check"></i>
+                  <span>Status: Verified</span>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="reference-info">
-              <h2>Your Insurance Policy Reference Number</h2>
-              <p>
-                Thank you for choosing our insurance services. We have generated a unique 16-character
-                reference number for your policy. This number will help you track and manage your
-                insurance policy. Please save this number for future reference as it will be required
-                for all your policy-related inquiries, claims, and communications with our support team.
-              </p>
 
-              <div className="reference-number-box">
-                <p className="reference-label">Reference Number:</p>
-                <p className="reference-number">{referenceNumber}</p>
+            {/* Quick Actions Grid */}
+            <div className="action-grid">
+              <div className="action-item">
+                <i className="fa-solid fa-file-pdf"></i>
+                <p>Download PDF</p>
               </div>
-
-              <div className="reference-note">
-                <p>This is your unique policy identification number. You can use this number to:</p>
-                <ul>
-                  <li>Track your policy status</li>
-                  <li>File claims</li>
-                  <li>Access policy documents</li>
-                  <li>Contact our support team</li>
-                  <li>Renew your policy</li>
-                </ul>
+              <div className="action-item" onClick={() => window.print()}>
+                <i className="fa-solid fa-print"></i>
+                <p>Print Page</p>
+              </div>
+              <div className="action-item">
+                <i className="fa-solid fa-envelope"></i>
+                <p>Email Me</p>
               </div>
             </div>
-          )}
 
-          {paymentCompleted && (
-            <button className="next-btn" onClick={handleNext}>
-              Next
+            <button className="finish-btn" onClick={() => navigate('/')}>
+              Go to Dashboard <i className="fa-solid fa-arrow-right"></i>
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

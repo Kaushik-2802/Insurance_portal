@@ -1,128 +1,213 @@
-/* Container and Wrapper */
-.renewal-wrapper {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background-color: #f4f8fc;
-  padding: 40px 20px;
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;800&display=swap');
+
+:root {
+  --primary-navy: #002347;
+  --accent-gold: #ffcc00;
+  --text-dim: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+}
+
+.renewal-page-root {
+  background: #f8fafc;
+  font-family: 'Urbanist', sans-serif;
   min-height: 100vh;
 }
 
-/* Stepper Bar */
-.stepper-bar {
+.renewal-main-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+
+/* --- Premium Stepper --- */
+.stepper-wrapper {
   display: flex;
-  background: #ffffff;
-  border: 1px solid #cce0ff;
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 0 auto 30px auto;
-  max-width: 1000px;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 50px;
 }
 
-.step-item {
-  flex: 1;
-  padding: 15px;
-  font-size: 0.85rem;
-  color: #666;
-  border-right: 1px solid #cce0ff;
-  text-align: center;
-  background: #f9f9f9;
+.progress-line {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #e2e8f0;
+  z-index: 1;
 }
 
-.step-item.active {
-  background: #e67e22; /* Orange for Active Step */
-  color: white;
+.progress-fill {
+  height: 100%;
+  background: var(--primary-navy);
+  transition: 0.5s ease;
 }
 
-.step-item.completed {
-  background: #004080; /* Navy for Completed Step */
-  color: white;
+.step-node {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Titles */
-.section-title {
-  color: #004080;
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-/* Selection Screen (Step 1 Vehicle) */
-.selection-screen h2 { color: #004080; margin-bottom: 30px; }
-.card-container { display: flex; justify-content: center; gap: 30px; }
-.v-card {
-  width: 180px;
+.node-circle {
+  width: 44px;
+  height: 44px;
   background: white;
-  border: 2px solid #004080;
-  border-radius: 12px;
-  cursor: pointer;
-  overflow: hidden;
+  border: 3px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: var(--text-dim);
   transition: 0.3s;
 }
-.v-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,64,128,0.1); }
-.v-icon { background: #004080; padding: 25px; font-size: 45px; color: white; }
-.v-label { padding: 12px; font-weight: bold; color: #004080; }
 
-/* Form Boxes */
-.blue-form-box {
-  background: #cce0ff;
-  border: 1px solid #004080;
-  border-radius: 8px;
-  padding: 25px;
-  margin-bottom: 25px;
-  text-align: left;
+.step-node.active .node-circle {
+  border-color: var(--primary-navy);
+  background: var(--primary-navy);
+  color: white;
+  box-shadow: 0 0 15px rgba(0, 35, 71, 0.2);
 }
 
-.greeting { font-weight: bold; color: #004080; margin-bottom: 15px; }
-.input-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; }
-.field { display: flex; flex-direction: column; flex: 1; min-width: 200px; text-align: left;}
-.field label { font-size: 0.85rem; color: #d32f2f; margin-bottom: 5px; font-weight: 600; }
-.field input { padding: 10px; border: 1px solid #004080; border-radius: 4px; }
+.node-label {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
 
-/* Policy Details Step */
-.details-container {
+/* --- Glass Card --- */
+.content-card-glass {
   background: white;
-  padding: 30px;
-  border-radius: 12px;
-  border: 1px solid #cce0ff;
-  max-width: 800px;
-  margin: 0 auto;
+  border-radius: 24px;
+  padding: 50px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
-.info-grid {
+/* Luxury Vehicle Selection */
+.luxury-card-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  background: #f9fbff;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  text-align: left;
+  gap: 30px;
+  margin-top: 40px;
 }
 
-.info-item span { color: #666; margin-right: 10px; }
-.info-item strong { color: #004080; }
+.luxury-card {
+  padding: 40px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
 
-.address-section { text-align: left; margin-top: 20px; }
-.address-section textarea {
+.luxury-card:hover {
+  background: var(--primary-navy);
+  color: white;
+  transform: translateY(-5px);
+}
+
+.luxury-card i {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  display: block;
+}
+
+/* Modern Input Styles */
+.modern-input {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.modern-input input {
   width: 100%;
-  height: 80px;
-  padding: 12px;
-  border: 1px solid #004080;
-  border-radius: 6px;
+  padding: 15px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: transparent;
+  transition: 0.3s;
+  box-sizing: border-box;
+}
+
+.modern-input label {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 5px;
+  color: var(--text-dim);
+  transition: 0.3s;
+  pointer-events: none;
+}
+
+.modern-input input:focus ~ label,
+.modern-input input:not(:placeholder-shown) ~ label {
+  top: 0;
+  font-size: 0.8rem;
+  color: var(--primary-navy);
+  font-weight: 700;
+}
+
+.modern-input input:focus {
+  border-color: var(--primary-navy);
+  outline: none;
+}
+
+/* Document Preview Surprise */
+.preview-document {
+  background: #f8fafc;
+  border-left: 5px solid var(--primary-navy);
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.doc-row {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 10px;
 }
 
-.checkbox-group { display: flex; align-items: center; gap: 8px; color: #004080; font-weight: 600; }
-
-/* Premium Table */
-.premium-table { width: 100%; border-collapse: collapse; background: white; }
-.premium-table td { padding: 15px; border: 1px solid #eee; text-align: left; }
-.total-row { background: #f4f8fc; border: 2px solid #004080 !important; }
-.total-row td { color: #004080; font-size: 1.2rem; }
-
 /* Buttons */
-.btn-group { display: flex; gap: 15px; margin-top: 20px; }
-.back-btn { background: #e0e0e0; border: 1px solid #999; padding: 10px 25px; border-radius: 4px; cursor: pointer; }
-.proceed-btn { background: #ffcc00; color: #004080; border: none; padding: 12px 35px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-.payment-btn { background: #004080; color: white; border: none; padding: 12px 35px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+.btn-main {
+  background: var(--primary-navy);
+  color: white;
+  border: none;
+  padding: 18px 35px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s;
+}
 
-.proceed-btn:hover { background: #e6b800; }
-.payment-btn:hover { background: #002d5a; }
+.btn-main.glow:hover {
+  box-shadow: 0 0 20px rgba(0, 35, 71, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+.animated-step {
+  animation: slideIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
