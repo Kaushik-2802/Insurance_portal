@@ -135,6 +135,13 @@
   display: inline-block;
 }
 
+.footer-section span{
+  color: white;
+}
+
+.footer-section i{
+  color: white;
+}
 .footer-section ul li a:hover {
   color: #fff;
   transform: translateX(8px);

@@ -9,6 +9,9 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import RenewInsurance from './pages/RenewInsurance'
+import ProtectedRoute from './components/ProtectedRoute'
+import AdminDashboard from './Admin/AdminDashboard'
+import AdminLogin from './Admin/AdminLogin'
 import './App.css'
 
 function App() {
@@ -24,6 +27,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/renew" element={<RenewInsurance />} />
+        <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin-login" element={<AdminLogin />} />
       </Routes>
     </BrowserRouter>
   )

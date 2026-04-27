@@ -39,6 +39,60 @@ const PolicyReference = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const createPdfBytes = (reference) => {
+    const streamContent = `BT /F1 18 Tf 50 740 Td (Insurance Policy Reference) Tj T* 0 -30 Td (Reference Number: ${reference}) Tj T* 0 -30 Td (Valid for: 1 Year) Tj ET\n`;
+    const objects = [
+      { id: 1, content: '<< /Type /Catalog /Pages 4 0 R >>' },
+      { id: 2, content: '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>' },
+      { id: 3, content: `<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 2 0 R >> >> /Contents 5 0 R >>` },
+      { id: 4, content: '<< /Type /Pages /Kids [3 0 R] /Count 1 >>' },
+      { id: 5, content: `<< /Length ${streamContent.length} >>\nstream\n${streamContent}endstream` },
+    ];
+
+    let pdf = '%PDF-1.3\n';
+    const offsets = [];
+    let position = pdf.length;
+
+    objects.forEach((obj) => {
+      offsets.push(position);
+      const objText = `${obj.id} 0 obj\n${obj.content}\nendobj\n`;
+      pdf += objText;
+      position += objText.length;
+    });
+
+    const xrefPos = position;
+    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+    offsets.forEach((offset) => {
+      pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+    });
+    pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+
+    return new TextEncoder().encode(pdf);
+  };
+
+  const downloadPolicyPdf = () => {
+    if (!referenceNumber) return;
+    const pdfBytes = createPdfBytes(referenceNumber);
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `policy-reference-${referenceNumber}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const emailPolicyDetails = () => {
+    if (!referenceNumber) return;
+    const subject = encodeURIComponent('Your Insurance Policy Reference');
+    const body = encodeURIComponent(
+      `Hello,%0D%0A%0D%0AHere is your policy reference number:%0D%0A${referenceNumber}%0D%0A%0D%0AThank you,%0D%0AInsurance Portal`
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
   return (
     <div className="policy-root">
       {showConfetti && <Confetti numberOfPieces={150} recycle={false} gravity={0.2} />}
@@ -93,7 +147,7 @@ const PolicyReference = () => {
 
             {/* Quick Actions Grid */}
             <div className="action-grid">
-              <div className="action-item">
+              <div className="action-item" onClick={downloadPolicyPdf}>
                 <i className="fa-solid fa-file-pdf"></i>
                 <p>Download PDF</p>
               </div>
@@ -101,7 +155,7 @@ const PolicyReference = () => {
                 <i className="fa-solid fa-print"></i>
                 <p>Print Page</p>
               </div>
-              <div className="action-item">
+              <div className="action-item" onClick={emailPolicyDetails}>
                 <i className="fa-solid fa-envelope"></i>
                 <p>Email Me</p>
               </div>
