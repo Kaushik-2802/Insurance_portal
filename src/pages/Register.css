@@ -85,7 +85,7 @@
   padding: 12px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: pointer; 
 }
 
 .register-btn:hover {

@@ -1,0 +1,27 @@
+.userMenu {
+  display: flex;
+  flex-direction: column; /* stack icon and dropdown vertically */
+  align-items: flex-end;  /* align them to the right side of header */
+  gap: 6px;
+}
+
+.userIcon {
+  color: white;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.userDropdown {
+  background: #004080;
+  color: white;
+  border: 1px solid #cce0ff;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.userDropdown option {
+  background: white;
+  color: #004080;
+}

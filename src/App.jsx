@@ -5,6 +5,7 @@ import ClaimForm from './pages/ClaimForm'
 import BuyInsurance from "./pages/BuyInsurance"
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
 import './App.css'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/buy-insurance" element={<BuyInsurance />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
