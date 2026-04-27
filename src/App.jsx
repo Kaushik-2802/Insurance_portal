@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from "./pages/Home"
 import ClaimForm from './pages/ClaimForm'
 import BuyInsurance from "./pages/BuyInsurance"
+import PolicyReference from './pages/PolicyReference'
+import Payment from './pages/Payment'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import './App.css'
@@ -14,6 +16,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/claim-form" element={<ClaimForm />} />
         <Route path="/buy-insurance" element={<BuyInsurance />} />
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/policy-reference" element={<PolicyReference />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
