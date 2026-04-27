@@ -1,0 +1,279 @@
+/* Policy Reference Page Styling - Based on Home.css template */
+
+/* General body styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f4f8fc;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Main container */
+.policy-reference-container {
+  padding: 20px;
+}
+
+/* Header section */
+.policy-reference-header {
+  background: #ffffff;
+  padding: 60px 20px;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 40px;
+}
+
+.policy-reference-header h1 {
+  color: #004080;
+  margin-bottom: 15px;
+  font-size: 2.5rem;
+}
+
+.policy-reference-header p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Content section */
+.policy-reference-content {
+  background: #cce0ff;
+  padding: 60px 20px;
+  border-radius: 8px;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Policy reference card */
+.policy-reference-card {
+  background: #ffffff;
+  padding: 50px 40px;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 64, 128, 0.1);
+}
+
+/* Reference info section */
+.reference-info h2 {
+  color: #004080;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.reference-info p {
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+/* Reference number box */
+.reference-number-box {
+  background: linear-gradient(135deg, #004080 0%, #0059b3 100%);
+  padding: 30px;
+  border-radius: 10px;
+  margin: 30px 0;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 64, 128, 0.2);
+}
+
+.reference-label {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.reference-number {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  letter-spacing: 2px;
+  word-break: break-all;
+}
+
+/* Reference note */
+.reference-note {
+  background: #f0f5ff;
+  padding: 20px;
+  border-left: 4px solid #004080;
+  border-radius: 6px;
+  margin: 25px 0;
+  color: #004080;
+  font-size: 0.95rem;
+}
+
+.reference-note p {
+  margin: 0 0 15px 0;
+  color: #004080;
+}
+
+.reference-note ul {
+  margin: 15px 0 0 20px;
+  padding: 0;
+}
+
+.reference-note li {
+  margin-bottom: 8px;
+  color: #004080;
+}
+
+/* Next button */
+.next-btn {
+  background: #ffcc00;
+  color: #004080;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 30px;
+  width: 100%;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-size: 1rem;
+}
+
+.next-btn:hover {
+  background: #e6b800;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+}
+
+.next-btn:active {
+  transform: translateY(0);
+}
+
+/* Payment pending section */
+.payment-pending {
+  text-align: center;
+  color: #004080;
+}
+
+.payment-pending h2 {
+  color: #ff6b35;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+.payment-pending p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+/* Loading indicator */
+.loading-indicator {
+  margin-top: 30px;
+}
+
+.loading-indicator p {
+  color: #004080;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #004080;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@media (max-width: 768px) {
+  .policy-reference-header h1 {
+    font-size: 2rem;
+  }
+
+  .policy-reference-content {
+    padding: 40px 15px;
+  }
+
+  .policy-reference-card {
+    padding: 30px 25px;
+  }
+
+  .reference-info h2 {
+    font-size: 1.5rem;
+  }
+
+  .reference-number {
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+     color:#ffffff;
+  }
+
+  .reference-number-box {
+    padding: 25px;
+     color:#ffffff;
+  }
+}
+
+@media (max-width: 480px) {
+  .policy-reference-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .policy-reference-header p {
+    font-size: 0.95rem;
+  }
+
+  .policy-reference-content {
+    padding: 30px 15px;
+    min-height: auto;
+  }
+
+  .policy-reference-card {
+    padding: 25px 15px;
+  }
+
+  .reference-info h2 {
+    font-size: 1.3rem;
+  }
+
+  .reference-info p {
+    font-size: 0.9rem;
+  }
+
+  .reference-number {
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    color:#ffffff;
+  }
+
+  .reference-label {
+    font-size: 0.85rem;
+    color:#ffffff;
+  }
+
+  .reference-number-box {
+    padding: 20px;
+    margin: 20px 0;
+    
+  }
+
+  .reference-note {
+    padding: 15px;
+    font-size: 0.85rem;
+  }
+
+  .next-btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}
