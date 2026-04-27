@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Import this
+import { useNavigate } from "react-router-dom";
 import "./InnerHeader.css";
 
 export default function InnerHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const handleLogout = () => {
-    // Add any logout logic here (like clearing localStorage/tokens)
-    console.log("Logging out...");
-    
-    setIsOpen(false); // Close the menu
-    navigate("/");    // Smoothly navigate to the home/root route
+    // Logic: clear tokens here
+    setIsOpen(false);
+    navigate("/");
   };
 
   useEffect(() => {
@@ -29,23 +27,43 @@ export default function InnerHeader() {
 
   return (
     <header className="header">
-      <div className="logo">
+      <div className="logo" onClick={() => navigate("/dashboard")} style={{cursor: 'pointer'}}>
         <h1>Shield General</h1>
-        <p className="tagline">Secure your ride, secure your life</p>
+        <p className="tagline">PREMIUM PROTECTION</p>
       </div>
 
-      <div className="userMenu" ref={menuRef}>
-        <i className="fa-solid fa-user userIcon" onClick={toggleMenu}></i>
+      <div className="userMenu" ref={menuRef} onClick={toggleMenu}>
+        <div className="user-info-text" style={{ textAlign: 'right', color: 'white', marginRight: '10px' }}>
+          <small style={{ opacity: 0.7, fontSize: '0.7rem', display: 'block' }}>Welcome back,</small>
+          <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Member</span>
+        </div>
+        
+        <div className="userIcon-wrapper">
+          <i className="fa-solid fa-user userIcon"></i>
+        </div>
 
         {isOpen && (
           <div className="userDropdown">
-            <div className="dropdownItem" onClick={() => navigate("/profile")}>Profile</div>
-            <div className="dropdownItem" onClick={() => navigate("/my-insurance")}>My Insurance</div>
-            <hr className="divider" />
+            <div className="dropdown-header">
+              <span>Account Settings</span>
+            </div>
             
-            {/* Kept as a div, navigating via the handleLogout function */}
+            <div className="dropdownItem" onClick={() => navigate("/profile")}>
+              <i className="fa-solid fa-circle-user"></i> Profile Details
+            </div>
+            
+            <div className="dropdownItem" onClick={() => navigate("/my-insurance")}>
+              <i className="fa-solid fa-shield-halved"></i> My Policies
+            </div>
+
+            <div className="dropdownItem" onClick={() => navigate("/support")}>
+              <i className="fa-solid fa-headset"></i> Help Support
+            </div>
+            
+            <hr style={{ border: 0, borderTop: '1px solid #eee', margin: 0 }} />
+            
             <div className="dropdownItem logout" onClick={handleLogout}>
-              Logout
+              <i className="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
             </div>
           </div>
         )}

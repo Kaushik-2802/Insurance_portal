@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 
 export default function Login() {
@@ -7,27 +7,53 @@ export default function Login() {
 
   const handleLogin = (event) => {
     event.preventDefault();
+    // In a real app, you'd validate credentials here
     navigate("/dashboard");
   };
 
   return (
-    <div className="login-body">
-      <div className="login-container">
-        <div className="login-card">
-          <h1 className="login-title">Login</h1>
-          <form className="login-form" onSubmit={handleLogin}>
-            <label htmlFor="username">Username or Email</label>
-            <input type="text" id="username" placeholder="Enter your username" />
+    <div className="login-page">
+      {/* Dynamic background elements */}
+      <div className="bg-blob"></div>
+      <div className="bg-blob-2"></div>
 
-            <label htmlFor="password">Password</label>
-            <input type="password" id="password" placeholder="Enter your password" />
-
-            <button type="submit" className="login-btn">Submit</button>
-          </form>
-          <p className="register-link">
-            Don’t have an account? <a href="/register">Register here</a>
-          </p>
+      <div className="login-card-glass">
+        <div className="brand-header">
+          <div className="shield-icon">
+            <i className="fa-solid fa-shield-halved"></i>
+          </div>
+          <h2>Shield General</h2>
+          <p>Secure Portal Login</p>
         </div>
+
+        <form className="login-form-modern" onSubmit={handleLogin}>
+          <div className="input-wrapper">
+            <i className="fa-solid fa-user"></i>
+            <input type="text" id="username" required placeholder=" " />
+            <label htmlFor="username">Username or Email</label>
+          </div>
+
+          <div className="input-wrapper">
+            <i className="fa-solid fa-lock"></i>
+            <input type="password" id="password" required placeholder=" " />
+            <label htmlFor="password">Password</label>
+          </div>
+
+          <div className="form-options">
+            <label className="remember-me">
+              <input type="checkbox" /> Remember me
+            </label>
+            <a href="#forgot" className="forgot-pass">Forgot Password?</a>
+          </div>
+
+          <button type="submit" className="login-btn-premium">
+            Access Account <i className="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          New to Shield? <Link to="/register">Create Account</Link>
+        </p>
       </div>
     </div>
   );

@@ -3,135 +3,152 @@ import { useNavigate } from 'react-router-dom';
 import './Payment.css';
 
 const Payment = () => {
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [cardHolderName, setCardHolderName] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('credit-card');
+  const [cardData, setCardData] = useState({
+    number: '',
+    name: '',
+    expiry: '',
+    cvv: '',
+    focused: ''
+  });
   const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCardData({ ...cardData, [name]: value });
+  };
 
   const handlePaymentSubmit = (e) => {
     e.preventDefault();
-
-    // Simulate payment processing
-    alert('Payment processing...');
-
-    // Set payment as completed in localStorage
+    alert('Processing Secure Payment...');
     localStorage.setItem('paymentCompleted', 'true');
-
-    // Redirect to policy reference page
-    setTimeout(() => {
-      navigate('/policy-reference');
-    }, 2000);
+    setTimeout(() => navigate('/policy-reference'), 2000);
   };
 
   return (
-    <div className="payment-container">
-      {/* Header Section */}
-      <div className="payment-header">
-        <h1>Payment</h1>
-        <p>Complete your insurance payment</p>
-      </div>
+    <div className="checkout-wrapper">
+      <div className="checkout-container">
+        {/* Left Side: Summary & Methods */}
+        <div className="checkout-info">
+          <div className="brand-header">
+            <i className="fa-solid fa-shield-halved"></i>
+            <h1>Secure Checkout</h1>
+          </div>
 
-      {/* Content Section */}
-      <div className="payment-content">
-        <div className="payment-card">
-          <h2>Payment Details</h2>
-
-          <div className="payment-summary">
-            <h3>Insurance Premium Summary</h3>
-            <div className="summary-item">
-              <span>Basic Coverage:</span>
-              <span>$500.00</span>
-            </div>
-            <div className="summary-item">
-              <span>Additional Coverage:</span>
-              <span>$200.00</span>
-            </div>
-            <div className="summary-item total">
-              <span>Total Amount:</span>
-              <span>$700.00</span>
+          <div className="price-card">
+            <span className="price-label">Total Premium</span>
+            <h2 className="price-amount">$700.00</h2>
+            <div className="price-breakdown">
+              <p>Basic Coverage: <span>$500.00</span></p>
+              <p>Add-ons: <span>$200.00</span></p>
             </div>
           </div>
 
-          <form onSubmit={handlePaymentSubmit}>
-            <div className="form-group">
-              <label htmlFor="payment-method">Payment Method</label>
-              <select
-                id="payment-method"
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                required
-              >
-                <option value="">Select Payment Method</option>
-                <option value="credit-card">Credit Card</option>
-                <option value="debit-card">Debit Card</option>
-                <option value="net-banking">Net Banking</option>
-                <option value="upi">UPI</option>
-              </select>
+          <div className="method-selector">
+            <h3>Choose Payment Method</h3>
+            <div className="method-grid">
+              {['credit-card', 'upi', 'net-banking'].map((method) => (
+                <div 
+                  key={method}
+                  className={`method-tile ${paymentMethod === method ? 'active' : ''}`}
+                  onClick={() => setPaymentMethod(method)}
+                >
+                  <i className={`fa-solid ${method === 'upi' ? 'fa-mobile-screen' : method === 'net-banking' ? 'fa-building-columns' : 'fa-credit-card'}`}></i>
+                  <span>{method.replace('-', ' ').toUpperCase()}</span>
+                </div>
+              ))}
             </div>
+          </div>
+        </div>
 
-            {(paymentMethod === 'credit-card' || paymentMethod === 'debit-card') && (
-              <>
-                <div className="form-group">
-                  <label htmlFor="card-holder-name">Card Holder Name</label>
-                  <input
-                    type="text"
-                    id="card-holder-name"
-                    placeholder="Enter card holder name"
-                    value={cardHolderName}
-                    onChange={(e) => setCardHolderName(e.target.value)}
-                    required
+        {/* Right Side: Visual Card & Form */}
+        <div className="checkout-form-area">
+          {paymentMethod === 'credit-card' ? (
+            <div className="card-ux-container">
+              {/* Visual Card Preview */}
+              <div className={`visual-card ${cardData.focused === 'cvv' ? 'flipped' : ''}`}>
+                <div className="card-front">
+                  <div className="card-chip"></div>
+                  <div className="card-logo">VISA</div>
+                  <div className="card-number-display">
+                    {cardData.number || "#### #### #### ####"}
+                  </div>
+                  <div className="card-bottom">
+                    <div className="card-holder">
+                      <small>Card Holder</small>
+                      <div>{cardData.name || "FULL NAME"}</div>
+                    </div>
+                    <div className="card-expiry">
+                      <small>Expires</small>
+                      <div>{cardData.expiry || "MM/YY"}</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="card-back">
+                  <div className="card-strip"></div>
+                  <div className="card-cvv-box">
+                    <small>CVV</small>
+                    <div className="cvv-display">{cardData.cvv}</div>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handlePaymentSubmit} className="real-form">
+                <div className="form-input-group">
+                  <label>Card Number</label>
+                  <input 
+                    name="number" 
+                    maxLength="19" 
+                    placeholder="0000 0000 0000 0000"
+                    onChange={handleInputChange}
+                    onFocus={() => setCardData({...cardData, focused: 'number'})}
+                    required 
                   />
                 </div>
-
-                <div className="form-group">
-                  <label htmlFor="card-number">Card Number</label>
-                  <input
-                    type="text"
-                    id="card-number"
-                    placeholder="Enter card number"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    maxLength="16"
-                    required
+                <div className="form-input-group">
+                  <label>Card Holder</label>
+                  <input 
+                    name="name" 
+                    placeholder="John Doe"
+                    onChange={handleInputChange}
+                    onFocus={() => setCardData({...cardData, focused: 'name'})}
+                    required 
                   />
                 </div>
-
                 <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="expiry-date">Expiry Date</label>
-                    <input
-                      type="text"
-                      id="expiry-date"
+                  <div className="form-input-group">
+                    <label>Expiry</label>
+                    <input 
+                      name="expiry" 
                       placeholder="MM/YY"
-                      value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.target.value)}
-                      maxLength="5"
-                      required
+                      onChange={handleInputChange}
+                      onFocus={() => setCardData({...cardData, focused: 'expiry'})}
+                      required 
                     />
                   </div>
-
-                  <div className="form-group">
-                    <label htmlFor="cvv">CVV</label>
-                    <input
-                      type="text"
-                      id="cvv"
-                      placeholder="CVV"
-                      value={cvv}
-                      onChange={(e) => setCvv(e.target.value)}
+                  <div className="form-input-group">
+                    <label>CVV</label>
+                    <input 
+                      name="cvv" 
                       maxLength="3"
-                      required
+                      placeholder="***"
+                      onChange={handleInputChange}
+                      onFocus={() => setCardData({...cardData, focused: 'cvv'})}
+                      required 
                     />
                   </div>
                 </div>
-              </>
-            )}
-
-            <button type="submit" className="pay-btn">
-              Pay $700.00
-            </button>
-          </form>
+                <button type="submit" className="complete-pay-btn">
+                  Confirm Payment <i className="fa-solid fa-lock"></i>
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="other-method-placeholder">
+              <i className="fa-solid fa-spinner fa-spin"></i>
+              <p>Redirecting to {paymentMethod.toUpperCase()} Gateway...</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
