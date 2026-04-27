@@ -107,8 +107,8 @@ const PolicyReference = () => {
               </div>
             </div>
 
-            <button className="finish-btn" onClick={() => navigate('/')}>
-              Go to Dashboard <i className="fa-solid fa-arrow-right"></i>
+            <button className="finish-btn" onClick={() => navigate('/claim-form')}>
+              Claim Insurance <i className="fa-solid fa-arrow-right"></i>
             </button>
           </div>
         )}
