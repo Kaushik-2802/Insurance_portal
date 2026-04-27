@@ -277,7 +277,9 @@ body {
   }
 }
 
-div p:first-child {
+.reference-number-box p:nth-of-type(1),
+.reference-number-box p:nth-of-type(2) {
   color: #ffffff;
 }
+
 
