@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './BuyInsurance.css';
+import InnerHeader from '../components/InnerHeader';
+import Footer from '../components/Footer';
 
 const BuyInsurance = () => {
   const [activeForm, setActiveForm] = useState(null);
@@ -72,6 +74,8 @@ const BuyInsurance = () => {
   };
 
   return (
+    <>
+    <InnerHeader />
     <div className="buy-insurance-container">
       {/* Header Section */}
       <div className="buy-insurance-header">
@@ -302,6 +306,8 @@ const BuyInsurance = () => {
         </div>
       )} */}
     </div>
+    <Footer />
+    </>
   );
 };
 
