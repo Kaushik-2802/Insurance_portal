@@ -67,7 +67,7 @@ body {
 }
 
 .reference-info p {
-  color: #ffffff;
+  color: #555;
   font-size: 1rem;
   line-height: 1.8;
   margin-bottom: 20px;
@@ -220,7 +220,6 @@ body {
 
   .reference-number-box {
     padding: 25px;
-     color:#ffffff;
   }
 }
 
@@ -277,3 +276,8 @@ body {
     font-size: 0.95rem;
   }
 }
+
+div p:first-child {
+  color: #ffffff;
+}
+
