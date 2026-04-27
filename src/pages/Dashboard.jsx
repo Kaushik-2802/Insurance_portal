@@ -63,7 +63,7 @@ export default function Dashboard() {
               <a href="/renew" className="action-btn">
                 <i className="fa-solid fa-arrows-rotate"></i> Renew Insurance
               </a>
-              <a href="/claim-form" className="action-btn">
+              <a href="/claim-insurance" className="action-btn">
                 <i className="fa-solid fa-hand-holding-dollar"></i> Claim Insurance
               </a>
               <a href="/calculate" className="action-btn outline">

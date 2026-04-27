@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from "./pages/Home"
-import ClaimForm from './pages/ClaimForm'
+import ClaimInsurance from './pages/ClaimInsurance'
 import BuyInsurance from "./pages/BuyInsurance"
 import PolicyReference from './pages/PolicyReference'
 import Payment from './pages/Payment'
@@ -12,6 +12,7 @@ import RenewInsurance from './pages/RenewInsurance'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminDashboard from './Admin/AdminDashboard'
 import AdminLogin from './Admin/AdminLogin'
+import PolicyType from './pages/PolicyType'
 import './App.css'
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/claim-form" element={<ClaimForm />} />
+        <Route path="/claim-insurance" element={<ClaimInsurance />} />
         <Route path="/buy-insurance" element={<BuyInsurance />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/policy-reference" element={<PolicyReference />} />
@@ -29,6 +30,7 @@ function App() {
         <Route path="/renew" element={<RenewInsurance />} />
         <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/policy-type" element={<PolicyType />} />
       </Routes>
     </BrowserRouter>
   )

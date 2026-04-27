@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./ClaimForm.css";
+import "./ClaimInsurance.css";
 import InnerHeader from "../components/InnerHeader";
 import Footer from "../components/Footer";
 
