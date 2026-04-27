@@ -38,11 +38,27 @@
 /* The Certificate Card */
 .policy-certificate {
   background: #ffffff;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-  border: 1px solid #e2e8f0;
-  margin-bottom: 30px;
+  padding: 50px 40px;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 64, 128, 0.1);
+}
+
+/* Reference info section */
+.reference-info h2 {
+  color: #004080;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.reference-info p {
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
 }
 
 .cert-header {
@@ -88,87 +104,102 @@
   border: none;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.3s;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #004080;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
 }
 
-.copy-btn:hover { background: #cbd5e1; }
-.copy-btn.copied { background: #10b981; color: white; }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@media (max-width: 768px) {
+  .policy-reference-header h1 {
+    font-size: 2rem;
+  }
 
-.copy-toast {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.8rem;
-  color: #10b981;
-  font-weight: 700;
+  .policy-reference-content {
+    padding: 40px 15px;
+  }
+
+  .policy-reference-card {
+    padding: 30px 25px;
+  }
+
+  .reference-info h2 {
+    font-size: 1.5rem;
+  }
+
+  .reference-number {
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+     color:#ffffff;
+  }
+
+  .reference-number-box {
+    padding: 25px;
+  }
 }
 
-.cert-footer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: #f1f5f9;
-  padding: 15px;
-  border-top: 1px solid #e2e8f0;
+@media (max-width: 480px) {
+  .policy-reference-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .policy-reference-header p {
+    font-size: 0.95rem;
+  }
+
+  .policy-reference-content {
+    padding: 30px 15px;
+    min-height: auto;
+  }
+
+  .policy-reference-card {
+    padding: 25px 15px;
+  }
+
+  .reference-info h2 {
+    font-size: 1.3rem;
+  }
+
+  .reference-info p {
+    font-size: 0.9rem;
+  }
+
+  .reference-number {
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    color:#ffffff;
+  }
+
+  .reference-label {
+    font-size: 0.85rem;
+    color:#ffffff;
+  }
+
+  .reference-number-box {
+    padding: 20px;
+    margin: 20px 0;
+    
+  }
+
+  .reference-note {
+    padding: 15px;
+    font-size: 0.85rem;
+  }
+
+  .next-btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
 }
 
-.footer-item { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; color: #64748b; font-weight: 600; }
-
-/* Quick Actions */
-.action-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-bottom: 40px;
+.reference-number-box p:nth-of-type(1),
+.reference-number-box p:nth-of-type(2) {
+  color: #ffffff;
 }
 
-.action-item {
-  background: white;
-  padding: 15px;
-  border-radius: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-  border: 1px solid transparent;
-}
 
-.action-item:hover {
-  background: #eef2ff;
-  border-color: #00408033;
-  transform: translateY(-5px);
-}
-
-.action-item i { font-size: 1.5rem; color: #004080; margin-bottom: 8px; }
-.action-item p { margin: 0; font-size: 0.8rem; font-weight: 700; color: #64748b; }
-
-.finish-btn {
-  background: #004080;
-  color: white;
-  border: none;
-  padding: 18px 40px;
-  border-radius: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 10px 20px rgba(0, 64, 128, 0.2);
-}
-
-.finish-btn:hover { transform: scale(1.05); background: #003366; }
-
-/* Animations */
-@keyframes bounceIn {
-  0% { transform: scale(0.3); opacity: 0; }
-  50% { transform: scale(1.05); opacity: 1; }
-  70% { transform: scale(0.9); }
-  100% { transform: scale(1); }
-}
-
-.animated-fade-in {
-  animation: fadeIn 1s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
