@@ -2,147 +2,166 @@ import React, { useState } from "react";
 import "./RenewInsurance.css";
 import InnerHeader from "../components/InnerHeader";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 
 export default function RenewInsurance() {
   const [currentStep, setCurrentStep] = useState(1);
   const [vehicleType, setVehicleType] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "Guest User",
+    regNo: "XXXX-XX-0000",
+    policyNo: "SH-00000000",
+    email: "",
+    address: ""
+  });
+  
+  const navigate = useNavigate();
+  const steps = ["Vehicle", "Details", "Preview", "Premium"];
 
-  const steps = ["Vehicle", "Information", "Verification", "Premium", "Finalize"];
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const resetCategory = () => {
+    setVehicleType(null);
+    setCurrentStep(1);
+  };
 
   return (
-    <div className="renewal-page-root">
+    <div className="renewal-ultra-root light-theme">
       <InnerHeader />
       
-      <div className="renewal-main-container">
-        {/* Modern Dynamic Stepper */}
-        <div className="stepper-wrapper">
-          <div className="progress-line">
-            <div className="progress-fill" style={{ width: `${(currentStep - 1) * 25}%` }}></div>
-          </div>
-          {steps.map((label, i) => (
-            <div key={i} className={`step-node ${currentStep >= i + 1 ? "active" : ""}`}>
-              <div className="node-circle">{currentStep > i + 1 ? "✓" : i + 1}</div>
-              <span className="node-label">{label}</span>
-            </div>
-          ))}
-        </div>
+      <div className="main-viewport">
+        {/* Soft Background Accents */}
+        <div className="orb orb-1"></div>
+        <div className="orb orb-2"></div>
 
-        <div className="content-card-glass animated-step">
+        <div className="renewal-grid-container">
           
-          {/* STEP 1: MODERN SELECTION */}
-          {currentStep === 1 && !vehicleType && (
-            <div className="selection-view">
-              <div className="view-header">
-                <h2>Renew Your Protection</h2>
-                <p>Select your vehicle category to fetch current policy status</p>
-              </div>
-              <div className="luxury-card-grid">
-                <div className="luxury-card" onClick={() => setVehicleType("Car")}>
-                  <div className="card-glare"></div>
-                  <i className="fa-solid fa-car-rear"></i>
-                  <h3>Private Car</h3>
-                  <span>Comprehensive Shield</span>
+          <div className="step-content-area">
+            {/* Progress Tracker */}
+            <div className="stepper-minimal">
+              {steps.map((s, i) => (
+                <div key={i} className={`mini-step ${currentStep > i ? "done" : ""} ${currentStep === i + 1 ? "active" : ""}`}>
+                  <div className="step-dot"></div>
+                  <span>{s}</span>
                 </div>
-                <div className="luxury-card" onClick={() => setVehicleType("Two Wheeler")}>
-                  <div className="card-glare"></div>
-                  <i className="fa-solid fa-motorcycle"></i>
-                  <h3>Two Wheeler</h3>
-                  <span>Essential Protection</span>
-                </div>
-              </div>
+              ))}
             </div>
-          )}
 
-          {/* STEP 1: FORM VIEW */}
-          {currentStep === 1 && vehicleType && (
-            <div className="form-view">
-              <div className="form-header-row">
-                <h3><i className="fa-solid fa-user-shield"></i> Basic Information</h3>
-                <button className="text-link" onClick={() => setVehicleType(null)}>Change Vehicle Type</button>
-              </div>
-              
-              <div className="form-grid">
-                <div className="modern-input">
-                  <input type="text" placeholder=" " required />
-                  <label>First Name</label>
+            <div className="glass-form-card">
+              {/* STEP 1: CATEGORY SELECTION */}
+              {currentStep === 1 && !vehicleType && (
+                <div className="step-transition">
+                  <h1 className="hero-text">Renew Your <br/><span>Protection.</span></h1>
+                  <p className="sub-text">Select your vehicle type to pull your latest policy data.</p>
+                  <div className="category-flex">
+                    <div className="cat-box" onClick={() => setVehicleType("Private Car")}>
+                      <div className="cat-icon"><i className="fa-solid fa-car-side"></i></div>
+                      <div className="cat-info"><h3>Private Car</h3><p>Elite Coverage</p></div>
+                    </div>
+                    <div className="cat-box" onClick={() => setVehicleType("Two Wheeler")}>
+                      <div className="cat-icon"><i className="fa-solid fa-motorcycle"></i></div>
+                      <div className="cat-info"><h3>Two Wheeler</h3><p>Standard Shield</p></div>
+                    </div>
+                  </div>
                 </div>
-                <div className="modern-input">
-                  <input type="tel" placeholder=" " required />
-                  <label>Mobile Number</label>
-                </div>
-                <div className="modern-input full-width">
-                  <input type="email" placeholder=" " required />
-                  <label>Email Address</label>
-                </div>
-                <div className="modern-input">
-                  <input type="text" placeholder=" " required />
-                  <label>Vehicle Reg No.</label>
-                </div>
-                <div className="modern-input">
-                  <input type="text" placeholder=" " required />
-                  <label>Existing Policy No.</label>
-                </div>
-              </div>
+              )}
 
-              <div className="action-footer">
-                <button className="btn-main glow" onClick={() => setCurrentStep(2)}>
-                  Verify Policy Details <i className="fa-solid fa-arrow-right"></i>
-                </button>
-              </div>
+              {/* STEP 2: DETAILS FORM */}
+              {currentStep === 1 && vehicleType && (
+                <div className="step-transition">
+                  <div className="form-top-nav">
+                    <button className="back-link-btn" onClick={resetCategory}>
+                       <i className="fa-solid fa-chevron-left"></i> Change Category
+                    </button>
+                    <span className="selection-tag">{vehicleType}</span>
+                  </div>
+                  
+                  <h2 className="section-title">Ownership Verification</h2>
+                  <div className="input-stack">
+                    <div className="floating-input">
+                      <input type="text" name="name" onChange={handleInputChange} placeholder=" " />
+                      <label>Full Name</label>
+                    </div>
+                    <div className="input-row">
+                        <div className="floating-input">
+                            <input type="text" name="regNo" onChange={handleInputChange} placeholder=" " />
+                            <label>Registration No.</label>
+                        </div>
+                        <div className="floating-input">
+                            <input type="text" name="policyNo" onChange={handleInputChange} placeholder=" " />
+                            <label>Existing Policy No.</label>
+                        </div>
+                    </div>
+                  </div>
+                  <button className="cta-btn primary" onClick={() => setCurrentStep(2)}>Continue to Dispatch</button>
+                </div>
+              )}
+
+              {/* STEP 3: LOGISTICS */}
+              {currentStep === 2 && (
+                <div className="step-transition">
+                  <h2 className="section-title">Delivery Details</h2>
+                  <p className="sub-text">Confirm your physical policy dispatch address.</p>
+                  <textarea className="modern-area" name="address" onChange={handleInputChange} placeholder="Enter your full address here..."></textarea>
+                  <div className="button-group">
+                    <button className="cta-btn secondary" onClick={() => setCurrentStep(1)}>Back</button>
+                    <button className="cta-btn primary" onClick={() => setCurrentStep(3)}>View Final Quote</button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 4: PREMIUM */}
+              {currentStep === 3 && (
+                <div className="step-transition">
+                   <h2 className="section-title">Ready to Renew</h2>
+                   <div className="premium-box-glass">
+                      <div className="p-row"><span>Base Premium</span><span>₹ 1,240</span></div>
+                      <div className="p-row"><span>No Claim Bonus (NCB)</span><span className="discount">- ₹ 248</span></div>
+                      <div className="p-row"><span>GST (18%)</span><span>₹ 178</span></div>
+                      <div className="p-divider"></div>
+                      <div className="p-total"><span>Total Payable</span><span>₹ 1,170</span></div>
+                   </div>
+                   <button className="cta-btn pay-btn" onClick={() => navigate("/payment")}>
+                      Secure Payment <i className="fa-solid fa-lock"></i>
+                   </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
-          {/* STEP 2: POLICY PREVIEW (The "Surprise" Document View) */}
-          {currentStep === 2 && (
-            <div className="preview-view">
-              <div className="preview-document">
-                <div className="doc-header">
-                  <h4>SHIELD GENERAL INSURANCE</h4>
-                  <span className="badge">Active Policy</span>
-                </div>
-                <div className="doc-body">
-                   <div className="doc-row"><span>Owner</span><strong>Johnathan Doe</strong></div>
-                   <div className="doc-row"><span>Model</span><strong>Toyota Camry Hybrid</strong></div>
-                   <div className="doc-row"><span>Valid Till</span><strong>24 April 2026</strong></div>
-                </div>
-              </div>
+          {/* RIGHT: DYNAMIC LIVE PREVIEW */}
+          <div className="visualizer-area">
+             <div className="live-policy-card">
+                <div className="card-inner">
+                    <div className="card-head">
+                        <div className="logo-stub">SHIELD</div>
+                        <div className="status-pill">PREVIEW</div>
+                    </div>
+                    <div className="card-main">
+                        <div className="v-label">POLICY HOLDER</div>
+                        <div className="v-value">{formData.name || "Enter Name"}</div>
+                        
+                        <div className="v-label">VEHICLE REGISTRATION</div>
+                        <div className="v-value">{formData.regNo || "XXXX-XX-0000"}</div>
 
-              <div className="dispatch-form">
-                <h4><i className="fa-solid fa-truck-fast"></i> Dispatch Details</h4>
-                <textarea placeholder="Your physical policy delivery address..."></textarea>
-                <div className="toggle-switch">
-                  <input type="checkbox" id="sameAdd" />
-                  <label htmlFor="sameAdd">Use registered policy address</label>
+                        <div className="v-label">PLAN TYPE</div>
+                        <div className="v-value">{vehicleType || "Not Selected"}</div>
+                    </div>
+                    <div className="card-foot">
+                        <div>
+                            <div className="v-label">VALIDITY</div>
+                            <div className="v-value small">APR 2026 - APR 2027</div>
+                        </div>
+                        <div className="qr-stub"><i className="fa-solid fa-qrcode"></i></div>
+                    </div>
                 </div>
-              </div>
+                <div className="floating-badge"><i className="fa-solid fa-check-double"></i></div>
+             </div>
+          </div>
 
-              <div className="action-footer split">
-                <button className="btn-outline" onClick={() => setCurrentStep(1)}>Back</button>
-                <button className="btn-main" onClick={() => setCurrentStep(3)}>Calculate Premium</button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: PREMIUM VIEW */}
-          {currentStep === 3 && (
-            <div className="premium-view">
-              <div className="premium-breakdown">
-                <h3>Renewal Quote</h3>
-                <div className="price-item"><span>Net Premium</span><span>₹ 811.00</span></div>
-                <div className="price-item"><span>GST (18%)</span><span>₹ 145.98</span></div>
-                <div className="price-total">
-                  <span>Grand Total</span>
-                  <span className="total-amount">₹ 956.98</span>
-                </div>
-              </div>
-              <div className="action-footer">
-                <button className="btn-main payment" onClick={() => alert("Redirecting...")}>
-                  Pay & Renew Instantly <i className="fa-solid fa-lock"></i>
-                </button>
-                <p className="secure-text"><i className="fa-solid fa-shield-check"></i> 256-bit Secure Encryption</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       <Footer />

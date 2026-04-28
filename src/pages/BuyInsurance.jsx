@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./BuyInsurance.css";
 import InnerHeader from "../components/InnerHeader";
 import Footer from "../components/Footer";
@@ -10,6 +11,7 @@ const BuyInsurance = () => {
     purchaseDate: "", registrationNumber: "",
     engineNumber: "", chasisNumber: "",
   });
+  const navigate=useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,10 +20,8 @@ const BuyInsurance = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(`${activeForm} Insurance Data:`, formData);
-    alert(`Success! Your ${activeForm} insurance request has been initiated.`);
+    navigate("/policy-type")
   };
-
   return (
     <div className="page-wrapper">
       <InnerHeader />

@@ -129,3 +129,80 @@
   .checkout-container { grid-template-columns: 1fr; }
   .checkout-info { padding: 30px; }
 }
+
+.policy-certificate {
+  background: white;
+  border-radius: 15px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.cert-header {
+  background: #004080;
+  color: white;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cert-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; }
+
+.cert-ref { text-align: right; }
+.cert-ref small { display: block; opacity: 0.8; font-size: 0.7rem; text-transform: uppercase; }
+
+.cert-main-grid {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  text-align: left;
+}
+
+.cert-section h3 {
+  font-size: 0.9rem;
+  color: #004080;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.data-row span { color: #777; }
+.data-row strong { color: #333; }
+
+.full-width { grid-column: span 2; background: #f9fbff; padding: 15px; border-radius: 10px; }
+.payment-flex { display: flex; justify-content: space-between; gap: 20px; }
+
+.idv-highlight { color: #2ecc71 !important; font-size: 1.1rem; }
+
+.cert-footer-banner {
+  background: #f1f8ff;
+  color: #004080;
+  padding: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  border-top: 1px solid #e0e6ed;
+}
+
+.copy-icon-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  margin-left: 10px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+}

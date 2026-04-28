@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./CalculatePremium.css";
+import InnerHeader from "../components/InnerHeader";
+import Footer from "../components/Footer";
 
 export default function CalculatePremium() {
   const vehicleData = {
@@ -36,6 +38,8 @@ export default function CalculatePremium() {
   };
 
   return (
+    <>
+    <InnerHeader />
     <div className="premium-wrapper">
       <div className="premium-card">
         {/* LEFT SIDE: FORM */}
@@ -95,5 +99,7 @@ export default function CalculatePremium() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

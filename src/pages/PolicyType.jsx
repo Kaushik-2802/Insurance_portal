@@ -1,9 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Policytype.css";
+import InnerHeader from "../components/InnerHeader";
+import Footer from "../components/Footer";
 
 export default function VehiclePolicies() {
   const [category, setCategory] = useState("twoWheeler");
   const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const navigate=useNavigate();
+
+  const handleSubmit = () => {
+    if (selectedPolicy) {
+      // FIX: Added Key and Value correctly
+      localStorage.setItem("policyTitle", selectedPolicy.title);
+      localStorage.setItem("policyPrice", selectedPolicy.details.minAmount);
+      navigate("/payment");
+    }
+  };
+
 
   const policyData = {
     twoWheeler: [
@@ -130,6 +144,8 @@ export default function VehiclePolicies() {
   };
 
   return (
+    <>
+    <InnerHeader />
     <div className="policy-section">
       <h2 className="premium-header">Explore Our Insurance Policies</h2>
       
@@ -204,11 +220,13 @@ export default function VehiclePolicies() {
             </div>
 
             <div className="modal-footer">
-              <button className="modal-apply-btn">Apply Now</button>
+              <button className="modal-apply-btn" onClick={handleSubmit}>Apply Now</button>
             </div>
           </div>
         </div>
       )}
     </div>
+    <Footer />
+    </>
   );
 }
