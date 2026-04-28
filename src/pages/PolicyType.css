@@ -1,183 +1,406 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
 :root {
-  --primary: #004080;
-  --secondary: #0073cf;
-  --accent: #ffcc00;
-  --bg-light: #f8fbff;
-  --text-dark: #1a1a1a;
-  --glass: rgba(255, 255, 255, 0.8);
+  --primary-deep: #002e5d;
+  --electric-blue: #0066ff;
+  --soft-bg: #f0f4f9;
+  --glass-white: rgba(255, 255, 255, 0.9);
+  --text-rich: #0f172a;
+  --text-slate: #64748b;
+  --accent-gold: #ffcc00;
 }
 
 .policy-section {
   padding: 80px 20px;
-  background-color: var(--bg-light);
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: var(--soft-bg);
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  text-align: center;
 }
 
-.header-content { margin-bottom: 40px; }
-.sub-header { color: #666; font-size: 1.1rem; margin-top: -20px; }
+.premium-header {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary-deep);
+  margin-bottom: 40px;
+  letter-spacing: -1px;
+}
 
-/* Enhanced Tabs */
+/* --- Neumorphic Tab Switcher --- */
+.tab-container {
+  background: #e2e8f0;
+  padding: 6px;
+  border-radius: 20px;
+  display: inline-flex;
+  gap: 5px;
+  margin-bottom: 50px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+
 .tab-btn {
-  border: 1px solid #d1d9e6;
-  color: var(--primary);
-  background: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  padding: 14px 35px;
+  border-radius: 15px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-slate);
+  background: transparent;
 }
 
 .tab-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-  box-shadow: 0 10px 20px rgba(0, 64, 128, 0.2);
+  background: white;
+  color: var(--electric-blue);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  transform: scale(1.02);
 }
 
-/* Modern Card Grid */
+/* --- Floating Policy Cards --- */
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .policy-card {
-  position: relative;
-  border: none;
   background: white;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  overflow: hidden;
+  padding: 40px 30px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+  cursor: pointer;
+  transition: 0.4s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .policy-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 64, 128, 0.12);
+  transform: translateY(-15px);
+  box-shadow: 0 30px 60px rgba(0, 46, 93, 0.12);
+  background: linear-gradient(to bottom right, #ffffff, #f8faff);
 }
 
-.policy-badge {
-  position: absolute;
-  top: 15px;
-  right: -30px;
-  background: var(--accent);
-  color: var(--primary);
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 5px 35px;
-  transform: rotate(45deg);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.learn-more {
-  display: block;
-  margin-top: 15px;
-  color: var(--secondary);
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-/* Fintech-style Calculator */
-.calculator-box {
-  background: #f0f4f8;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  border: 1px dashed #cbd5e0;
-}
-
-.calc-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-.calc-header span { font-size: 0.9rem; color: #555; }
-
-.modern-slider {
-  width: 100%;
-  height: 6px;
-  border-radius: 5px;
-  background: #d1d9e6;
-  outline: none;
-  -webkit-appearance: none;
-}
-
-.modern-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--primary);
-  border-radius: 50%;
-  cursor: pointer;
-  border: 3px solid white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.estimate-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid #d1d9e6;
-}
-
-.final-price {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #2ecc71;
-}
-
-/* Modal Enhancements */
-.modal-icon-bg {
-  width: 50px;
-  height: 50px;
+.policy-icon-wrapper {
+  font-size: 3rem;
+  margin-bottom: 20px;
   background: #f0f7ff;
-  border-radius: 12px;
+  width: 90px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.policy-card:hover .policy-icon-wrapper {
+  background: var(--electric-blue);
+  transform: rotate(-5deg) scale(1.1);
+}
+
+.policy-info h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary-deep);
+  margin-bottom: 15px;
+}
+
+.policy-info p {
+  color: var(--text-slate);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* --- High-End Detail Modal --- */
+.modal-overlay {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 650px;
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.3);
+  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.9) translateY(30px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 40px 40px 20px;
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.modal-icon-large {
+  font-size: 3rem;
+  background: white;
+  padding: 15px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.modal-header h2 {
+  font-weight: 800;
+  color: var(--primary-deep);
   font-size: 1.8rem;
+  text-align: left;
 }
 
-.modal-subtitle {
-  font-size: 0.8rem;
-  color: #888;
+.close-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #f1f5f9;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-btn:hover { background: #e2e8f0; color: #ef4444; }
+
+.modal-scroll-area {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 40px 40px;
+  text-align: left;
+}
+
+/* Custom Scrollbar */
+.modal-scroll-area::-webkit-scrollbar { width: 6px; }
+.modal-scroll-area::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+.detail-row {
+  margin-bottom: 25px;
+}
+
+.detail-row strong {
+  display: block;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  color: var(--electric-blue);
+  margin-bottom: 8px;
 }
 
-.info-grid {
-  display: grid;
-  gap: 10px;
+.detail-row p {
+  color: var(--text-rich);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.terms-notice {
+  background: #fffbeb;
+  padding: 15px;
+  border-radius: 15px;
+  border-left: 4px solid var(--accent-gold);
+}
+
+.terms-notice p {
+  font-size: 0.8rem;
+  color: #92400e;
+}
+
+.modal-footer {
+  padding: 30px 40px;
+  background: white;
+  border-top: 1px solid #f1f5f9;
 }
 
 .modal-apply-btn {
+  width: 100%;
+  padding: 20px;
+  border-radius: 20px;
+  border: none;
+  background: var(--electric-blue);
+  color: white;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 15px 30px rgba(0, 102, 255, 0.3);
   transition: 0.3s;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
 }
 
 .modal-apply-btn:hover {
-  transform: scale(1.02);
-  background: #ffd633;
+  transform: translateY(-3px);
+  background: var(--primary-deep);
+  box-shadow: 0 20px 40px rgba(0, 46, 93, 0.4);
 }
 
-.calculator-box {
-  background: #f0f7ff;
-  border: 1px solid #c2d9ff;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
+/* --- High-End Detail Modal --- */
+.modal-overlay {
+  background: rgba(15, 23, 42, 0.7); /* Slightly darker for better focus */
+  backdrop-filter: blur(12px); /* Increased blur for a deeper glass effect */
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* Ensure it stays above everything */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
-.calculator-box h4 {
-  margin-top: 0;
-  color: #0056b3;
-}
-
-.calculator-box input[type="range"] {
+.modal-content {
+  background: #ffffff !important; /* Force solid white to fix transparency */
   width: 100%;
-  margin: 15px 0;
+  max-width: 650px;
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  /* Deep shadow with a secondary soft spread to give it "weight" */
+  box-shadow: 
+    0 30px 100px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1); 
+  animation: modalPop 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes modalPop {
+  from { 
+    opacity: 0; 
+    transform: scale(0.92) translateY(40px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
+}
+
+.modal-header {
+  padding: 40px 40px 20px;
+  /* Soft gradient that feels like premium paper */
+  background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
+  border-bottom: 1px solid #f1f5f9;
+  z-index: 2;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+}
+
+.modal-icon-large {
+  font-size: 3.5rem;
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 24px;
+  /* Neumorphic pop for the icon */
+  box-shadow: 
+    8px 8px 16px #e2e8f0, 
+    -8px -8px 16px #ffffff;
+}
+
+.modal-header h2 {
+  font-weight: 800;
+  color: var(--primary-deep);
+  font-size: 2rem;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.close-btn {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  color: var(--text-slate);
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-.estimate-result {
-  font-size: 1.1rem;
-  color: #2d3436;
+.close-btn:hover { 
+  background: #fff1f2; 
+  color: #ef4444; 
+  transform: rotate(90deg);
+  border-color: #fecaca;
 }
 
-.estimate-result strong {
-  color: #e67e22;
-  font-size: 1.3rem;
+.modal-scroll-area {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 30px 40px;
+  background: #ffffff; /* Explicit background for the scrollable part */
+  text-align: left;
+}
+
+/* Custom "Fintech" Scrollbar */
+.modal-scroll-area::-webkit-scrollbar { width: 8px; }
+.modal-scroll-area::-webkit-scrollbar-track { background: transparent; }
+.modal-scroll-area::-webkit-scrollbar-thumb { 
+  background: #cbd5e1; 
+  border-radius: 20px; 
+  border: 2px solid #ffffff; 
+}
+
+.detail-row {
+  margin-bottom: 28px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.detail-row:last-child { border-bottom: none; }
+
+.detail-row strong {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--electric-blue);
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.detail-row p {
+  color: var(--text-rich);
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.modal-footer {
+  padding: 30px 40px;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  position: sticky;
+  bottom: 0;
 }
