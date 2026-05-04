@@ -108,6 +108,33 @@
 .card-chip { width: 40px; height: 30px; background: #d4af37; border-radius: 4px; margin-bottom: 20px; }
 .card-number-display { font-family: 'Space Mono', monospace; font-size: 1.4rem; letter-spacing: 2px; }
 
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.card-holder,
+.card-expiry {
+  color: white;
+}
+
+.card-holder small,
+.card-expiry small {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+}
+
+.card-holder div,
+.card-expiry div {
+  color: white;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
 .card-strip { width: 100%; height: 40px; background: #000; margin-top: 30px; }
 .card-cvv-box { padding: 20px; text-align: right; }
 .cvv-display { background: white; color: black; padding: 5px 10px; border-radius: 4px; display: inline-block; width: 40px; }
@@ -231,6 +258,63 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+}
+
+.upi-instruction {
+  margin: 0 0 20px;
+  color: #475569;
+  font-size: 14px;
+  text-align: center;
+}
+
+.form-error {
+  margin: 0 0 16px 0;
+  color: #dc2626;
+  font-size: 14px;
+  text-align: center;
+}
+
+.upi-notice {
+  margin: 0 0 20px 0;
+  color: #334155;
+  font-size: 14px;
+  text-align: center;
+}
+
+.payment-success-card {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 30px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.12);
+  text-align: center;
+}
+
+.payment-success-card h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.payment-success-card p {
+  margin: 0;
+  color: #475569;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #d1fae5;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
 }
 
 .upi-header i {

@@ -14,7 +14,12 @@ const Payment = () => {
   const [upiId, setUpiId] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
   const [countdown, setCountdown] = useState(300);
-  const [qrCode, setQrCode] = useState('');
+  const UPI_AMOUNT = '700.00';
+  const [netBankData, setNetBankData] = useState({ account: '', ifsc: '', holder: '' });
+  const [netBankStage, setNetBankStage] = useState('details');
+  const [otp, setOtp] = useState('');
+  const [enteredOtp, setEnteredOtp] = useState('');
+  const [bankError, setBankError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,37 +31,28 @@ const Payment = () => {
     }
   }, [showQRCode, countdown]);
 
-  const generateQRCode = (text) => {
-    try {
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(text)}&ecc=M`;
-      return qrCodeUrl;
-    } catch (error) {
-      console.error('QR Code generation error:', error);
-      return null;
+  useEffect(() => {
+    if (paymentMethod !== 'upi') {
+      setShowQRCode(false);
     }
-  };
+    if (paymentMethod !== 'net-banking') {
+      setNetBankStage('details');
+      setBankError('');
+      setEnteredOtp('');
+      setOtp('');
+    }
+  }, [paymentMethod]);
 
   const handleUPISubmit = (e) => {
     e.preventDefault();
-    if (!upiId) {
-      alert('Please enter a valid UPI ID');
-      return;
-    }
-    const upiString = `upi://pay?pa=${upiId.trim()}&pn=InsurancePayment&am=700&tn=PolicyPayment&tr=${Date.now()}`;
-    const qrUrl = generateQRCode(upiString);
-    if (qrUrl) {
-      setQrCode(qrUrl);
-      setShowQRCode(true);
-      setCountdown(300);
-    } else {
-      alert('Failed to generate QR code. Please try again.');
-    }
+    setUpiId(upiId.trim());
+    setShowQRCode(true);
+    setCountdown(300);
   };
 
   const handlePaymentTimeout = () => {
     setShowQRCode(false);
     setUpiId('');
-    setQrCode('');
     setCountdown(300);
     alert('QR Code expired. Please try again.');
   };
@@ -71,7 +67,46 @@ const Payment = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'number') {
+      const cleaned = value.replace(/\D/g, '');
+      const formatted = cleaned.match(/.{1,4}/g)?.join(' ') || '';
+      setCardData({ ...cardData, [name]: formatted });
+      return;
+    }
     setCardData({ ...cardData, [name]: value });
+  };
+
+  const handleNetBankInputChange = (e) => {
+    const { name, value } = e.target;
+    setNetBankData({ ...netBankData, [name]: value });
+  };
+
+  const handleNetBankSubmit = (e) => {
+    e.preventDefault();
+    const { account, ifsc, holder } = netBankData;
+    if (!account || !ifsc || !holder) {
+      setBankError('Please fill in all net banking details.');
+      return;
+    }
+    setBankError('');
+    const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    setOtp(generatedOtp);
+    setEnteredOtp('');
+    setNetBankStage('otp');
+  };
+
+  const verifyNetBankOtp = (e) => {
+    e.preventDefault();
+    if (enteredOtp !== otp) {
+      setBankError('Invalid OTP. Please try again.');
+      return;
+    }
+    setBankError('');
+    localStorage.setItem('paymentCompleted', 'true');
+    const policyRef = `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+    localStorage.setItem('policyReferenceNumber', policyRef);
+    setNetBankStage('success');
+    setTimeout(() => navigate('/policy-reference'), 2000);
   };
 
   const handlePaymentSubmit = (e) => {
@@ -154,6 +189,7 @@ const Payment = () => {
                   <label>Card Number</label>
                   <input 
                     name="number" 
+                    value={cardData.number}
                     maxLength="19" 
                     placeholder="0000 0000 0000 0000"
                     onChange={handleInputChange}
@@ -214,9 +250,9 @@ const Payment = () => {
                       placeholder="yourname@upi"
                       value={upiId}
                       onChange={(e) => setUpiId(e.target.value)}
-                      required
                     />
                   </div>
+                  <p className="upi-instruction">Enter your UPI ID to generate the payment QR code for ₹{UPI_AMOUNT}.</p>
                   <button type="submit" className="complete-pay-btn">
                     Generate QR Code <i className="fa-solid fa-qrcode"></i>
                   </button>
@@ -233,7 +269,7 @@ const Payment = () => {
                   </div>
                   <div className="qr-body">
                     <img src="/qr_code_1.jpg" alt="Payment QR Code" className="qr-image" />
-                    <p className="upi-display">{upiId}</p>
+                    {/* <p className="upi-display">{upiId || 'UPI ID not provided'}</p> */}
                   </div>
 
                   <div className="policy-amount-section">
@@ -271,6 +307,88 @@ const Payment = () => {
                       Cancel <i className="fa-solid fa-xmark"></i>
                     </button>
                   </div>
+                </div>
+              )}
+            </div>
+          ) : paymentMethod === 'net-banking' ? (
+            <div className="netbanking-payment-container">
+              {netBankStage === 'details' && (
+                <form onSubmit={handleNetBankSubmit} className="upi-form">
+                  <div className="upi-header">
+                    <i className="fa-solid fa-building-columns"></i>
+                    <h2>Net Banking</h2>
+                  </div>
+                  <div className="form-input-group">
+                    <label>Account Number</label>
+                    <input
+                      type="text"
+                      name="account"
+                      placeholder="123456789012"
+                      value={netBankData.account}
+                      onChange={handleNetBankInputChange}
+                    />
+                  </div>
+                  <div className="form-input-group">
+                    <label>IFSC Code</label>
+                    <input
+                      type="text"
+                      name="ifsc"
+                      placeholder="ICIC0001234"
+                      value={netBankData.ifsc}
+                      onChange={handleNetBankInputChange}
+                    />
+                  </div>
+                  <div className="form-input-group">
+                    <label>Account Holder Name</label>
+                    <input
+                      type="text"
+                      name="holder"
+                      placeholder="John Doe"
+                      value={netBankData.holder}
+                      onChange={handleNetBankInputChange}
+                    />
+                  </div>
+                  {bankError && <p className="form-error">{bankError}</p>}
+                  <button type="submit" className="complete-pay-btn">
+                    Generate OTP <i className="fa-solid fa-key"></i>
+                  </button>
+                </form>
+              )}
+              {netBankStage === 'otp' && (
+                <form onSubmit={verifyNetBankOtp} className="upi-form">
+                  <div className="upi-header">
+                    <i className="fa-solid fa-lock"></i>
+                    <h2>Enter OTP</h2>
+                    <p className="upi-instruction">OTP sent to your registered mobile number.</p>
+                  </div>
+                  <div className="form-input-group">
+                    <label>OTP</label>
+                    <input
+                      type="text"
+                      name="otp"
+                      maxLength="4"
+                      placeholder="1234"
+                      value={enteredOtp}
+                      onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ''))}
+                    />
+                  </div>
+                  {bankError && <p className="form-error">{bankError}</p>}
+                  <p className="upi-notice">For demo, use OTP: <strong>{otp}</strong></p>
+                  <button type="submit" className="complete-pay-btn">
+                    Verify OTP <i className="fa-solid fa-check"></i>
+                  </button>
+                </form>
+              )}
+              {netBankStage === 'success' && (
+                <div className="payment-success-card">
+                  <div className="success-icon">
+                    <i className="fa-solid fa-circle-check"></i>
+                  </div>
+                  <h2>Payment Successful!</h2>
+                  <p>Your net banking payment was completed successfully.</p>
+                  <button onClick={() => navigate('/policy-reference')} className="complete-pay-btn">
+                    Go to Policy Reference
+                  </button>
                 </div>
               )}
             </div>
