@@ -19,6 +19,9 @@ import ResetPassword from './pages/ResetPassword'
 import PrivacyPolicy from './components/PrivacyPolicy'
 import Compliance from './components/Compliance'
 import Terms from './components/Terms'
+import Profile from './pages/Profile'
+import MyPolicies from './pages/MyPolicies'
+import Help from './pages/Help'
 import './App.css'
 
 function App() {
@@ -43,6 +46,9 @@ function App() {
         <Route path='/privacy' element={<PrivacyPolicy />} />
         <Route path='/terms' element={<Terms />} />
         <Route path='/compliance' element={<Compliance />} />
+        <Route path='/profile' element={<Profile />} />
+        <Route path='/my-insurance' element={<MyPolicies />} />
+        <Route path='/support' element={<Help />} />
       </Routes>
     </BrowserRouter>
   )

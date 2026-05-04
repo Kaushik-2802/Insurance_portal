@@ -1,0 +1,150 @@
+/* Import a cleaner, high-end font */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+/* Dynamic Background Wrapper */
+.profile-wrapper {
+  min-height: 100vh;
+  padding: 60px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #020617;
+  /* Surprise: A subtle animated mesh gradient background */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(30, 64, 175, 0.3) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 40%);
+  background-attachment: fixed;
+}
+
+.profile-page {
+  max-width: 900px;
+  width: 100%;
+  padding: 50px;
+  /* Surprise: Glassmorphism with a 'Violet-Blue' tint */
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #f1f5f9;
+  animation: slideIn 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Surprise: Left-aligned title with a gradient text effect */
+.profile-title {
+  text-align: left;
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 40px;
+  background: linear-gradient(to right, #22d3ee, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1.5px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 50px;
+}
+
+.profile-photo {
+  width: 140px;
+  height: 140px;
+  border-radius: 30px; /* Modern squircle shape */
+  object-fit: cover;
+  border: 2px solid rgba(34, 211, 238, 0.5);
+  padding: 5px; /* Creates a ring effect */
+  background: rgba(34, 211, 238, 0.1);
+}
+
+.profile-basic h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.profile-basic p {
+  color: #94a3b8; /* Soft blue-grey */
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.profile-section h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #22d3ee; /* Electric Cyan accent */
+  margin-bottom: 25px;
+  opacity: 0.8;
+}
+
+/* Surprise: Cards for address items instead of just a grid */
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.address-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, border 0.3s ease;
+}
+
+.address-item:hover {
+  transform: translateY(-5px);
+  border-color: rgba(34, 211, 238, 0.4);
+  background: rgba(34, 211, 238, 0.02);
+}
+
+.address-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #818cf8; /* Subtle violet label */
+  margin-bottom: 8px;
+}
+
+.address-value {
+  color: #e2e8f0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Surprise: A 'Glowing' button */
+.back-btn {
+  margin-top: 50px;
+  padding: 16px 40px;
+  background: linear-gradient(135deg, #0891b2, #4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+}
+
+.back-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 30px -5px rgba(79, 70, 229, 0.6);
+  filter: brightness(1.2);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .profile-header { flex-direction: column; text-align: center; }
+  .profile-title { text-align: center; font-size: 2rem; }
+}

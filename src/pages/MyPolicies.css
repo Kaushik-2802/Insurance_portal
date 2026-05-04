@@ -1,0 +1,22 @@
+/* New Badge Styling */
+.status-badge {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.1);
+}
+
+/* Add a slight vertical separator between policy blocks if needed */
+.profile-section {
+  position: relative;
+}
+
+.profile-section:not(:last-of-type) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 40px;
+}

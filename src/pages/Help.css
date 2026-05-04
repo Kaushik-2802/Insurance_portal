@@ -1,0 +1,47 @@
+/* Styling for the help cards */
+.faq-card {
+  padding: 25px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+}
+
+.text-link {
+  background: none;
+  border: none;
+  color: #22d3ee;
+  padding: 0;
+  margin-top: 15px;
+  text-align: left;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+  width: fit-content;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+/* Emergency Support Layout */
+.emergency-container {
+  display: flex;
+  gap: 20px;
+  background: rgba(239, 68, 68, 0.05); /* Very subtle red warning tint */
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.contact-box {
+  flex: 1;
+}
+
+/* Mobile Tweak */
+@media (max-width: 640px) {
+  .emergency-container {
+    flex-direction: column;
+    text-align: center;
+  }
+}
