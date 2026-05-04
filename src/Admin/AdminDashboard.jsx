@@ -1,189 +1,228 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
-  const [settlementStatus, setSettlementStatus] = useState("Idle"); // Idle, Verifying, Ready, Paid
-  const [activeStep, setActiveStep] = useState(1);
+  const [settlementStatus, setSettlementStatus] = useState("Idle");
   const [claimRequests, setClaimRequests] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [txHash, setTxHash] = useState(null);
+  const navigate=useNavigate();
+  
+  // Detailed AI Checkpoints for the Settlement Engine
+  const [aiChecks, setAiChecks] = useState({
+    identity: false,
+    fraudScore: false,
+    ledgerSync: false
+  });
 
-  // --- Handlers ---
-  const handleLogout = () => {
-    localStorage.removeItem('isAdminAuthenticated');
-    window.location.href = '/admin-login';
-  };
+  // --- Automated Response System ---
+  const sendAutomatedResponse = (type, claim) => {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let message = "";
 
-  const startVerification = () => {
-    setSettlementStatus("Verifying");
-    setTimeout(() => {
-      setSettlementStatus("Ready");
-      setActiveStep(2);
-    }, 2000);
-  };
-
-  const executeTransfer = () => {
-    setSettlementStatus("Paid");
-    setActiveStep(3);
-  };
-
-  // --- Dummy Data ---
-  const pendingValidations = [
-    { id: "POL-99281", user: "Alex Rivera", amount: "$1,200" },
-    { id: "POL-44102", user: "Sarah Chen", amount: "$4,500" },
-  ];
-
-  useEffect(() => {
-    try {
-      const storedRequests = JSON.parse(localStorage.getItem('adminClaimRequests') || '[]');
-      setClaimRequests(Array.isArray(storedRequests) ? storedRequests : []);
-    } catch (error) {
-      setClaimRequests([]);
+    if (type === "APPROVE") {
+      message = `SYSTEM AUTH: Claim ${claim.id} approved. Automated payout of $4,500.00 queued for ${claim.user}.`;
+    } else {
+      const missing = claim.missingDocs.length > 0 ? claim.missingDocs.join(", ") : "Valid ID Scan";
+      message = `OUTBOUND ALERT to ${claim.user}: "Claim ${claim.id} rejected. Missing docs: ${missing}. Please re-upload."`;
     }
+
+    setAuditLogs(prev => [{ id: Date.now(), time, msg: message }, ...prev]);
+  };
+
+  // --- Document Verification Handlers ---
+  const handleVerify = (id) => {
+    setClaimRequests(prev => prev.map(c => {
+      if (c.id === id) {
+        sendAutomatedResponse("APPROVE", c);
+        return { ...c, docs: "Verified", missingDocs: [] };
+      }
+      return c;
+    }));
+  };
+
+  const handleReject = (id) => {
+    setClaimRequests(prev => prev.map(c => {
+      if (c.id === id) {
+        sendAutomatedResponse("REJECT", c);
+        return { ...c, docs: "Rejected" };
+      }
+      return c;
+    }));
+  };
+
+  // --- Multi-Step Settlement Logic ---
+  const startSettlementSequence = () => {
+    setSettlementStatus("Verifying");
+    setTxHash(null);
+    
+    // Step 1: Biometrics
+    setTimeout(() => setAiChecks(prev => ({...prev, identity: true})), 800);
+    // Step 2: Fraud Check
+    setTimeout(() => setAiChecks(prev => ({...prev, fraudScore: true})), 1600);
+    // Step 3: Ledger Sync
+    setTimeout(() => {
+      setAiChecks(prev => ({...prev, ledgerSync: true}));
+      setSettlementStatus("Ready");
+    }, 2400);
+  };
+
+  const processFinalPayment = () => {
+    const hash = "0x" + Math.random().toString(16).slice(2, 14).toUpperCase();
+    setTxHash(hash);
+    setSettlementStatus("Paid");
+    
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setAuditLogs(prev => [{ id: Date.now(), time, msg: `FINANCE CONFIRMED: Payout successful. TX: ${hash}` }, ...prev]);
+  };
+
+  // Initialize Dummy Data
+  useEffect(() => {
+    setClaimRequests([
+      { 
+        id: "CLM-882", user: "Alex Rivera", type: "Motor", 
+        docs: "Pending", risk: "Low", 
+        missingDocs: ["Front Bumper Photo", "Police Report"] 
+      },
+      { 
+        id: "CLM-901", user: "Sarah Chen", type: "2-Wheeler", 
+        docs: "Pending", risk: "Medium", 
+        missingDocs: ["Current Insurance Copy"] 
+      }
+    ]);
   }, []);
 
-  const userQueries = [
-    { id: 1, subject: "Policy Renewal Delay", msg: "I haven't received my docs...", time: "2m ago" },
-    { id: 2, subject: "Payment Failed", msg: "Amount debited but no policy.", time: "1h ago" },
-  ];
-
   return (
-    <div className="admin-dashboard-root">
+    <div className="arc-admin-wrapper">
       {/* Top Navigation */}
-      <nav className="admin-nav">
-        <div className="nav-logo">
-          <i className="fa-solid fa-shield-halved"></i>
-          <span>ADMIN <strong>PRO</strong></span>
+      <nav className="arc-navbar">
+        <div className="arc-nav-brand">
+          <div className="arc-logo-box"><i className="fa-solid fa-shield-halved"></i></div>
+          <span>ARCTIC <strong className="arc-accent-text">CORE</strong> <small className="arc-tag-mini">ADMIN PANEL</small></span>
         </div>
-        <div className="nav-actions">
-          <span className="system-time">System Status: <strong>Online</strong></span>
-          <button onClick={handleLogout} className="logout-mini-btn">
-            <i className="fa-solid fa-power-off"></i> Logout
+        <div className="arc-nav-info">
+          <div className="arc-engine-status"><span className="arc-pulse"></span> AI Engine: Active</div>
+          <button onClick={() => navigate("/admin-login")} className="arc-exit-btn" title="Sign Out">
+            <i className="fa-solid fa-power-off"></i>
           </button>
         </div>
       </nav>
 
-      <main className="dashboard-grid">
-        {/* TOP LEFT: Reference Validation */}
-        <section className="dashboard-card admin-left">
-          <div className="card-header">
-            <h3><i className="fa-solid fa-magnifying-glass-chart"></i> Reference Validation</h3>
-            <span className="badge-count">{2 + claimRequests.length} Pending</span>
-          </div>
-          <div className="validation-list">
-            {pendingValidations.map((item) => (
-              <div key={item.id} className="validation-item">
-                <div className="item-info">
-                  <span className="id-tag">{item.id}</span>
-                  <p>{item.user} • <strong>{item.amount}</strong></p>
-                </div>
-                <div className="item-actions">
-                  <button className="btn-v-green"><i className="fa-solid fa-check"></i></button>
-                  <button className="btn-v-red"><i className="fa-solid fa-xmark"></i></button>
-                </div>
-              </div>
-            ))}
-            {claimRequests.length > 0 && claimRequests.map((request) => (
-              <div key={request.id} className="validation-item new-claim-request">
-                <div className="item-info">
-                  <span className="id-tag">{request.id}</span>
-                  <p>{request.policy} • <strong>{request.reason}</strong></p>
-                  <small>{request.status} • {request.createdAt}</small>
-                </div>
-                <div className="item-actions">
-                  <button className="btn-v-green"><i className="fa-solid fa-check"></i></button>
-                  <button className="btn-v-red"><i className="fa-solid fa-xmark"></i></button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* TOP RIGHT: User Queries */}
-        <section className="dashboard-card admin-right">
-          <div className="card-header">
-            <h3><i className="fa-solid fa-message-dots"></i> User Inquiries</h3>
-          </div>
-          <div className="query-feed">
-            {userQueries.map((q) => (
-              <div key={q.id} className="query-card">
-                <div className="query-top">
-                  <span className="query-subject">{q.subject}</span>
-                  <span className="query-time">{q.time}</span>
-                </div>
-                <p className="query-snippet">{q.msg}</p>
-                <button className="reply-btn">Open Thread</button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* BOTTOM: Smart Settlement Console */}
-        <section className="dashboard-card admin-bottom">
-          <div className="card-header">
-            <h3><i className="fa-solid fa-gears"></i> Smart Settlement Console</h3>
-            <div className={`status-pill ${settlementStatus}`}>
-              {settlementStatus}
+      <main className="arc-main-grid">
+        {/* Left Column: Verification & Logs */}
+        <div className="arc-primary-col">
+          
+          {/* Detailed Verification Section */}
+          <section className="arc-glass-panel">
+            <div className="arc-panel-head">
+              <h3><i className="fa-solid fa-file-shield"></i> Document Verification Detail</h3>
             </div>
-          </div>
+            <div className="arc-verification-stack">
+              {claimRequests.map((claim) => (
+                <div key={claim.id} className={`arc-verify-card arc-state-${claim.docs.toLowerCase()}`}>
+                  <div className="arc-verify-info">
+                    <div className="arc-user-meta">
+                      <span className="arc-id-pill">{claim.id}</span>
+                      <h4>{claim.user}</h4>
+                    </div>
+                    <div className="arc-missing-box">
+                      <p className="arc-label">Status: <span className={`arc-txt-${claim.docs.toLowerCase()}`}>{claim.docs}</span></p>
+                      {claim.missingDocs.length > 0 && claim.docs !== "Verified" && (
+                        <div className="arc-warning-list">
+                          <strong>Missing Requirements:</strong>
+                          <ul>
+                            {claim.missingDocs.map((doc, i) => <li key={i}><i className="fa-solid fa-circle-exclamation"></i> {doc}</li>)}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="arc-verify-actions">
+                    <button onClick={() => handleVerify(claim.id)} className="arc-action-btn arc-confirm">
+                      <i className="fa-solid fa-check-double"></i> Auto-Approve
+                    </button>
+                    <button onClick={() => handleReject(claim.id)} className="arc-action-btn arc-deny">
+                      <i className="fa-solid fa-bell"></i> Alert Missing
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
 
-          <div className="settlement-workspace">
-            {/* Column 1: Financials */}
-            <div className="workspace-column">
-              <div className="input-group-modern">
-                <label>Payee Account (Linked)</label>
-                <div className="verified-input">
-                  <input type="text" value="•••• •••• 8829" readOnly />
-                  <i className="fa-solid fa-circle-check"></i>
+          {/* Automated Response & Activity Log */}
+          <section className="arc-glass-panel">
+            <div className="arc-panel-head"><h3><i className="fa-solid fa-robot"></i> Automated Activity Log</h3></div>
+            <div className="arc-log-container">
+              {auditLogs.length === 0 && <p className="arc-dim">Waiting for system triggers...</p>}
+              {auditLogs.map(log => (
+                <div key={log.id} className="arc-log-entry">
+                  <span className="arc-timestamp">{log.time}</span> {log.msg}
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column: Detailed Settlement Engine */}
+        <div className="arc-secondary-col">
+          <section className="arc-glass-panel arc-settlement-engine">
+            <div className="arc-panel-head">
+              <h3><i className="fa-solid fa-microchip"></i> Smart Settlement Engine</h3>
+              <div className={`arc-status-pill arc-status-${settlementStatus.toLowerCase()}`}>{settlementStatus}</div>
+            </div>
+
+            <div className="arc-engine-body">
+              {/* AI Verification Checklist */}
+              <div className="arc-checklist">
+                <div className={`arc-check-item ${aiChecks.identity ? 'active' : ''}`}>
+                  <i className={aiChecks.identity ? "fa-solid fa-circle-check" : "fa-solid fa-circle-notch fa-spin"}></i>
+                  <span>Biometric Identity Match</span>
+                </div>
+                <div className={`arc-check-item ${aiChecks.fraudScore ? 'active' : ''}`}>
+                  <i className={aiChecks.fraudScore ? "fa-solid fa-circle-check" : "fa-solid fa-circle-notch fa-spin"}></i>
+                  <span>Anti-Fraud Score Analysis</span>
+                </div>
+                <div className={`arc-check-item ${aiChecks.ledgerSync ? 'active' : ''}`}>
+                  <i className={aiChecks.ledgerSync ? "fa-solid fa-circle-check" : "fa-solid fa-circle-notch fa-spin"}></i>
+                  <span>Bank Ledger Synchronization</span>
                 </div>
               </div>
-              <div className="input-group-modern">
-                <label>Final Settlement Amount</label>
-                <input type="text" defaultValue="$4,500.00" readOnly={settlementStatus === "Paid"} />
+
+              <hr className="arc-divider" />
+
+              {/* Financial Detail Summary */}
+              <div className="arc-finance-details">
+                <div className="arc-data-row">
+                  <label>Payout Liquidity</label>
+                  <span className="arc-liquidity-high">98.4% Stable</span>
+                </div>
+                <div className="arc-data-row">
+                  <label>Approved Payout</label>
+                  <span className="arc-price">$4,500.00</span>
+                </div>
+                {txHash && (
+                  <div className="arc-data-row arc-hash-row">
+                    <label>TRANSACTION HASH</label>
+                    <code>{txHash}</code>
+                  </div>
+                )}
               </div>
-              
+
               <button 
-                className={`action-trigger-btn ${settlementStatus}`}
-                onClick={
-                  settlementStatus === "Idle" ? startVerification : 
-                  settlementStatus === "Ready" ? executeTransfer : null
-                }
+                className={`arc-settle-btn arc-btn-${settlementStatus.toLowerCase()}`}
+                onClick={settlementStatus === "Idle" ? startSettlementSequence : processFinalPayment}
                 disabled={settlementStatus === "Verifying" || settlementStatus === "Paid"}
               >
-                {settlementStatus === "Idle" && "Initiate Bank Verification"}
-                {settlementStatus === "Verifying" && <><i className="fa-solid fa-spinner fa-spin"></i> Checking Nodes...</>}
+                {settlementStatus === "Idle" && "Initiate Pre-Payment Audit"}
+                {settlementStatus === "Verifying" && "Scanning Security Nodes..."}
                 {settlementStatus === "Ready" && "Execute Instant Transfer"}
-                {settlementStatus === "Paid" && <><i className="fa-solid fa-circle-check"></i> Funds Disbursed</>}
+                {settlementStatus === "Paid" && "Funds Dispatched"}
               </button>
             </div>
-
-            {/* Column 2: Risk Meter */}
-            <div className="workspace-column border-sides">
-              <div className="risk-header">
-                <span>Risk Assessment</span>
-                <span className="risk-score">Low (15/100)</span>
-              </div>
-              <div className="risk-meter">
-                <div className="meter-value" style={{ width: '15%' }}></div>
-              </div>
-              <ul className="check-list">
-                <li className="checked"><i className="fa-solid fa-circle-check"></i> Policy Active</li>
-                <li className="checked"><i className="fa-solid fa-circle-check"></i> Identity Verified</li>
-                <li className="checked"><i className="fa-solid fa-circle-check"></i> Fraud Scan Passed</li>
-              </ul>
-            </div>
-
-            {/* Column 3: Audit Trail */}
-            <div className="workspace-column">
-              <p className="trail-title">Activity Log</p>
-              <div className="log-entries">
-                <div className="log-entry"><span>14:02</span> Claim Evidence Validated</div>
-                <div className="log-entry"><span>14:10</span> AI Risk Assessment: Low</div>
-                {settlementStatus === "Verifying" && <div className="log-entry pending">Verifying Bank Routing...</div>}
-                {settlementStatus === "Ready" && <div className="log-entry success">Bank Verified: Ready</div>}
-                {settlementStatus === "Paid" && <div className="log-entry final">TXID: 8829-SETTLED-2026</div>}
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
     </div>
   );
