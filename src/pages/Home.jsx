@@ -14,51 +14,51 @@ export default function Home() {
           <div className="carousel-inner">
             <div className="carousel-item active">
               <div className="overlay-gradient"></div>
-              <img src="img1.png" className="d-block w-100 hero-img" alt="Car Insurance" />
+              <img src="1.png" className="d-block w-100 hero-img" alt="Car Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
-                <h1>Drive with Confidence</h1>
-                <p>Comprehensive protection for every journey you take.</p>
+                <h1>The Digital Evolution of Insurance</h1>
+                <p>LTI Insurance modernizes traditional coverage by bringing a simple, fair, and digital experience directly to your smartphone.</p>
               </div>
             </div>
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="img2.png" className="d-block w-100 hero-img" alt="Car Insurance" />
+              <img src="2.png" className="d-block w-100 hero-img" alt="Car Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
-                <h1>Drive with  over Confidence</h1>
-                <p>Comprehensive protection for every journey you take.</p>
+                <h1>Smarter Protection for Every Ride</h1>
+                <p>Secure your journey instantly with digital insurance plans designed to keep you and your electric scooter protected across the city.</p>
               </div>
             </div>
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="img3.png" className="d-block w-100 hero-img" alt="Car Insurance" />
+              <img src="3.png" className="d-block w-100 hero-img" alt="Car Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
-                <h1>Drive with Confidence</h1>
-                <p>Comprehensive protection for every journey you take.</p>
+                <h1>Comprehensive Peace of Mind for Your Family </h1>
+                <p>Drive with confidence knowing our intelligent auto insurance protects what matters most on every journey.</p>
               </div>
             </div>
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="img4.png" className="d-block w-100 hero-img" alt="Car Insurance" />
+              <img src="4.png" className="d-block w-100 hero-img" alt="Car Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
-                <h1>Drive with Confidence</h1>
-                <p>Comprehensive protection for every journey you take.</p>
+                <h1>Instant Claims at Your Fingertips</h1>
+                <p>Experience the future of claims with AI-driven verification that turns a simple photo into an instant approval.</p>
               </div>
             </div>
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="img5.png" className="d-block w-100 hero-img" alt="Car Insurance" />
+              <img src="5.png" className="d-block w-100 hero-img" alt="Car Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
-                <h1>Drive with Confidence</h1>
-                <p>Comprehensive protection for every journey you take.</p>
+                <h1>A Shield for All Your Mobility Needs</h1>
+                <p>Whether you are on two wheels or four, our integrated digital protection ensures every vehicle in your life is covered by a single, secure shield.</p>
               </div>
             </div>
             {/* ... Repeat for other items with 'hero-img' and 'custom-caption' classes ... */}
