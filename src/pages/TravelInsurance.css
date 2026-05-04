@@ -58,30 +58,34 @@
 .neo-container {
   position: relative;
   z-index: 10;
-  max-width: 1250px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
   padding: 40px 20px 80px;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* --- FORCED LAYOUT FIX FOR WIDER FORM --- */
 .neo-split-layout {
   display: flex;
-  gap: 40px; 
-  align-items: flex-start;
-  justify-content: center;
+  gap: 40px;
+  align-items: stretch;
+  justify-content: flex-start;
   width: 100%;
-  max-width: 1150px; /* Allows the entire block to stretch wider */
-  margin: 0 auto; 
+  margin: 0 auto;
   position: relative;
   z-index: 10;
 }
 
 .neo-main-content {
-  flex: 1 1 auto !important; /* Forces this section to grow and fill empty space */
-  width: 100% !important;
-  max-width: 750px !important; /* Drastically increases the allowed width of the form */
+  flex: 1;
+  width: 100%;
+  max-width: 750px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 /* ---------------------------------------- */
 
@@ -201,7 +205,13 @@
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0 4px 24px rgba(15, 23, 42, 0.07), 0 1px 4px rgba(15, 23, 42, 0.04);
-  width: 100% !important; /* Force card to match the new wider main container */
+  width: 100%;
+  max-width: 750px;
+  margin: 0;
+  min-height: 600px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   position: relative;
   z-index: 15;
 }
@@ -209,8 +219,8 @@
 .neo-sidebar {
   width: 360px;
   flex-shrink: 0;
-  position: sticky;
-  top: 24px;
+  position: relative;
+  top: 0;
   align-self: flex-start;
   max-height: calc(100vh - 48px);
   overflow-y: auto;
