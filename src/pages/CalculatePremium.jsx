@@ -93,7 +93,7 @@ export default function CalculatePremium() {
                 <p>⏱️ {duration} Year(s) Tenure</p>
                 <p>💎 Comprehensive Protection</p>
               </div>
-              <button className="btn-buy-now">Proceed to Buy</button>
+              {/* <button className="btn-buy-now">Proceed to Buy</button> */}
             </div>
           )}
         </div>
