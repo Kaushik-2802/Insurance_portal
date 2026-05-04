@@ -1,11 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import "./ClaimInsurance.css";
 import InnerHeader from "../components/InnerHeader";
 import Footer from "../components/Footer";
 
 export default function ClaimForm() {
   const [selectedReason, setSelectedReason] = useState("");
+  const [policyNumber, setPolicyNumber] = useState("");
+  const [linkedMobile, setLinkedMobile] = useState("");
   const [isHovered, setIsHovered] = useState(null);
+  const navigate = useNavigate();
 
   const reasons = [
     { id: "Natural Disaster", icon: "fa-solid fa-cloud-showers-heavy", desc: "Flood, Storm, Earthquakes" },
@@ -28,14 +32,49 @@ export default function ClaimForm() {
             <p className="claim-subtitle">Tell us what happened. We're here to help you get back on track.</p>
           </div>
 
-          <form onSubmit={(e) => e.preventDefault()} className="claim-form-layout">
+          <form onSubmit={(e) => {
+              e.preventDefault();
+              if (!policyNumber || !linkedMobile || !selectedReason) {
+                window.alert('Please fill in all fields and select a claim reason.');
+                return;
+              }
+
+              const existingRequests = JSON.parse(localStorage.getItem('adminClaimRequests') || '[]');
+              const newRequest = {
+                id: `CLM-${Date.now()}`,
+                policy: policyNumber,
+                mobile: linkedMobile,
+                reason: selectedReason,
+                status: 'Pending',
+                createdAt: new Date().toLocaleString(),
+              };
+              localStorage.setItem('adminClaimRequests', JSON.stringify([newRequest, ...existingRequests]));
+              window.alert('Claim process initiated. Your request has been sent to admin.');
+              navigate('/dashboard');
+            }}
+            className="claim-form-layout"
+          >
             <div className="input-group-modern">
               <div className="floating-field">
-                <input type="text" id="policy" placeholder=" " required />
+                <input
+                  type="text"
+                  id="policy"
+                  placeholder=" "
+                  required
+                  value={policyNumber}
+                  onChange={(e) => setPolicyNumber(e.target.value)}
+                />
                 <label htmlFor="policy"><i className="fa-solid fa-hashtag"></i> Policy Number</label>
               </div>
               <div className="floating-field">
-                <input type="tel" id="mobile" placeholder=" " required />
+                <input
+                  type="tel"
+                  id="mobile"
+                  placeholder=" "
+                  required
+                  value={linkedMobile}
+                  onChange={(e) => setLinkedMobile(e.target.value)}
+                />
                 <label htmlFor="mobile"><i className="fa-solid fa-phone"></i> Linked Mobile</label>
               </div>
             </div>

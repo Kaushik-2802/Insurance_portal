@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
   const [settlementStatus, setSettlementStatus] = useState("Idle"); // Idle, Verifying, Ready, Paid
   const [activeStep, setActiveStep] = useState(1);
+  const [claimRequests, setClaimRequests] = useState([]);
 
   // --- Handlers ---
   const handleLogout = () => {
@@ -29,6 +30,15 @@ export default function AdminDashboard() {
     { id: "POL-99281", user: "Alex Rivera", amount: "$1,200" },
     { id: "POL-44102", user: "Sarah Chen", amount: "$4,500" },
   ];
+
+  useEffect(() => {
+    try {
+      const storedRequests = JSON.parse(localStorage.getItem('adminClaimRequests') || '[]');
+      setClaimRequests(Array.isArray(storedRequests) ? storedRequests : []);
+    } catch (error) {
+      setClaimRequests([]);
+    }
+  }, []);
 
   const userQueries = [
     { id: 1, subject: "Policy Renewal Delay", msg: "I haven't received my docs...", time: "2m ago" },
@@ -56,7 +66,7 @@ export default function AdminDashboard() {
         <section className="dashboard-card admin-left">
           <div className="card-header">
             <h3><i className="fa-solid fa-magnifying-glass-chart"></i> Reference Validation</h3>
-            <span className="badge-count">2 Pending</span>
+            <span className="badge-count">{2 + claimRequests.length} Pending</span>
           </div>
           <div className="validation-list">
             {pendingValidations.map((item) => (
@@ -64,6 +74,19 @@ export default function AdminDashboard() {
                 <div className="item-info">
                   <span className="id-tag">{item.id}</span>
                   <p>{item.user} • <strong>{item.amount}</strong></p>
+                </div>
+                <div className="item-actions">
+                  <button className="btn-v-green"><i className="fa-solid fa-check"></i></button>
+                  <button className="btn-v-red"><i className="fa-solid fa-xmark"></i></button>
+                </div>
+              </div>
+            ))}
+            {claimRequests.length > 0 && claimRequests.map((request) => (
+              <div key={request.id} className="validation-item new-claim-request">
+                <div className="item-info">
+                  <span className="id-tag">{request.id}</span>
+                  <p>{request.policy} • <strong>{request.reason}</strong></p>
+                  <small>{request.status} • {request.createdAt}</small>
                 </div>
                 <div className="item-actions">
                   <button className="btn-v-green"><i className="fa-solid fa-check"></i></button>
