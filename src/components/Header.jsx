@@ -6,7 +6,7 @@ export default function Header() {
   return (
     <header className="header">
       <div className="logo">
-        <h1>Shield General</h1>
+        <h1>LTI Insurance</h1>
         <p className="tagline">Secure your ride, secure your life</p>
       </div>
       <nav className="nav">
@@ -19,9 +19,9 @@ export default function Header() {
           <li><Link to="/login">Login</Link></li>
         </ul>
       </nav>
-      <div className="cta">
+      {/* <div className="cta">
         <Link to="/quote" className="quote-btn">Get a Quote</Link>
-      </div>
+      </div> */}
     </header>
   );
 }

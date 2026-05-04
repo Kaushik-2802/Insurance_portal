@@ -28,7 +28,7 @@ export default function InnerHeader() {
   return (
     <header className="header">
       <div className="logo" onClick={() => navigate("/dashboard")} style={{cursor: 'pointer'}}>
-        <h1>Shield General</h1>
+        <h1>LTI Insurance</h1>
         <p className="tagline">PREMIUM PROTECTION</p>
       </div>
 
