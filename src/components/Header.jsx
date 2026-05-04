@@ -13,9 +13,9 @@ export default function Header() {
         <ul>
           {/* <li><Link to="/two-wheeler">Two-Wheeler Insurance</Link></li>
           <li><Link to="/four-wheeler">Four-Wheeler Insurance</Link></li> */}
-          <li><Link to="/about">About Us</Link></li>
-          <li><Link to="/contact">Contact Us</Link></li>
-          <li><Link to="/help">Help</Link></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+          <li><a href="#help">Help</a></li>
           <li><Link to="/login">Login</Link></li>
         </ul>
       </nav>

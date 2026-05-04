@@ -1,3 +1,8 @@
+html {
+  scroll-behavior: smooth;
+}
+
+
 :root {
   --primary-blue: #003366;
   --accent-gold: #ffcc00;
@@ -181,11 +186,59 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: rgb(11, 11, 11);
   transition: 0.3s;
 }
 
 .control-icon:hover {
   background: var(--accent-gold);
   color: var(--primary-blue);
+}
+
+/* Help Section */
+.help-section {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 50px 40px;
+  margin: 60px auto;
+  max-width: 800px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.help-section h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #060505;
+  margin-bottom: 20px;
+}
+
+.help-section p {
+  color: #121313;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.help-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-section ul li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 1rem;
+  color: #060606;
+  margin-bottom: 15px;
+}
+
+.help-section ul li i {
+  color: #ffcc00; /* accent gold */
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 6px rgba(255, 204, 0, 0.4));
 }

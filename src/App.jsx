@@ -16,6 +16,9 @@ import PolicyType from './pages/PolicyType'
 import CalculatePremium from './pages/CalculatePremium'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import PrivacyPolicy from './components/PrivacyPolicy'
+import Compliance from './components/Compliance'
+import Terms from './components/Terms'
 import './App.css'
 
 function App() {
@@ -37,6 +40,9 @@ function App() {
         <Route path="/calculate-premium" element={<CalculatePremium />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path='/reset-password' element={<ResetPassword />} />
+        <Route path='/privacy' element={<PrivacyPolicy />} />
+        <Route path='/terms' element={<Terms />} />
+        <Route path='/compliance' element={<Compliance />} />
       </Routes>
     </BrowserRouter>
   )
