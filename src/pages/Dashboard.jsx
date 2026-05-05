@@ -57,7 +57,7 @@ export default function Dashboard() {
           <div className="action-card">
             <h2>Quick Actions</h2>
             <div className="btn-group">
-              <a href="/buy-insurance" className="action-btn primary">
+              <a href="/choose-insurance" className="action-btn primary">
                 <i className="fa-solid fa-cart-plus"></i> Buy Insurance
               </a>
               <a href="/renew" className="action-btn">

@@ -250,3 +250,73 @@
   .input-group-modern, .reason-grid { grid-template-columns: 1fr; }
   .claim-glass-card { padding: 30px 20px; }
 }
+
+/* Date Input Tweaks */
+.full-width-mobile {
+  grid-column: span 2; /* Spans across both columns for better hierarchy */
+}
+
+.fixed-label {
+  top: -10px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700;
+  color: #004080;
+}
+
+/* Upload Dropzone Style */
+.upload-section {
+  margin-top: 30px;
+}
+
+.upload-dropzone {
+  border: 2px dashed #cbd5e1;
+  background: #f8fafc;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.upload-dropzone i {
+  font-size: 2rem;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+.upload-dropzone p {
+  color: #64748b;
+}
+
+.upload-dropzone p span {
+  color: #004080;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.upload-dropzone:hover {
+  background: #f1f5f9;
+  border-color: #004080;
+}
+
+.file-preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.file-chip {
+  background: #e2e8f0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+@media (max-width: 600px) {
+  .full-width-mobile { grid-column: span 1; }
+}
