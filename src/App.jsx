@@ -23,6 +23,7 @@ import Profile from './pages/Profile'
 import MyPolicies from './pages/MyPolicies'
 import Help from './pages/Help'
 import TravelInsurance from './pages/TravelInsurance'
+import ChooseInsurance from './pages/ChooseInsurance'
 import './App.css'
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
         <Route path='/my-insurance' element={<MyPolicies />} />
         <Route path='/travel-insurance' element={<TravelInsurance />} />
         <Route path='/support' element={<Help />} />
+        <Route path='/choose-insurance' element={<ChooseInsurance />} />
       </Routes>
     </BrowserRouter>
   )

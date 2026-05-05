@@ -1,0 +1,178 @@
+/* ChooseInsurance.css */
+
+/* Elegant, soft background */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fcfcfd;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(200, 210, 255, 0.15) 0, transparent 50%), 
+    radial-gradient(at 100% 100%, rgba(255, 230, 200, 0.15) 0, transparent 50%);
+  min-height: 100vh;
+  font-family: "Didot", "Playfair Display", serif; /* Serif adds instant elegance */
+}
+
+.choose-insurance-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120px 20px;
+}
+
+.choose-insurance-container h1 {
+  font-size: 2.2rem;
+  font-weight: 300;
+  letter-spacing: 0.15rem;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  margin-bottom: 60px;
+  position: relative;
+}
+
+/* Subtle underline decoration */
+.choose-insurance-container h1::after {
+  content: "";
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 1px;
+  background: #b5a48b; /* Soft gold/brass accent */
+}
+
+.button-group {
+  display: flex;
+  gap: 40px;
+  max-width: 1000px;
+  width: 100%;
+}
+
+.button-group button {
+  /* Ultra-transparent & Minimalist */
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  
+  flex: 1;
+  height: 280px;
+  border-radius: 4px; /* Sharp, slight radius is more "luxury" than round */
+  
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  color: #444;
+  
+  cursor: pointer;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Remove the previous arrow and add a sophisticated hover effect */
+.button-group button::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: rgba(181, 164, 139, 0.08); /* Faint gold wash */
+  transition: height 0.4s ease;
+  z-index: -1;
+}
+
+.button-group button:hover {
+  border: 1px solid #b5a48b; /* Gold border on hover */
+  color: #000;
+  letter-spacing: 0.25rem; /* Text slightly expands */
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
+}
+
+.button-group button:hover::after {
+  height: 100%;
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+  .button-group {
+    flex-direction: column;
+    padding: 0 40px;
+  }
+  .button-group button {
+    height: 180px;
+  }
+}
+
+.button-group button {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  
+  flex: 1;
+  height: 280px;
+  border-radius: 4px;
+  
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem; /* Slightly smaller for sophistication */
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  color: #444;
+  
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* The Elegant Arrow Wrapper */
+.arrow-icon {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  font-weight: 200;
+  color: #b5a48b; /* Using that gold accent */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  opacity: 0.6;
+}
+
+/* Hover States */
+.button-group button:hover {
+  border: 1px solid #b5a48b;
+  color: #000;
+  transform: translateY(-8px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.04);
+}
+
+/* Move the arrow and make it more visible on hover */
+.button-group button:hover .arrow-icon {
+  transform: translateX(12px);
+  opacity: 1;
+}
+
+/* The faint gold wash background on hover */
+.button-group button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(181, 164, 139, 0.05));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
+
+.button-group button:hover::before {
+  opacity: 1;
+}
