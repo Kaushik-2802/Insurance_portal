@@ -22,6 +22,11 @@ const Payment = () => {
   const [bankError, setBankError] = useState('');
   const navigate = useNavigate();
 
+  const getRedirectPath=()=>{
+    const flow=localStorage.getItem('activeFlow');
+    return flow==='travel'? '/travel-success': '/policy-reference'
+  }
+
   useEffect(() => {
     if (showQRCode && countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -62,7 +67,7 @@ const Payment = () => {
     localStorage.setItem('paymentCompleted', 'true');
     const policyRef = `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     localStorage.setItem('policyReferenceNumber', policyRef);
-    setTimeout(() => navigate('/policy-reference'), 1500);
+    setTimeout(() => navigate(getRedirectPath()), 1500);
   };
 
   const handleInputChange = (e) => {
@@ -106,14 +111,14 @@ const Payment = () => {
     const policyRef = `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     localStorage.setItem('policyReferenceNumber', policyRef);
     setNetBankStage('success');
-    setTimeout(() => navigate('/policy-reference'), 2000);
+    setTimeout(() => navigate(getRedirectPath()), 2000);
   };
 
   const handlePaymentSubmit = (e) => {
     e.preventDefault();
     alert('Processing Secure Payment...');
     localStorage.setItem('paymentCompleted', 'true');
-    setTimeout(() => navigate('/policy-reference'), 2000);
+    setTimeout(() => navigate(getRedirectPath()), 2000);
   };
 
   return (

@@ -12,6 +12,7 @@ export default function VehiclePolicies() {
   const handleSubmit = () => {
     if (selectedPolicy) {
       // FIX: Added Key and Value correctly
+      localStorage.setItem('activeFlow', 'motor');
       localStorage.setItem("policyTitle", selectedPolicy.title);
       localStorage.setItem("policyPrice", selectedPolicy.details.minAmount);
       navigate("/payment");

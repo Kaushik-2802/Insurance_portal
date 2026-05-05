@@ -80,6 +80,7 @@ export default function TravelInsurance() {
   };
 
   const handleProceedToPayment = () => {
+    localStorage.setItem("activeFlow",'travel');
     localStorage.setItem('travelInsuranceData', JSON.stringify({ travelType, tripData, members, selectedAddons, healthAnswers }));
     navigate('/payment');
   };
