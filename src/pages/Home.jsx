@@ -137,10 +137,10 @@ export default function Home() {
           </ul>
         </div>
         <div className="about-image-box">
-          <div className="glass-card">
+          {/* <div className="glass-card">
             <h4>"Fastest claim process I've ever experienced."</h4>
             <p>- Rahul S., Coimbatore</p>
-          </div>
+          </div> */}
         </div>
       </section>
 
