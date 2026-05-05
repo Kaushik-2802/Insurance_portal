@@ -875,6 +875,32 @@
 .neo-btn-checkout.pulse { background: #fff; color: var(--accent-navy); }
 .neo-btn-checkout.pulse:hover { opacity: 0.92; }
 
+/* ----------------------------------------------------- */
+/* NEW: Email Policy Footer Link in Sidebar              */
+/* ----------------------------------------------------- */
+
+.sidebar-footer-links {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.email-policy-btn {
+  color: #93c5fd;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+
+.email-policy-btn:hover {
+  color: #ffffff;
+}
+
 /* Animations */
 .animate-fade-in  { animation: fadeIn  0.35s ease-out both; }
 .animate-slide-up { animation: slideUp 0.45s ease-out both; }

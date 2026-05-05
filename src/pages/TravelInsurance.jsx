@@ -7,7 +7,8 @@ import Footer from '../components/Footer';
 export default function TravelInsurance() {
   const [step, setStep] = useState('type');
   const [travelType, setTravelType] = useState('');
-  const [tripData, setTripData] = useState({ country: '', startDate: '', endDate: '' });
+  // Changed 'country' to 'destination' to handle both states and countries cleanly
+  const [tripData, setTripData] = useState({ destination: '', startDate: '', endDate: '' });
   const [memberData, setMemberData] = useState({ name: '', age: '', mobile: '', email: '', address: '' });
   const [members, setMembers] = useState([]);
   const [selectedAddons, setSelectedAddons] = useState([]);
@@ -33,7 +34,8 @@ export default function TravelInsurance() {
 
   const validateTripData = () => {
     const newErrors = {};
-    if (!tripData.country.trim()) newErrors.country = 'Destination required';
+    // Dynamic validation message based on travel type
+    if (!tripData.destination.trim()) newErrors.destination = travelType === 'domestic' ? 'State required' : 'Country required';
     if (!tripData.startDate) newErrors.startDate = 'Required';
     if (!tripData.endDate) newErrors.endDate = 'Required';
     setErrors(newErrors);
@@ -155,17 +157,19 @@ export default function TravelInsurance() {
               <div className="glass-card animate-fade-in">
                 <h2 className="neo-title">Trip Logistics</h2>
                 <div className="neo-input-group">
-                  <label htmlFor="country">Destination Country</label>
+                  {/* Dynamic Label based on travelType */}
+                  <label htmlFor="destination">{travelType === 'domestic' ? 'Destination State' : 'Destination Country'}</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-location-dot input-icon" aria-hidden="true" />
                     <input
-                      id="country" type="text" name="country"
-                      placeholder="e.g. USA, Japan, Switzerland"
-                      value={tripData.country} onChange={handleTripInputChange}
-                      className={errors.country ? 'error' : ''}
+                      id="destination" type="text" name="destination"
+                      // Dynamic Placeholder based on travelType
+                      placeholder={travelType === 'domestic' ? 'e.g. Kerala, Goa, Rajasthan' : 'e.g. USA, Japan, Switzerland'}
+                      value={tripData.destination} onChange={handleTripInputChange}
+                      className={errors.destination ? 'error' : ''}
                     />
                   </div>
-                  {errors.country && <span className="neo-error">{errors.country}</span>}
+                  {errors.destination && <span className="neo-error">{errors.destination}</span>}
                 </div>
                 <div className="neo-row">
                   <div className="neo-input-group">
@@ -340,7 +344,7 @@ export default function TravelInsurance() {
                   </div>
                   <div className="summary-chip">
                     <span>Destination</span>
-                    <strong>{tripData.country || 'Pending'}</strong>
+                    <strong>{tripData.destination || 'Pending'}</strong>
                   </div>
                   <div className="summary-chip">
                     <span>Travelers</span>
@@ -357,7 +361,7 @@ export default function TravelInsurance() {
                 <div className="summary-top">
                   <div className="dest-badge">
                     <i className="fa-solid fa-plane" aria-hidden="true" />
-                    {tripData.country ? tripData.country.toUpperCase() : 'DESTINATION'}
+                    {tripData.destination ? tripData.destination.toUpperCase() : 'DESTINATION'}
                   </div>
                   <button className="neo-edit-btn" onClick={() => setStep('trip')} aria-label="Edit destination">
                     <i className="fa-solid fa-pen" aria-hidden="true" />
