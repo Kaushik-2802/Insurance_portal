@@ -153,4 +153,9 @@
     text-align: center;
   }
 }
-``
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 40px;
+}

@@ -134,12 +134,12 @@ export default function TravelPolicySuccess() {
 
       {/* ACTIONS */}
       <div className="policy-actions">
-        <button className="outline">Download PDF</button>
-        <button className="outline">Email Policy</button>
+        <button className="outline" onClick={() => window.print()}>Download PDF</button>
+        <button className="outline" onClick={() => window.location.href=`mailto:?subject=Insurance&body=${referenceNumber}`}>Email Policy</button>
       </div>
 
-      <button className="home-btn" onClick={() => navigate('/')}>
-        Go to Home →
+      <button className="home-btn" onClick={() => navigate('/dashboard')}>
+        Go to Dashboard →
       </button>
 
       <Footer />
