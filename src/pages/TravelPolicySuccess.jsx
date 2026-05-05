@@ -21,17 +21,17 @@ export default function TravelPolicySuccess() {
     <div className="travel-success-wrapper">
       <InnerHeader />
 
-      {/* SUCCESS HEADER */}
-      <section className="travel-success-hero">
-        <div className="success-icon">✓</div>
+      {/* SUCCESS MESSAGE */}
+      <div className="travel-success-banner">
+        <div className="check-icon">✓</div>
         <h1>PAYMENT SUCCESSFUL!</h1>
-        <p>Your travel insurance policy is now active.</p>
-      </section>
+        <p>Your travel insurance policy is now active</p>
+      </div>
 
       {/* POLICY CARD */}
-      <section className="travel-policy-card">
+      <div className="travel-policy-card">
 
-        {/* CARD HEADER */}
+        {/* HEADER */}
         <div className="policy-header">
           <div className="brand">✈ SecureTrip Insurance</div>
           <div className="policy-ref">
@@ -41,7 +41,7 @@ export default function TravelPolicySuccess() {
         </div>
 
         {/* DETAILS */}
-        <div className="policy-details">
+        <div className="policy-details-grid">
 
           {/* POLICY HOLDER */}
           <div className="info-box">
@@ -66,7 +66,7 @@ export default function TravelPolicySuccess() {
 
             <div className="info-row">
               <span>Policy Status</span>
-              <strong className="status-active">ACTIVE</strong>
+              <strong className="active">ACTIVE</strong>
             </div>
           </div>
 
@@ -130,12 +130,12 @@ export default function TravelPolicySuccess() {
         <div className="verified">
           ✅ Digitally Signed & Verified Certificate
         </div>
-      </section>
+      </div>
 
       {/* ACTIONS */}
-      <div className="actions">
-        <button className="btn-outline">Download PDF</button>
-        <button className="btn-outline">Email Policy</button>
+      <div className="policy-actions">
+        <button className="outline">Download PDF</button>
+        <button className="outline">Email Policy</button>
       </div>
 
       <button className="home-btn" onClick={() => navigate('/')}>
