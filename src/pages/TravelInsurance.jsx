@@ -270,6 +270,18 @@ export default function TravelInsurance() {
 
             {step === 'health' && (
               <div className="glass-card animate-fade-in">
+                <div className="neo-health-info-card">
+                  <div className="health-card-copy">
+                    <h3 className="neo-title m-0">Health Check Snapshot</h3>
+                    <p className="neo-desc">Review your medical declaration with a quick glance before you continue.</p>
+                    <button type="button" className="neo-btn-text health-back-button" onClick={handleBack}>
+                      <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back
+                    </button>
+                  </div>
+                  <div className="health-card-image">
+                    <img src="/1.png" alt="Health travel illustration" />
+                  </div>
+                </div>
                 <div className="neo-health-header">
                   <h2 className="neo-title m-0">Medical Declaration</h2>
                   <i className="fa-solid fa-stethoscope highlight-icon" aria-hidden="true" />
@@ -302,6 +314,37 @@ export default function TravelInsurance() {
                 <div className="neo-actions">
                   <button type="button" className="neo-btn-text" onClick={handleBack}>← Back</button>
                   <button type="button" className="neo-btn-gradient" onClick={() => handleNext('confirmation')}>View Final Summary</button>
+                </div>
+              </div>
+            )}
+
+            {step === 'confirmation' && (
+              <div className="glass-card animate-fade-in">
+                <div className="neo-confirmation-card">
+                  <div className="confirmation-card-copy">
+                    <h3 className="neo-title m-0">Final Confirmation</h3>
+                    <p className="neo-desc">Your trip details and add-on selection are ready. Review the summary and complete checkout from the sidebar.</p>
+                    <button type="button" className="neo-btn-text health-back-button" onClick={handleBack}>
+                      <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Back to Health
+                    </button>
+                  </div>
+                  <div className="confirmation-card-image">
+                    <img src="/4.png" alt="Travel confirmation illustration" />
+                  </div>
+                </div>
+                <div className="neo-confirmation-summary">
+                  <div className="summary-chip">
+                    <span>Travel Type</span>
+                    <strong>{travelType ? travelType.charAt(0).toUpperCase() + travelType.slice(1) : 'Not selected'}</strong>
+                  </div>
+                  <div className="summary-chip">
+                    <span>Destination</span>
+                    <strong>{tripData.country || 'Pending'}</strong>
+                  </div>
+                  <div className="summary-chip">
+                    <span>Travelers</span>
+                    <strong>{members.length > 0 ? `${members.length} Person(s)` : '1 Person'}</strong>
+                  </div>
                 </div>
               </div>
             )}

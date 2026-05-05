@@ -86,6 +86,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  
 }
 /* ---------------------------------------- */
 
@@ -207,13 +208,14 @@
   box-shadow: 0 4px 24px rgba(15, 23, 42, 0.07), 0 1px 4px rgba(15, 23, 42, 0.04);
   width: 100%;
   max-width: 750px;
-  margin: 0;
+  margin: 0px 20px;
   min-height: 600px;
   flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 15;
+  bottom:0px;
 }
 
 .neo-sidebar {
@@ -556,6 +558,151 @@
   padding-bottom: 18px;
   margin-bottom: 28px;
 }
+
+.neo-health-info-card {
+  background: #eff6ff;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 22px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+  margin-bottom: 28px;
+}
+
+.health-card-copy {
+  flex: 1;
+  min-width: 0;
+  max-width: 56%;
+}
+
+.health-card-copy h3 {
+  font-size: 1.45rem;
+  margin-bottom: 10px;
+  color: var(--accent-navy);
+}
+
+.health-card-copy p {
+  font-size: 0.98rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.health-card-image {
+  width: 180px;
+  min-width: 160px;
+  max-width: 220px;
+  background: #f8fbff;
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.health-card-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  object-fit: cover;
+  min-height: 120px;
+  display: block;
+}
+
+.neo-confirmation-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+  margin-bottom: 28px;
+}
+
+.confirmation-card-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.confirmation-card-copy h3 {
+  font-size: 1.45rem;
+  margin-bottom: 10px;
+  color: var(--accent-navy);
+}
+
+.confirmation-card-copy p {
+  margin-bottom: 18px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.confirmation-card-image {
+  width: 190px;
+  min-width: 160px;
+  max-width: 220px;
+  background: #f8fbff;
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-card-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  display: block;
+}
+
+.neo-confirmation-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.summary-chip {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-chip span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.summary-chip strong {
+  color: var(--accent-navy);
+  font-size: 1rem;
+}
+
+.health-back-button {
+  border: 1px solid var(--accent-cyan);
+  border-radius: 12px;
+  color: var(--accent-navy);
+  background: #ffffff;
+  padding: 10px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.health-back-button:hover {
+  background: #eff6ff;
+}
 .highlight-icon { font-size: 2rem; color: var(--accent-cyan); flex-shrink: 0; }
 
 .neo-health-body { margin-top: 16px; }
@@ -749,6 +896,12 @@
   .action-right-group { flex-direction: column; width: 100%; }
   .action-right-group button { width: 100%; }
   .neo-actions { flex-direction: column; align-items: stretch; }
+  .neo-health-info-card { flex-direction: column; align-items: stretch; }
+  .health-card-image { width: 100%; min-width: auto; max-width: 100%; }
+  .health-card-copy { width: 100%; }
+  .neo-confirmation-card { flex-direction: column; align-items: stretch; }
+  .confirmation-card-image { width: 100%; min-width: auto; max-width: 100%; }
+  .confirmation-card-copy { width: 100%; }
   .neo-btn-text { text-align: center; }
 }
 
