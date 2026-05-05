@@ -70,7 +70,7 @@
 }
 /* Subtle background "Shield" decoration */
 .footer::before {
-  content: "SHIELD";
+  content: "LTI INSURANCE";
   position: absolute;
   top: -50px;
   right: -20px;

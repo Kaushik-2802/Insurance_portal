@@ -29,7 +29,7 @@ export default function Footer() {
               <li><Link to="/buy">Policy Purchase</Link></li>
               <li><Link to="/claims">FastTrack Claims</Link></li>
               <li><Link to="/renew">Renewal Hub</Link></li>
-              <li><Link to="/partners">Garage Network</Link></li>
+              <li><Link to="/calculate-premium">Calculate Premium</Link></li>
             </ul>
           </div>
 
