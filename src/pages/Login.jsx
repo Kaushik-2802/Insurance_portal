@@ -50,7 +50,7 @@ export default function Login() {
           <div className="shield-icon">
             <i className="fa-solid fa-shield-halved"></i>
           </div>
-          <h2>Shield General</h2>
+          <h2>LTI Insurance</h2>
           <p>Secure Portal Login</p>
         </div>
 
@@ -101,7 +101,7 @@ export default function Login() {
         </form>
 
         <p className="auth-footer">
-          New to Shield? <Link to="/register">Create Account</Link>
+          New to LTI? <Link to="/register">Create Account</Link>
         </p>
       </div>
     </div>

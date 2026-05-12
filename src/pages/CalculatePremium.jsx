@@ -22,84 +22,101 @@ export default function CalculatePremium() {
   const [duration, setDuration] = useState(1);
   const [quote, setQuote] = useState(null);
 
+  // Reset company and model when type changes
   useEffect(() => {
     const companies = Object.keys(vehicleData[type]);
     setCompany(companies[0]);
     setModel(vehicleData[type][companies[0]][0]);
+    setQuote(null); // Clear quote on change
   }, [type]);
 
+  // Reset model when company changes
   useEffect(() => {
-    setModel(vehicleData[type][company][0]);
+    // Safety check: ensure the company actually exists in the current type
+    if (vehicleData[type][company]) {
+      setModel(vehicleData[type][company][0]);
+    }
   }, [company, type]);
 
   const handleCalculate = () => {
     const base = type === "Car" ? 5500 : 1800;
-    setQuote((base * duration * 1.18).toLocaleString());
+    const years = Number(duration);
+    setQuote((base * years * 1.18).toLocaleString());
   };
 
   return (
     <>
-    <InnerHeader />
-    <div className="premium-wrapper">
-      <div className="premium-card">
-        {/* LEFT SIDE: FORM */}
-        <div className="form-side">
-          <h2 className="title-navy">Quick Premium Estimator</h2>
-          <p className="subtitle">Select your vehicle details to see respective models.</p>
-          
-          <div className="grid-inputs">
-            <div className="input-group">
-              <label>Vehicle Type</label>
-              <select value={type} onChange={(e) => setType(e.target.value)}>
-                {Object.keys(vehicleData).map(v => <option key={v} value={v}>{v}</option>)}
-              </select>
+      <InnerHeader />
+      <div className="premium-wrapper">
+        <div className="premium-card">
+          <div className="form-side">
+            <h2 className="title-navy">Quick Premium Estimator</h2>
+            <p className="subtitle">Select your vehicle details to see respective models.</p>
+            
+            <div className="grid-inputs">
+              <div className="input-group">
+                <label>Vehicle Type</label>
+                <select value={type} onChange={(e) => setType(e.target.value)}>
+                  {Object.keys(vehicleData).map(v => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Company</label>
+                <select value={company} onChange={(e) => setCompany(e.target.value)}>
+                  {/* FIX 1: Added Optional Chaining and fallback to empty array */}
+                  {Object.keys(vehicleData[type] || {}).map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Model</label>
+                <select value={model} onChange={(e) => setModel(e.target.value)}>
+                  {/* FIX 2: Safety check to ensure company exists in current type before mapping */}
+                  {(vehicleData[type][company] || []).map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Duration (Years)</label>
+                <input 
+                  type="number" 
+                  min="1" 
+                  value={duration} 
+                  onChange={(e) => setDuration(Number(e.target.value))} 
+                />
+              </div>
             </div>
 
-            <div className="input-group">
-              <label>Company</label>
-              <select value={company} onChange={(e) => setCompany(e.target.value)}>
-                {Object.keys(vehicleData[type]).map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-
-            <div className="input-group">
-              <label>Model</label>
-              <select value={model} onChange={(e) => setModel(e.target.value)}>
-                {vehicleData[type][company].map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-
-            <div className="input-group">
-              <label>Duration (Years)</label>
-              <input type="number" min="1" value={duration} onChange={(e) => setDuration(e.target.value)} />
-            </div>
+            <button className="btn-calculate" onClick={handleCalculate}>
+              Calculate Quote
+            </button>
           </div>
 
-          <button className="btn-calculate" onClick={handleCalculate}>
-            Calculate Quote
-          </button>
-        </div>
-
-        {/* RIGHT SIDE: RESULT BOX */}
-        <div className={`result-side ${quote ? "active" : ""}`}>
-          {!quote ? (
-            <div className="placeholder-text">Waiting for your selection...</div>
-          ) : (
-            <div className="quote-display">
-              <span className="label-white">Summary for {model}</span>
-              <h1 className="amount-yellow">₹{quote}</h1>
-              <div className="breakdown-list">
-                <p>📍 {company} India Coverage</p>
-                <p>⏱️ {duration} Year(s) Tenure</p>
-                <p>💎 Comprehensive Protection</p>
+          <div className={`result-side ${quote ? "active" : ""}`}>
+            {!quote ? (
+              <div className="placeholder-text">Waiting for your selection...</div>
+            ) : (
+              <div className="quote-display">
+                <span className="label-white">Summary for {model}</span>
+                <h1 className="amount-yellow">₹{quote}</h1>
+                <div className="breakdown-list">
+                  <p>📍 {company} India Coverage</p>
+                  <p>⏱️ {duration} Year(s) Tenure</p>
+                  <p>💎 Comprehensive Protection</p>
+                </div>
               </div>
-              {/* <button className="btn-buy-now">Proceed to Buy</button> */}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
-    <Footer />
+      <Footer />
     </>
   );
 }
