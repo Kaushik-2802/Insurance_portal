@@ -1,14 +1,14 @@
 import express from "express";
 import User from "../models/User.js";
-import multer from "multer"; // 1. Imported Multer
+import multer from "multer"; 
 import path from "path";
 
 const router = express.Router();
 
-// 2. Configure where and how multer handles uploaded files
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/"); // Ensure an empty 'uploads' folder exists in your backend root!
+        cb(null, "uploads/"); 
     },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
@@ -26,7 +26,6 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter });
 
 // ─── ROUTE TO GET PROFILE DETAILS ───
-// Maps to: http://localhost:5000/api/profile
 router.get("/profile", async (req, res) => {
     try {
         const { userId } = req.query; 
@@ -47,7 +46,6 @@ router.get("/profile", async (req, res) => {
 });
 
 // ─── ROUTE TO UPDATE PROFILE DETAILS ───
-// Maps to: http://localhost:5000/api/profile/update
 router.put("/profile/update", upload.single("profileImage"), async (req, res) => {
     try {
         const { userId } = req.query; 
@@ -71,7 +69,6 @@ router.put("/profile/update", upload.single("profileImage"), async (req, res) =>
             updateData.profileImage = `http://localhost:5000/uploads/${req.file.filename}`;
         }
 
-        // Clean out empty properties so they don't overwrite database fields with null strings
         Object.keys(updateData).forEach(
             key => (updateData[key] === undefined || updateData[key] === "") && delete updateData[key]
         );
