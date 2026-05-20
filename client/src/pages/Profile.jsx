@@ -61,7 +61,7 @@ export default function Profile() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
@@ -73,7 +73,7 @@ export default function Profile() {
   };
 
   const handleCancel = (e) => {
-    if (e) e.preventDefault(); // Stop any form bubble triggers
+    if (e) e.preventDefault(); 
     setIsEditing(false);
     setSelectedFile(null);
     setEditImagePreview(null);
@@ -94,20 +94,25 @@ export default function Profile() {
   const handleSaveSubmit = async (e) => {
     e.preventDefault(); 
     
-    // Check if any changes were made
+    // Helper to safely compare trimmed text inputs without null/undefined edge cases
+    const hasFieldChanged = (formVal, dbVal) => {
+      return String(formVal || "").trim() !== String(dbVal || "").trim();
+    };
+
+    // Compares all fields simultaneously to capture any combination of edits
     const hasTextChanged = 
-      formData.firstName !== (userData?.firstName || "") ||
-      formData.middleName !== (userData?.middleName || "") ||
-      formData.lastName !== (userData?.lastName || "") ||
-      formData.mobile !== (userData?.mobile || "") ||
-      formData.street !== (userData?.street || "") ||
-      formData.city !== (userData?.city || "") ||
-      formData.country !== (userData?.country || "India") ||
-      formData.pincode !== (userData?.pincode || "");
+      hasFieldChanged(formData.firstName, userData?.firstName) ||
+      hasFieldChanged(formData.middleName, userData?.middleName) ||
+      hasFieldChanged(formData.lastName, userData?.lastName) ||
+      hasFieldChanged(formData.mobile, userData?.mobile) ||
+      hasFieldChanged(formData.street, userData?.street) ||
+      hasFieldChanged(formData.city, userData?.city) ||
+      hasFieldChanged(formData.country, userData?.country || "India") ||
+      hasFieldChanged(formData.pincode, userData?.pincode);
 
     const hasImageChanged = selectedFile !== null;
 
-    // If nothing changed, exit edit mode smoothly
+    // If absolutely nothing was altered across the entire form, exit edit mode smoothly
     if (!hasTextChanged && !hasImageChanged) {
       setIsEditing(false);
       return; 
@@ -277,7 +282,6 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* ─── ACTIONS BLOCK RESTORED INSIDE FORM WITH EXPLICIT CLICKS ─── */}
           <div className="profile-actions-panel" style={{ display: 'flex', gap: '15px', marginTop: '20px', position: 'relative', zIndex: 10 }}>
             {isEditing ? (
               <>
@@ -290,7 +294,7 @@ export default function Profile() {
               </>
             ) : (
               <>
-                <button type="button" onClick={(e) => { e.preventDefault(); setIsEditing(true); }} className="edit-btn" style={{ padding: '10px 20px', cursor: 'pointer' }}>
+                <button type="button" onClick={(e) => { e.preventDefault(); setIsEditing(true); }} className="edit-btn" style={{ background: '#007bff', color: '#fff', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                   Edit Profile
                 </button>
                 <button type="button" className="back-btn" onClick={(e) => { e.preventDefault(); navigate("/dashboard"); }} style={{ padding: '10px 20px', cursor: 'pointer' }}>
