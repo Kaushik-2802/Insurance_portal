@@ -11,11 +11,10 @@ export default function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    setError(""); // Reset error on new attempt
+    setError(""); 
 
-    // 2. Dummy Validation Logic
     if (!email.includes("@")) {
       setError("Please enter a valid business email.");
       return;
@@ -26,18 +25,33 @@ export default function Login() {
       return;
     }
 
-    // 3. Simulate API Call / Loading State
     setIsLoading(true);
     
-    setTimeout(() => {
-      setIsLoading(false);
-      // Logic for demo redirect
-      if (email === "johndoe@gmail.com" && password === "password123") {
-        navigate("/dashboard");
-      } else {
-        setError("Invalid credentials.");
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message ||data.msg|| "Something went wrong.");
       }
-    }, 1500);
+      localStorage.setItem("userId", data.userId);
+
+      console.log("Login Success Data:", data);
+      localStorage.setItem("user", JSON.stringify(data.customer));
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -68,7 +82,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <label htmlFor="username">Username or Email</label>
+            <label htmlFor="username">Email</label>
           </div>
 
           <div className="input-wrapper">

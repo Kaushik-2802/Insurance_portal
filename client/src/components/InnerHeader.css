@@ -131,3 +131,27 @@
 .dropdownItem.logout:hover {
   background: #fff5f5;
 }
+
+.userIcon-wrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Fallback Icon Style */
+.userIcon {
+  font-size: 1.2rem;
+  color: white;
+}
+
+/* Uploaded Image Class Rules */
+.header-profile-photo {
+  transition: transform 0.2s ease-in-out;
+}
+
+.userIcon-wrapper:hover .header-profile-photo {
+  transform: scale(1.05); /* Slight popup effect on hover */
+}

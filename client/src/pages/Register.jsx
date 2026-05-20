@@ -8,10 +8,15 @@ export default function Register() {
   const [formData, setFormData] = useState({
     firstname: "", middlename: "", lastname: "",
     email: "", phoneno: "",
-    street: "", city: "", pincode: "",
+    street: "", city: "", pincode: "", country:"",
     password: "", confirmPassword: ""
   });
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState("");
   const totalSteps = 4;
 
   // Handle input changes
@@ -20,6 +25,15 @@ export default function Register() {
     setFormData({ ...formData, [id]: value });
     // Clear error as user types
     if (errors[id]) setErrors({ ...errors, [id]: null });
+  };
+
+  // ─── ADDED THE MISSING FUNCTION HERE ───
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      setImagePreview(URL.createObjectURL(file)); // Generates temporary preview link
+    }
   };
 
   // Validation Logic per Step
@@ -60,11 +74,53 @@ export default function Register() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep()) {
-      alert("Account Created Successfully!");
+
+    if (currentStep !== totalSteps) {
+      return; 
+    }
+
+    if (!validateStep()) {
+      return; 
+    }
+
+    setIsSubmitting(true);
+    setApiError("");
+
+    const submissionData = new FormData();
+    submissionData.append("firstName", formData.firstname);
+    submissionData.append("middleName", formData.middlename);
+    submissionData.append("lastName", formData.lastname);
+    submissionData.append("email", formData.email);
+    submissionData.append("mobile", formData.phoneno);
+    submissionData.append("street", formData.street);
+    submissionData.append("city", formData.city);
+    submissionData.append("pincode", formData.pincode);
+    submissionData.append("country", formData.country);
+    submissionData.append("password", formData.password);
+    
+    if (profileImage) {
+      submissionData.append("profileImage", profileImage);
+    }
+    
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        body: submissionData
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.msg || data.message || "Something went wrong");
+      }
+      
+      alert("Account created successfully!!");
       navigate("/login");
+    } catch (err) {
+      setApiError(err.message || "An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -82,12 +138,29 @@ export default function Register() {
 
         <h1 className="register-title">Create Secure Account</h1>
 
+        {apiError && <p className="error-text" style={{ textAlign: "center", marginBottom: "15px" }}>{apiError}</p>}
+
         <form className="register-form-wizard" onSubmit={handleSubmit}>
           
           {/* STEP 1 */}
           {currentStep === 1 && (
             <div className="wizard-step animated fadeIn">
               <h3><i className="fa-solid fa-circle-user"></i> Personal Profile</h3>
+              <div className="profile-upload-section" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '25px' }}>
+                <div className="image-preview-container" style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#eee', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--primary-color, #0056b3)' }}>
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <i className="fa-solid fa-camera" style={{ fontSize: '1.5rem', color: '#aaa' }}></i>
+                  )}
+                </div>
+                <div className="upload-btn-wrapper">
+                  <label htmlFor="image-upload-input" className="btn-secondary" style={{ padding: '8px 15px', cursor: 'pointer', borderRadius: '6px', fontSize: '0.85rem' }}>
+                    <i className="fa-solid fa-upload"></i> Upload Avatar Image
+                  </label>
+                  <input type="file" id="image-upload-input" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+                </div>
+              </div>
               <div className="name-grid">
                 <div className={`input-field float-input ${errors.firstname ? "error-input" : ""}`}>
                   <input type="text" id="firstname" placeholder=" " value={formData.firstname} onChange={handleChange} />
@@ -144,6 +217,12 @@ export default function Register() {
                   <label>Pincode</label>
                   {errors.pincode && <span className="error-text">{errors.pincode}</span>}
                 </div>
+                <div className={`float-input ${errors.country ? "error-input" : ""}`}>
+                  <input type="text" id="country" placeholder=" " value={formData.country} onChange={handleChange} />
+                  <label>Country</label>
+                  {/* FIX: Changed errors.Country to lowercase errors.country */}
+                  {errors.country && <span className="error-text">{errors.country}</span>} 
+                </div>
               </div>
             </div>
           )}
@@ -177,8 +256,8 @@ export default function Register() {
                 Next <i className="fa-solid fa-arrow-right"></i>
               </button>
             ) : (
-              <button type="submit" className="btn-premium ml-auto finish-btn">
-                <i className="fa-solid fa-shield"></i> Complete Security Setup
+              <button type="submit" disabled={isSubmitting} className="btn-premium ml-auto finish-btn">
+                <i className="fa-solid fa-shield"></i> {isSubmitting ? "Processing..." : "Complete Security Setup"}
               </button>
             )}
           </div>

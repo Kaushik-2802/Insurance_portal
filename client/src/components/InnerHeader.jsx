@@ -6,6 +6,9 @@ export default function InnerHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -25,6 +28,40 @@ export default function InnerHeader() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+ useEffect(() => {
+     const fetchProfileDetails = async () => {
+       try {
+         // 1. Grab the saved user ID string
+         const storedUserId = localStorage.getItem("userId");
+         
+         if (!storedUserId) {
+           throw new Error("No session found. Please log in first.");
+         }
+ 
+         // 2. Pass the ID directly to your API in the URL string
+         const response = await fetch(`http://localhost:5000/api/profile?userId=${storedUserId}`, {
+           method: "GET",
+           headers: {
+             "Content-Type": "application/json"
+           },
+         });
+         
+         const data = await response.json();
+         if (!response.ok) {
+           throw new Error(data.message || data.msg || data.err || "Something is wrong");
+         }
+         setUserData(data);
+       } catch (err) {
+         setError(err.message);
+       } finally {
+         setLoading(false);
+       }
+     };
+     fetchProfileDetails();
+   }, []);
+
+   const hasUploadedImage = userData?.profileImage && userData.profileImage !== "placeholder.jpg";
+
   return (
     <header className="header">
       <div className="logo" onClick={() => navigate("/dashboard")} style={{cursor: 'pointer'}}>
@@ -35,11 +72,26 @@ export default function InnerHeader() {
       <div className="userMenu" ref={menuRef} onClick={toggleMenu}>
         <div className="user-info-text" style={{ textAlign: 'right', color: 'white', marginRight: '10px' }}>
           <small style={{ opacity: 0.7, fontSize: '0.7rem', display: 'block' }}>Welcome back,</small>
-          <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Member</span>
+          <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>{userData?.firstName}</span>
         </div>
         
-        <div className="userIcon-wrapper">
-          <i className="fa-solid fa-user userIcon"></i>
+        <div className="userIcon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {hasUploadedImage ? (
+            <img 
+              src={userData.profileImage} 
+              alt="User Profile" 
+              className="header-profile-photo"
+              style={{
+                width: "35px",
+                height: "35px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #fff"
+              }}
+            />
+          ) : (
+            <i className="fa-solid fa-user userIcon"></i>
+          )}
         </div>
 
         {isOpen && (
