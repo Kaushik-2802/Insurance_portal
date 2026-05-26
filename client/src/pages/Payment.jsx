@@ -12,19 +12,20 @@ const Payment = () => {
     focused: ''
   });
   
-  // New Validation State
   const [errors, setErrors] = useState({});
-  
   const [upiId, setUpiId] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
   const [countdown, setCountdown] = useState(300);
   const UPI_AMOUNT = '700.00';
+  
   const [netBankData, setNetBankData] = useState({ account: '', ifsc: '', holder: '' });
   const [netBankStage, setNetBankStage] = useState('details');
   const [otp, setOtp] = useState('');
   const [enteredOtp, setEnteredOtp] = useState('');
   const [bankError, setBankError] = useState('');
+  
   const navigate = useNavigate();
+  const API_BASE_URL = "http://localhost:5000/api/payments";
 
   const getRedirectPath = () => {
     const flow = localStorage.getItem('activeFlow');
@@ -34,7 +35,7 @@ const Payment = () => {
   const handleBackClick = () => {
     const confirmBack = window.confirm("Are you sure you want to go back? Your payment progress will be lost.");
     if (confirmBack) {
-      navigate(-1); // Goes back to the previous page
+      navigate(-1);
     }
   };
 
@@ -44,7 +45,6 @@ const Payment = () => {
     const raw = number.replace(/\s/g, '');
     if (raw.length !== 16) return "Card number must be 16 digits";
     
-    // Luhn Algorithm Check
     let sum = 0;
     for (let i = 0; i < raw.length; i++) {
       let intVal = parseInt(raw.substr(i, 1));
@@ -68,7 +68,7 @@ const Payment = () => {
     return null;
   };
 
-  // --- HANDLERS ---
+  // --- SIDE EFFECTS ---
 
   useEffect(() => {
     if (showQRCode && countdown > 0) {
@@ -80,7 +80,7 @@ const Payment = () => {
   }, [showQRCode, countdown]);
 
   useEffect(() => {
-    setErrors({}); // Reset errors when switching methods
+    setErrors({});
     if (paymentMethod !== 'upi') setShowQRCode(false);
     if (paymentMethod !== 'net-banking') {
       setNetBankStage('details');
@@ -88,32 +88,7 @@ const Payment = () => {
     }
   }, [paymentMethod]);
 
-  const handleUPISubmit = (e) => {
-    e.preventDefault();
-    const upiRegex = /^[\w.-]+@[\w.-]+$/;
-    if (!upiRegex.test(upiId)) {
-      setErrors({ upi: "Please enter a valid UPI ID (e.g., name@bank)" });
-      return;
-    }
-    setErrors({});
-    setShowQRCode(true);
-    setCountdown(300);
-  };
-
-  const handlePaymentTimeout = () => {
-    setShowQRCode(false);
-    setUpiId('');
-    setCountdown(300);
-    alert('QR Code expired. Please try again.');
-  };
-
-  const completeUPIPayment = () => {
-    alert('UPI Payment Successful!');
-    localStorage.setItem('paymentCompleted', 'true');
-    const policyRef = `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-    localStorage.setItem('policyReferenceNumber', policyRef);
-    setTimeout(() => navigate(getRedirectPath()), 1500);
-  };
+  // --- INPUT HANDLERS ---
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -134,7 +109,6 @@ const Payment = () => {
     }
 
     setCardData({ ...cardData, [name]: formattedValue });
-    // Clear error for this field as user types
     if (errors[name]) setErrors({ ...errors, [name]: null });
   };
 
@@ -144,6 +118,109 @@ const Payment = () => {
     if (bankError) setBankError('');
   };
 
+  const handlePaymentTimeout = () => {
+    setShowQRCode(false);
+    setUpiId('');
+    setCountdown(300);
+    alert('QR Code expired. Please try again.');
+  };
+
+  // --- BACKEND INTEGRATED SUBMISSIONS ---
+
+  // 1. Credit Card Submit
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    
+    const cardError = validateCardNumber(cardData.number);
+    const expiryError = validateExpiry(cardData.expiry);
+    const nameError = !cardData.name.trim() ? "Name is required" : null;
+    const cvvError = cardData.cvv.length < 3 ? "Invalid CVV" : null;
+
+    if (cardError || expiryError || nameError || cvvError) {
+      setErrors({ number: cardError, expiry: expiryError, name: nameError, cvv: cvvError });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/credit-card`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: cardData.number,
+          name: cardData.name,
+          expiry: cardData.expiry,
+          cvv: cardData.cvv
+        })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Processing Secure Payment...');
+        localStorage.setItem('paymentCompleted', 'true');
+        localStorage.setItem('policyReferenceNumber', data.policyReferenceNumber);
+        setTimeout(() => navigate(getRedirectPath()), 2000);
+      } else {
+        alert("Payment Failed: " + data.message);
+      }
+    } catch (err) {
+      alert("Error connecting to the payment server.");
+    }
+  };
+
+  // 2. UPI Initiate
+  const handleUPISubmit = async (e) => {
+    e.preventDefault();
+    const upiRegex = /^[\w.-]+@[\w.-]+$/;
+    if (!upiRegex.test(upiId)) {
+      setErrors({ upi: "Please enter a valid UPI ID (e.g., name@bank)" });
+      return;
+    }
+    setErrors({});
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upi/initiate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ upiId })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('policyReferenceNumber', data.policyReferenceNumber);
+        setShowQRCode(true);
+        setCountdown(300);
+      } else {
+        alert("Could not generate QR Code: " + data.message);
+      }
+    } catch (err) {
+      alert("Error connecting to the payment server.");
+    }
+  };
+
+  // 3. UPI Confirm
+  const completeUPIPayment = async () => {
+    const policyReferenceNumber = localStorage.getItem('policyReferenceNumber');
+    try {
+      const response = await fetch(`${API_BASE_URL}/upi/confirm`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ policyReferenceNumber })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        alert('UPI Payment Successful!');
+        localStorage.setItem('paymentCompleted', 'true');
+        setTimeout(() => navigate(getRedirectPath()), 1500);
+      } else {
+        alert("Verification failed. Please retry.");
+      }
+    } catch (err) {
+      alert("Error verifying payment verification hook.");
+    }
+  };
+
+  // 4. Net Banking Details Form Handlers
   const handleNetBankSubmit = (e) => {
     e.preventDefault();
     const { account, ifsc, holder } = netBankData;
@@ -161,37 +238,34 @@ const Payment = () => {
     setNetBankStage('otp');
   };
 
-  const verifyNetBankOtp = (e) => {
+  // 5. Net Banking OTP Verification
+  const verifyNetBankOtp = async (e) => {
     e.preventDefault();
     if (enteredOtp !== otp) {
       setBankError('Invalid OTP. Please try again.');
       return;
     }
     setBankError('');
-    localStorage.setItem('paymentCompleted', 'true');
-    const policyRef = `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-    localStorage.setItem('policyReferenceNumber', policyRef);
-    setNetBankStage('success');
-    setTimeout(() => navigate(getRedirectPath()), 2000);
-  };
 
-  const handlePaymentSubmit = (e) => {
-    e.preventDefault();
-    
-    // Final Validation
-    const cardError = validateCardNumber(cardData.number);
-    const expiryError = validateExpiry(cardData.expiry);
-    const nameError = !cardData.name.trim() ? "Name is required" : null;
-    const cvvError = cardData.cvv.length < 3 ? "Invalid CVV" : null;
+    try {
+      const response = await fetch(`${API_BASE_URL}/net-banking/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(netBankData)
+      });
+      const data = await response.json();
 
-    if (cardError || expiryError || nameError || cvvError) {
-      setErrors({ number: cardError, expiry: expiryError, name: nameError, cvv: cvvError });
-      return;
+      if (data.success) {
+        localStorage.setItem('paymentCompleted', 'true');
+        localStorage.setItem('policyReferenceNumber', data.policyReferenceNumber);
+        setNetBankStage('success');
+        setTimeout(() => navigate(getRedirectPath()), 2000);
+      } else {
+        setBankError(data.message || "Netbanking processing failed.");
+      }
+    } catch (err) {
+      alert("Server failure processing net banking transmission.");
     }
-
-    alert('Processing Secure Payment...');
-    localStorage.setItem('paymentCompleted', 'true');
-    setTimeout(() => navigate(getRedirectPath()), 2000);
   };
 
   return (
@@ -229,16 +303,13 @@ const Payment = () => {
             </div>
           </div>
           <div className="back-navigation">
-          <button type="button" className="secondary-back-btn" onClick={handleBackClick}>
-          <i className="fa-solid fa-chevron-left"></i> Go Back
-          </button>
+            <button type="button" className="secondary-back-btn" onClick={handleBackClick}>
+              <i className="fa-solid fa-chevron-left"></i> Go Back
+            </button>
           </div>
         </div>
 
-        
-
         {/* Right Side: Visual Card & Form */}
-        
         <div className="checkout-form-area">
           {paymentMethod === 'credit-card' ? (
             <div className="card-ux-container">
@@ -407,6 +478,13 @@ const Payment = () => {
                    <p className="otp-hint">Demo OTP: {otp}</p>
                    <button type="submit" className="complete-pay-btn">Verify & Pay</button>
                 </form>
+              )}
+              {netBankStage === 'success' && (
+                <div className="upi-form" style={{textAlign: 'center', padding: '20px'}}>
+                  <i className="fa-solid fa-circle-check" style={{fontSize: '3rem', color: '#2ecc71', marginBottom: '15px'}}></i>
+                  <h2>Authentication Successful!</h2>
+                  <p>Securing details with backend systems...</p>
+                </div>
               )}
             </div>
           )}

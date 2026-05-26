@@ -1,19 +1,33 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./ResetPassword.css";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract variables safely out of route transition context
+  const emailFromState = location.state?.email || "";
+  const otpFromState = location.state?.otp || "";
 
   // Combined state for all form fields
   const [formData, setFormData] = useState({
-    email: "",
+    email: emailFromState, // Auto-populate with the verified email
     newPass: "",
     confPass: "",
   });
 
   // State for error messages
   const [errors, setErrors] = useState({});
+  // Track backend network request errors/status
+  const [serverError, setServerError] = useState("");
+
+  // Auto-populate form if email arrives after initial render hook mount
+  useEffect(() => {
+    if (emailFromState) {
+      setFormData((prev) => ({ ...prev, email: emailFromState }));
+    }
+  }, [emailFromState]);
 
   // Regex Patterns
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,6 +36,9 @@ export default function ResetPassword() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // Clear backend error message on type change
+    setServerError("");
 
     // Immediate Email Validation
     if (name === "email") {
@@ -58,11 +75,36 @@ export default function ResetPassword() {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      alert("Verification link sent to " + formData.email + " and password updated!");
-      navigate("/login");
+      try {
+        // Trigger live backend fetch mutation update execution string payload
+        const response = await fetch("http://localhost:5000/api/reset-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            otp: otpFromState, // Send along the verified code from step 1
+            newPassword: formData.newPass,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("Password updated successfully inside database collection!");
+          navigate("/login");
+        } else {
+          // Display errors returned by our backend express router rules validation handler
+          setServerError(data.message || "Failed to update your credentials.");
+        }
+      } catch (error) {
+        console.error("API Connection Error:", error);
+        setServerError("Could not connect to authentication server. Try again later.");
+      }
     }
   };
 
@@ -77,6 +119,9 @@ export default function ResetPassword() {
 
       <div className="reset-card-glass">
         <h1>Reset Password</h1>
+
+        {/* Global Server Message Notification Node */}
+        {serverError && <div className="error-text global-error-banner" style={{ textAlign: "center", marginBottom: "15px" }}>{serverError}</div>}
 
         <form onSubmit={handleSubmit} noValidate>
           {/* Email Field */}

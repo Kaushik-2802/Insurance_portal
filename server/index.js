@@ -3,6 +3,8 @@ import mongoose from "mongoose"
 import cors from "cors"
 import authRoutes from "./routes/authRoutes.js"
 import profileRoutes from "./routes/profileRoutes.js"
+import resetRoutes from "./routes/resetRoutes.js"
+import paymentRoutes from "./routes/paymentRoutes.js"
 
 const app=express()
 app.use(express.json());
@@ -13,6 +15,8 @@ mongoose.connect("mongodb://localhost:27017/LTI_INSURANCE").then(console.log("mo
 app.use('/api/auth',authRoutes)
 app.use('/api',profileRoutes)
 app.use("/uploads", express.static("uploads"));
+app.use("/api",resetRoutes)
+app.use("/api/payments",paymentRoutes)
 
 const port=5000;
 app.listen(port,()=>console.log(`Server running at port ${port}`))
