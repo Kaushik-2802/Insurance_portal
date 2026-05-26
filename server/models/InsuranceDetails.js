@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const insuranceDetailsSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId, // Connects directly to the User collection _id
+      ref: "User",
+      required: true
+    },
     refNo: {
       type: String,
       required: true,

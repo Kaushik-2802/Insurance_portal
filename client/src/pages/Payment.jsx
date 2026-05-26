@@ -27,6 +27,11 @@ const Payment = () => {
   const navigate = useNavigate();
   const API_BASE_URL = "http://localhost:5000/api/payments";
 
+  // Shared helper to retrieve the logged-in user identification safely
+  const getActiveUserId = () => {
+    return localStorage.getItem("userId");
+  };
+
   const getRedirectPath = () => {
     const flow = localStorage.getItem('activeFlow');
     return flow === 'travel' ? '/travel-success' : '/policy-reference';
@@ -127,7 +132,7 @@ const Payment = () => {
 
   // --- BACKEND INTEGRATED SUBMISSIONS ---
 
-  // 1. Credit Card Submit
+  // 1. Credit Card Submit (FIXED PAYLOAD WITH USERID)
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
     
@@ -141,6 +146,12 @@ const Payment = () => {
       return;
     }
 
+    const currentUserId = getActiveUserId();
+    if (!currentUserId) {
+      alert("Authentication session expired. Please re-login.");
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/credit-card`, {
         method: "POST",
@@ -149,7 +160,8 @@ const Payment = () => {
           number: cardData.number,
           name: cardData.name,
           expiry: cardData.expiry,
-          cvv: cardData.cvv
+          cvv: cardData.cvv,
+          userId: currentUserId // 👈 FIX: Sent user validation id token string
         })
       });
       const data = await response.json();
@@ -197,14 +209,24 @@ const Payment = () => {
     }
   };
 
-  // 3. UPI Confirm
+  // 3. UPI Confirm (FIXED PAYLOAD WITH USERID)
   const completeUPIPayment = async () => {
     const policyReferenceNumber = localStorage.getItem('policyReferenceNumber');
+    const currentUserId = getActiveUserId();
+
+    if (!currentUserId) {
+      alert("Authentication identity trace missing. Please re-login.");
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/upi/confirm`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ policyReferenceNumber })
+        body: JSON.stringify({ 
+          policyReferenceNumber,
+          userId: currentUserId // 👈 FIX: Appended verification requirement
+        })
       });
       const data = await response.json();
 
@@ -238,7 +260,7 @@ const Payment = () => {
     setNetBankStage('otp');
   };
 
-  // 5. Net Banking OTP Verification
+  // 5. Net Banking OTP Verification (FIXED PAYLOAD WITH USERID)
   const verifyNetBankOtp = async (e) => {
     e.preventDefault();
     if (enteredOtp !== otp) {
@@ -247,11 +269,20 @@ const Payment = () => {
     }
     setBankError('');
 
+    const currentUserId = getActiveUserId();
+    if (!currentUserId) {
+      alert("Authentication context not verified. Please re-login.");
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/net-banking/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(netBankData)
+        body: JSON.stringify({
+          ...netBankData,
+          userId: currentUserId // 👈 FIX: Attached account matching context trace
+        })
       });
       const data = await response.json();
 
