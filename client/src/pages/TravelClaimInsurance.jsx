@@ -25,29 +25,64 @@ export default function TravelClaimInsurance() {
     setFiles((prev) => [...prev, ...uploadedFiles]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!policyNumber || !linkedMobile || !selectedReason || !incidentDate) {
       window.alert('Please complete all fields before submitting your travel claim.');
       return;
     }
+    if (files.length === 0) {
+      window.alert('Please upload supporting documentation to validate your claim.');
+      return;
+    }
 
-    const existingRequests = JSON.parse(localStorage.getItem('adminClaimRequests') || '[]');
-    const newRequest = {
-      id: `TRV-CLM-${Date.now()}`,
-      policy: policyNumber,
-      mobile: linkedMobile,
-      reason: selectedReason,
-      date: incidentDate,
-      attachments: files.length,
-      type: 'Travel',
-      status: 'Pending',
-      createdAt: new Date().toLocaleString(),
-    };
+    // Construct Multipart Form Data for backend multer middleware configuration
+    const formData = new FormData();
+    formData.append("policyNo", policyNumber.trim());
+    formData.append("mobileNo", linkedMobile.trim());
+    formData.append("date", incidentDate);
+    formData.append("incidentType", selectedReason);
+    
+    files.forEach((file) => {
+      formData.append("supportDocs", file);
+    });
 
-    localStorage.setItem('adminClaimRequests', JSON.stringify([newRequest, ...existingRequests]));
-    window.alert('Travel claim submitted successfully. Our team will reach out soon.');
-    navigate('/dashboard');
+    try {
+      const response = await fetch("http://localhost:5000/api/claims/submit", {
+        method: "POST",
+        body: formData, // Browser handles multi-part boundary headers automatically
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Only run dashboard storage synchronization if server verification checks pass successfully
+        const existingRequests = JSON.parse(localStorage.getItem('adminClaimRequests') || '[]');
+        const newRequest = {
+          id: result.claimId || `TRV-CLM-${Date.now()}`,
+          policy: policyNumber.trim(),
+          mobile: linkedMobile.trim(),
+          reason: selectedReason,
+          date: incidentDate,
+          attachments: files.length,
+          type: 'Travel',
+          status: 'Pending',
+          createdAt: new Date().toLocaleString(),
+        };
+
+        localStorage.setItem('adminClaimRequests', JSON.stringify([newRequest, ...existingRequests]));
+        
+        window.alert('Travel claim submitted and verified successfully. Our team will reach out soon.');
+        navigate('/dashboard');
+      } else {
+        // Captures "Policy was not found in our database records" error messages from backend
+        window.alert('Verification / Submission Warning: ' + result.message);
+      }
+    } catch (error) {
+      console.error("Networking tracking layer fault architecture log: ", error);
+      window.alert('Unable to transmit data stream. Please verify your microservice connectivity pipeline.');
+    }
   };
 
   return (

@@ -1,30 +1,36 @@
-const mongoose=require("mongoose")
+import mongoose from "mongoose";
 
-const travelInsuranceSchema=new mongoose.Schema(
-    {
-        vehicleType:{
-            type:String,
-            enum:["Two Wheeler","Four Wheeler"],
-            required:true
-        },
-        destination:{
-            type:String,
-            required:true,
-            trim:true
-        },
-        takeOffDate:{
-            type:Date,
-            required:true
-        },
-        returnDate:{
-            type:Date,
-            required:true
-        }
+const travelInsuranceSchema = new mongoose.Schema(
+  {
+    policyNo: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true
     },
-    {
-        timestamps:true
+    travelType: {
+      type: String,
+      required: true
+    },
+    destination: {
+      type: String,
+      required: true
+    },
+    startDate: {
+      type: Date,
+      required: true
+    },
+    endDate: {
+      type: Date,
+      required: true
+    },
+    members: {
+      type: Array,
+      default: []
     }
+  },
+  { timestamps: true }
 );
 
-const TravelInsurance=mongoose.model("TravelInsurance",travelInsuranceSchema)
+const TravelInsurance = mongoose.model("TravelInsurance", travelInsuranceSchema);
 export default TravelInsurance;
