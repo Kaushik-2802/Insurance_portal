@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"; // Changed to ES Module import
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -22,7 +22,6 @@ const paymentSchema = new mongoose.Schema(
       unique: true,
       required: true
     },
-    // Meta logs safely stored (No CVV or complete raw cards)
     paymentDetails: {
       cardHolderName: String,
       lastFourDigits: String, 
@@ -33,4 +32,5 @@ const paymentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Payment", paymentSchema);
+// Changed to ES Module default export
+export default mongoose.model("Payment", paymentSchema);

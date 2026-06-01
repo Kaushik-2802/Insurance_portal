@@ -3,7 +3,8 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import TravelClaim from "../models/TravelClaim.js";
-import TravelInsurance from "../models/TravelInsurance.js"; // <-- CRITICAL: Import the master policy model
+import TravelInsurance from "../models/TravelInsurance.js";
+import BuyInsurance from "../models/BuyInsurance.js";
 
 const router = express.Router();
 
@@ -31,15 +32,13 @@ router.post("/submit", upload.array("supportDocs"), async (req, res) => {
     try {
         const { policyNo, date, mobileNo, incidentType } = req.body;
 
-        // 1. Structural Parameters Check
         if (!policyNo || !date || !mobileNo || !incidentType) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Missing mandatory parameters. All textual input targets required." 
+            return res.status(400).json({
+                success: false,
+                message: "Missing mandatory parameters. All textual input targets required."
             });
         }
 
-        // 2. ABSOLUTE VERIFICATION GUARD: Check if the policy exists in our records
         const activePolicy = await TravelInsurance.findOne({ policyNo: policyNo.trim() });
 
         if (!activePolicy) {
@@ -49,17 +48,15 @@ router.post("/submit", upload.array("supportDocs"), async (req, res) => {
             });
         }
 
-        // 3. Document Check
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Claim filing denied. Please upload at least one supporting document." 
+            return res.status(400).json({
+                success: false,
+                message: "Claim filing denied. Please upload at least one supporting document."
             });
         }
 
         const filePathString = req.files.map(file => file.filename).join(", ");
 
-        // 4. Save the Verified Claim
         const newTravelClaim = new TravelClaim({
             policyNo: policyNo.trim(),
             date: new Date(date),
@@ -82,6 +79,62 @@ router.post("/submit", upload.array("supportDocs"), async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Internal system fallback execution fault during claim archiving operations.",
+            error: error.message
+        });
+    }
+});
+
+router.post("/vehicle/submit", upload.array("supportDocs"), async (req, res) => {
+    try {
+        const { registration, date, mobileNo, incidentType } = req.body;
+
+        if (!registration || !date || !mobileNo || !incidentType) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing mandatory parameters. All textual input targets required."
+            });
+        }
+
+        const activePolicy = await BuyInsurance.findOne({ registration: registration.trim() });
+
+        if (!activePolicy) {
+            return res.status(404).json({
+                success: false,
+                message: `Claim Filing Rejected: The vehicle registration '${registration}' does not exist in our active database.`
+            });
+        }
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Claim filing denied. Please upload at least one supporting document."
+            });
+        }
+
+        const filePathString = req.files.map(file => file.filename).join(", ");
+
+        const newVehicleClaim = new TravelClaim({
+            policyNo: registration.trim(),
+            date: new Date(date),
+            mobileNo: mobileNo.trim(),
+            incidentType,
+            supportDocs: filePathString
+        });
+
+        const savedClaim = await newVehicleClaim.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Vehicle insurance claim successfully verified and submitted.",
+            claimId: savedClaim._id,
+            data: savedClaim
+        });
+
+    } catch (error) {
+        console.error("Internal processing fault in Claim Routing Layer: ", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal system fallback execution fault during vehicle claim archiving operations.",
             error: error.message
         });
     }
