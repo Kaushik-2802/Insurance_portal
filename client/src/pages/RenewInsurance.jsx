@@ -1,31 +1,100 @@
-import React, { useState } from "react";
-import "./RenewInsurance.css";
-import InnerHeader from "../components/InnerHeader";
-import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import './RenewInsurance.css';
+import InnerHeader from '../components/InnerHeader';
+import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 export default function RenewInsurance() {
   const [currentStep, setCurrentStep] = useState(1);
   const [vehicleType, setVehicleType] = useState(null);
   const [formData, setFormData] = useState({
-    name: "Guest User",
-    regNo: "XXXX-XX-0000",
-    policyNo: "SH-00000000",
-    email: "",
-    address: ""
+    name: '',
+    regNo: '',
+    policyNo: '',
+    email: '',
+    address: ''
   });
   
+  const [validationError, setValidationError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const navigate = useNavigate();
   const steps = ["Vehicle", "Details", "Preview", "Premium"];
+  const API_BASE_URL = "http://localhost:5000/api/insurance";
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (validationError) setValidationError(''); // Clear error messages when user modifies criteria
   };
 
   const resetCategory = () => {
     setVehicleType(null);
     setCurrentStep(1);
+    setValidationError('');
+  };
+
+  // =========================================================================
+  // BACKEND LOOKUP VERIFICATION HOOK
+  // =========================================================================
+  const handleVerifyAndContinue = async () => {
+    if (!formData.policyNo.trim()) {
+      setValidationError("Please input an existing policy tracking reference number.");
+      return;
+    }
+
+    setIsVerifying(true);
+    setValidationError('');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/verify-policy/${formData.policyNo.trim()}`);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // ✅ Policy validation verified! Seed form with official system records
+        setFormData(prev => ({
+          ...prev,
+          name: data.policy.name || prev.name || "Verified Holder",
+          regNo: data.policy.regNo || prev.regNo,
+        }));
+        
+        // Match the category variant safely
+        if (data.policy.vehicleType) {
+          setVehicleType(data.policy.vehicleType);
+        }
+
+        // Advance layout context structures
+        setCurrentStep(2);
+      } else {
+        // ❌ Policy reference mismatch error notification
+        setValidationError(data.message || "Invalid database identification record.");
+      }
+    } catch (err) {
+      setValidationError("Error contacting validation server. Check backend connections.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // =========================================================================
+  // SUBMIT RENEWAL TRANSACTION PARAMETERS TO PAYMENT HANDLING FLOW
+  // =========================================================================
+  const handleProceedToPayment = () => {
+    // Save contextual items to localStorage so your payment interface page processes references correctly
+    localStorage.setItem("policyPrice", "₹1,170");
+    localStorage.setItem("policyTitle", `${vehicleType || "Vehicle"} Renewal`);
+    
+    // Save vehicle parameters structure to map properties accurately inside payload targets
+    localStorage.setItem("vehicleDetails", JSON.stringify({
+      bikeModel: vehicleType === "Two Wheeler" ? "Renewed Motorcycle Profile" : "Renewed Private Car Profile",
+      regNo: formData.regNo
+    }));
+
+    // Explicitly seed the renewal request tracking data so payment confirms update operations
+    localStorage.setItem("renewalPolicyNo", formData.policyNo);
+    localStorage.setItem("renewalAddress", formData.address);
+
+    navigate("/payment");
   };
 
   return (
@@ -33,14 +102,13 @@ export default function RenewInsurance() {
       <InnerHeader />
       
       <div className="main-viewport">
-        {/* Soft Background Accents */}
         <div className="orb orb-1"></div>
         <div className="orb orb-2"></div>
 
         <div className="renewal-grid-container">
           
           <div className="step-content-area">
-            {/* Progress Tracker */}
+            {/* Progress Tracker Minimal Display layout */}
             <div className="stepper-minimal">
               {steps.map((s, i) => (
                 <div key={i} className={`mini-step ${currentStep > i ? "done" : ""} ${currentStep === i + 1 ? "active" : ""}`}>
@@ -69,7 +137,7 @@ export default function RenewInsurance() {
                 </div>
               )}
 
-              {/* STEP 2: DETAILS FORM */}
+              {/* STEP 2: DETAILS FORM WITH DATABASE VERIFICATION */}
               {currentStep === 1 && vehicleType && (
                 <div className="step-transition">
                   <div className="form-top-nav">
@@ -80,32 +148,58 @@ export default function RenewInsurance() {
                   </div>
                   
                   <h2 className="section-title">Ownership Verification</h2>
+                  <p className="sub-text">Provide an existing validation reference sequence token (e.g., POL-XXXXXX).</p>
+                  
                   <div className="input-stack">
                     <div className="floating-input">
-                      <input type="text" name="name" onChange={handleInputChange} placeholder=" " />
-                      <label>Full Name</label>
+                      <input 
+                        type="text" 
+                        name="policyNo" 
+                        value={formData.policyNo} 
+                        onChange={handleInputChange} 
+                        placeholder=" " 
+                        required 
+                      />
+                      <label>Existing Policy No. (Required Verification)</label>
                     </div>
+
                     <div className="input-row">
                         <div className="floating-input">
-                            <input type="text" name="regNo" onChange={handleInputChange} placeholder=" " />
-                            <label>Registration No.</label>
+                            <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder=" " />
+                            <label>Full Name (Optional Lookup)</label>
                         </div>
                         <div className="floating-input">
-                            <input type="text" name="policyNo" onChange={handleInputChange} placeholder=" " />
-                            <label>Existing Policy No.</label>
+                            <input type="text" name="regNo" value={formData.regNo} onChange={handleInputChange} placeholder=" " />
+                            <label>Registration No. (Optional Lookup)</label>
                         </div>
                     </div>
                   </div>
-                  <button className="cta-btn primary" onClick={() => setCurrentStep(2)}>Continue to Dispatch</button>
+
+                  {validationError && <p className="error-banner-msg" style={{color: '#e74c3c', marginTop: '10px', fontSize: '0.9rem'}}><i className="fa-solid fa-circle-exclamation"></i> {validationError}</p>}
+
+                  <button 
+                    className="cta-btn primary" 
+                    onClick={handleVerifyAndContinue}
+                    disabled={isVerifying}
+                    style={{marginTop: '20px'}}
+                  >
+                    {isVerifying ? "Querying Vault Reference..." : "Verify & Continue to Dispatch"}
+                  </button>
                 </div>
               )}
 
-              {/* STEP 3: LOGISTICS */}
+              {/* STEP 3: LOGISTICS DISPLAY SECTION */}
               {currentStep === 2 && (
                 <div className="step-transition">
                   <h2 className="section-title">Delivery Details</h2>
-                  <p className="sub-text">Confirm your physical policy dispatch address.</p>
-                  <textarea className="modern-area" name="address" onChange={handleInputChange} placeholder="Enter your full address here..."></textarea>
+                  <p className="sub-text">Confirm your physical policy document dispatch delivery address target.</p>
+                  <textarea 
+                    className="modern-area" 
+                    name="address" 
+                    value={formData.address} 
+                    onChange={handleInputChange} 
+                    placeholder="Enter your full dispatch address destination parameters here..."
+                  ></textarea>
                   <div className="button-group">
                     <button className="cta-btn secondary" onClick={() => setCurrentStep(1)}>Back</button>
                     <button className="cta-btn primary" onClick={() => setCurrentStep(3)}>View Final Quote</button>
@@ -113,7 +207,7 @@ export default function RenewInsurance() {
                 </div>
               )}
 
-              {/* STEP 4: PREMIUM */}
+              {/* STEP 4: PREMIUM SUMMARY CALCULATION VIEW */}
               {currentStep === 3 && (
                 <div className="step-transition">
                    <h2 className="section-title">Ready to Renew</h2>
@@ -124,36 +218,42 @@ export default function RenewInsurance() {
                       <div className="p-divider"></div>
                       <div className="p-total"><span>Total Payable</span><span>₹ 1,170</span></div>
                    </div>
-                   <button className="cta-btn pay-btn" onClick={() => navigate("/payment")}>
-                      Secure Payment <i className="fa-solid fa-lock"></i>
-                   </button>
+                   <div className="button-group" style={{marginTop: '20px'}}>
+                     <button className="cta-btn secondary" onClick={() => setCurrentStep(2)}>Back</button>
+                     <button className="cta-btn pay-btn" onClick={handleProceedToPayment}>
+                        Secure Payment & Renew <i className="fa-solid fa-lock"></i>
+                     </button>
+                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* RIGHT: DYNAMIC LIVE PREVIEW */}
+          {/* RIGHT: LIVE PREVIEW CONTAINER */}
           <div className="visualizer-area">
              <div className="live-policy-card">
                 <div className="card-inner">
                     <div className="card-head">
                         <div className="logo-stub">LTI INSURANCE</div>
-                        <div className="status-pill">PREVIEW</div>
+                        <div className="status-pill">{currentStep === 3 ? "VERIFIED" : "PREVIEW"}</div>
                     </div>
                     <div className="card-main">
+                        <div className="v-label">POLICY NUMBER</div>
+                        <div className="v-value" style={{color: '#2ecc71', fontWeight: 'bold'}}>{formData.policyNo || "Unverified ID"}</div>
+
                         <div className="v-label">POLICY HOLDER</div>
-                        <div className="v-value">{formData.name || "Enter Name"}</div>
+                        <div className="v-value">{formData.name || "Awaiting Verification"}</div>
                         
                         <div className="v-label">VEHICLE REGISTRATION</div>
                         <div className="v-value">{formData.regNo || "XXXX-XX-0000"}</div>
 
-                        <div className="v-label">PLAN TYPE</div>
+                        <div className="v-label">PLAN CATEGORY</div>
                         <div className="v-value">{vehicleType || "Not Selected"}</div>
                     </div>
                     <div className="card-foot">
                         <div>
-                            <div className="v-label">VALIDITY</div>
-                            <div className="v-value small">APR 2026 - APR 2027</div>
+                            <div className="v-label">VALIDITY EXTENSION</div>
+                            <div className="v-value small">EXTENDS +1 YEAR</div>
                         </div>
                         <div className="qr-stub"><i className="fa-solid fa-qrcode"></i></div>
                     </div>
