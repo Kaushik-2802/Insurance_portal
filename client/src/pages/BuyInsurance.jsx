@@ -12,20 +12,17 @@ const BuyInsurance = () => {
     engineNumber: "", chasisNumber: "",
   });
 
-  // State to track error messages
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track server loading state
   
   const navigate = useNavigate();
 
-  // Validation Logic
   const validate = () => {
     let tempErrors = {};
     
-    // Manufacturer/Model: Not empty and minimum length
     if (!formData.manufacturer.trim()) tempErrors.manufacturer = "Manufacturer is required";
     if (!formData.model.trim()) tempErrors.model = "Model is required";
 
-    // Registration Number: e.g., AA 00 AA 0000 (Indian Standard format example)
     const regRegex = /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/i;
     if (!formData.registrationNumber) {
       tempErrors.registrationNumber = "Registration number is required";
@@ -33,16 +30,13 @@ const BuyInsurance = () => {
       tempErrors.registrationNumber = "Format: XX 00 XX 0000";
     }
 
-    // Driving License: Typically 15 alphanumeric characters
     if (formData.drivingLicense.length < 5) {
       tempErrors.drivingLicense = "Enter a valid Driving License number";
     }
 
-    // Engine & Chassis: Usually 17 characters for Chassis, 6+ for engine
     if (formData.engineNumber.length < 6) tempErrors.engineNumber = "Invalid Engine Number";
     if (formData.chasisNumber.length < 10) tempErrors.chasisNumber = "Invalid Chassis Number";
 
-    // Purchase Date: Cannot be in the future
     const selectedDate = new Date(formData.purchaseDate);
     const today = new Date();
     if (!formData.purchaseDate) {
@@ -52,7 +46,6 @@ const BuyInsurance = () => {
     }
 
     setErrors(tempErrors);
-    // Return true if the errors object is empty
     return Object.keys(tempErrors).length === 0;
   };
 
@@ -60,17 +53,64 @@ const BuyInsurance = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Clear error for a specific field as the user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log("Form Data Submitted:", formData);
-      navigate("/policy-type");
+      setIsSubmitting(true);
+
+      // Bundle tracking states + user text inputs seamlessly
+      const submissionPayload = {
+        userId: "60d0fe4f5311236168a109ca", // Mock placeholder user object assignment
+        activeForm: activeForm,             // "bike" or "car"
+        ...formData,                        // Spreads manufacturer, model, registrationNumber, engineNumber, chasisNumber, drivingLicense, purchaseDate
+        amount: activeForm === "bike" ? "₹1,850" : "₹4,500",
+        paymentMethod: "Razorpay / Digital Wallet",
+        transactionId: "TXN-" + Math.floor(Math.random() * 10000000)
+      };
+
+      try {
+        const response = await fetch("http://localhost:5000/api/insurance/create-policy", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(submissionPayload),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          console.log("Success confirmation data object received:", data);
+
+          // =========================================================================
+          // 🚀 THE BRIDGE FIX: Align payload structure exactly with Payment.js hooks
+          // =========================================================================
+          const localPayloadStaging = {
+            bikeModel: formData.model, 
+            regNo: formData.registrationNumber, // Maps exactly to parsed.regNo lookup in Payment.js
+            vehicleType: activeForm === "bike" ? "Two Wheeler" : "Four Wheeler",
+            insuredValue: activeForm === "bike" ? "₹2,85,000" : "₹7,50,000"
+          };
+
+          // Save tracking block explicitly so downstream payments pick it up seamlessly
+          localStorage.setItem("vehicleDetails", JSON.stringify(localPayloadStaging));
+          // =========================================================================
+
+          navigate("/policy-type", { state: { policy: data.policy } });
+        } else {
+          alert(data.message || "Something went wrong saving details down to DB.");
+        }
+      } catch (error) {
+        console.error("Network interface communication failure:", error);
+        alert("Failed connecting to the backend. Please verify your server port console.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -164,8 +204,8 @@ const BuyInsurance = () => {
                 </div>
               </div>
 
-              <button type="submit" className="glow-btn">
-                Generate Policy Quote <i className="fa-solid fa-bolt-lightning"></i>
+              <button type="submit" className="glow-btn" disabled={isSubmitting}>
+                {isSubmitting ? "Processing..." : "Generate Policy Quote"} <i className="fa-solid fa-bolt-lightning"></i>
               </button>
             </form>
           </div>

@@ -1,4 +1,4 @@
-import mongoose from "mongoose"; // Changed to ES Module import
+import mongoose from "mongoose"; 
 
 const paymentSchema = new mongoose.Schema(
   {

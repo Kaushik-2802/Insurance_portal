@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Payment.css';
 
 const Payment = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
   const [cardData, setCardData] = useState({
     number: '',
@@ -16,21 +19,114 @@ const Payment = () => {
   const [upiId, setUpiId] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
   const [countdown, setCountdown] = useState(300);
-  const UPI_AMOUNT = '700.00';
   
+  // =========================================================================
+  // STATE DEFINITIONS
+  // =========================================================================
+  const [totalAmount, setTotalAmount] = useState('700.00'); // Baseline fallback
+  const [currencySymbol, setCurrencySymbol] = useState('₹');
+  const [selectedPlanTitle, setSelectedPlanTitle] = useState('Vehicle Insurance Plan');
+
+  // =========================================================================
+  // DYNAMIC AMOUNT, TITLE & CURRENCY SYNC HOOK
+  // =========================================================================
+  useEffect(() => {
+    try {
+      let rawAmount = '';
+      let rawTitle = '';
+
+      // 1. Prioritize React Router Link/Navigate state (passed directly from previous screen)
+      if (location.state && location.state.price) {
+        rawAmount = String(location.state.price);
+        rawTitle = location.state.title || '';
+      } else {
+        // 2. Fallback check: Standalone policy type screen keys next
+        const policyPriceField = localStorage.getItem("policyPrice");
+        const policyTitleField = localStorage.getItem("policyTitle");
+
+        // 3. Keep existing fallback checks for form structures intact
+        const standalonePremium = localStorage.getItem("calculatedPremium") || localStorage.getItem("premiumAmount");
+        const localFormSaved = localStorage.getItem("vehicleDetails") || localStorage.getItem("insuranceForm");
+        
+        if (policyPriceField) {
+          rawAmount = String(policyPriceField);
+          rawTitle = policyTitleField || '';
+        } else if (standalonePremium) {
+          rawAmount = String(standalonePremium);
+        } else if (localFormSaved) {
+          const parsed = JSON.parse(localFormSaved);
+          rawAmount = String(parsed.premium || parsed.finalPremium || parsed.planPrice || parsed.totalAmount || parsed.amount || '');
+        }
+      }
+
+      // Sync detected configurations to state fields
+      if (rawTitle) {
+        setSelectedPlanTitle(rawTitle);
+      }
+
+      if (rawAmount) {
+        // Detect currency symbol dynamically
+        if (rawAmount.includes('$')) {
+          setCurrencySymbol('$');
+        } else {
+          setCurrencySymbol('₹');
+        }
+
+        // Extract numbers and decimals safely (Removes strings like "/year" or "Starts")
+        const cleanedAmount = rawAmount.replace(/[^0-9.]/g, '');
+        if (cleanedAmount) {
+          setTotalAmount(cleanedAmount);
+        }
+      } else {
+        setTotalAmount('700.00');
+        setCurrencySymbol('₹');
+      }
+    } catch (e) {
+      console.error("Could not parse dynamic premium from allocation workflow context", e);
+    }
+  }, [location.state]); // Dependencies monitor state transitions seamlessly
+
   const [netBankData, setNetBankData] = useState({ account: '', ifsc: '', holder: '' });
   const [netBankStage, setNetBankStage] = useState('details');
   const [otp, setOtp] = useState('');
   const [enteredOtp, setEnteredOtp] = useState('');
   const [bankError, setBankError] = useState('');
   
-  const navigate = useNavigate();
   const API_BASE_URL = "http://localhost:5000/api/payments";
 
-  // Shared helper to retrieve the logged-in user identification safely
-  const getActiveUserId = () => {
-    return localStorage.getItem("userId");
+  // Dynamic calculations for display breakdowns
+  const parsedAmount = parseFloat(totalAmount) || 700.00;
+  const basicCoverageDisplay = (parsedAmount * 0.75).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
+  const addOnsDisplay = (parsedAmount * 0.25).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
+  const formattedTotalDisplay = parsedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // =========================================================================
+  // DYNAMIC VEHICLE EXTRACTION HOOKS
+  // =========================================================================
+  const getVehiclePayloadDetails = () => {
+    try {
+      const localFormSaved = localStorage.getItem("vehicleDetails") || localStorage.getItem("insuranceForm");
+      if (localFormSaved) {
+        const parsed = JSON.parse(localFormSaved);
+        return {
+          model: parsed.bikeModel || parsed.carModel || parsed.model || "Dynamic Vehicle Model",
+          registrationNumber: parsed.regNo || parsed.registrationNumber || "TS-09-DYNAMIC",
+          vehicleType: parsed.vehicleType || (parsed.carModel ? "Four Wheeler" : "Two Wheeler"),
+          insuredValue: parsed.insuredValue || "₹2,500,000"
+        };
+      }
+    } catch (e) {
+      console.error("Could not parse vehicle details from localStorage", e);
+    }
+    return {
+      model: localStorage.getItem("selectedBikeModel") || localStorage.getItem("selectedCarModel") || "Selected Vehicle Model",
+      registrationNumber: localStorage.getItem("selectedRegNo") || "TS-09-XX-9999",
+      vehicleType: "Two Wheeler",
+      insuredValue: "₹2,85,000"
+    };
   };
+
+  const getActiveUserId = () => localStorage.getItem("userId");
 
   const getRedirectPath = () => {
     const flow = localStorage.getItem('activeFlow');
@@ -39,13 +135,10 @@ const Payment = () => {
 
   const handleBackClick = () => {
     const confirmBack = window.confirm("Are you sure you want to go back? Your payment progress will be lost.");
-    if (confirmBack) {
-      navigate(-1);
-    }
+    if (confirmBack) navigate(-1);
   };
 
   // --- VALIDATION UTILITIES ---
-
   const validateCardNumber = (number) => {
     const raw = number.replace(/\s/g, '');
     if (raw.length !== 16) return "Card number must be 16 digits";
@@ -74,7 +167,6 @@ const Payment = () => {
   };
 
   // --- SIDE EFFECTS ---
-
   useEffect(() => {
     if (showQRCode && countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -94,7 +186,6 @@ const Payment = () => {
   }, [paymentMethod]);
 
   // --- INPUT HANDLERS ---
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
@@ -130,9 +221,7 @@ const Payment = () => {
     alert('QR Code expired. Please try again.');
   };
 
-  // --- BACKEND INTEGRATED SUBMISSIONS ---
-
-  // 1. Credit Card Submit (FIXED PAYLOAD WITH USERID)
+  // --- BACKEND INTEGRATED SUBMISSIONS WITH LOCALSTORAGE TENURE ---
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
     
@@ -152,6 +241,11 @@ const Payment = () => {
       return;
     }
 
+    const vehicleInfo = getVehiclePayloadDetails();
+    
+    // ✅ Extract Tenure directly from browser local storage environment mapping
+    const storedTenure = localStorage.getItem("tenure") || "1";
+
     try {
       const response = await fetch(`${API_BASE_URL}/credit-card`, {
         method: "POST",
@@ -161,7 +255,10 @@ const Payment = () => {
           name: cardData.name,
           expiry: cardData.expiry,
           cvv: cardData.cvv,
-          userId: currentUserId // 👈 FIX: Sent user validation id token string
+          userId: currentUserId,
+          amount: totalAmount, 
+          tenure: parseInt(storedTenure, 10), // ✅ Attached securely to body pipeline
+          ...vehicleInfo 
         })
       });
       const data = await response.json();
@@ -179,7 +276,6 @@ const Payment = () => {
     }
   };
 
-  // 2. UPI Initiate
   const handleUPISubmit = async (e) => {
     e.preventDefault();
     const upiRegex = /^[\w.-]+@[\w.-]+$/;
@@ -193,7 +289,10 @@ const Payment = () => {
       const response = await fetch(`${API_BASE_URL}/upi/initiate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ upiId })
+        body: JSON.stringify({ 
+          upiId,
+          amount: totalAmount
+        })
       });
       const data = await response.json();
 
@@ -209,7 +308,6 @@ const Payment = () => {
     }
   };
 
-  // 3. UPI Confirm (FIXED PAYLOAD WITH USERID)
   const completeUPIPayment = async () => {
     const policyReferenceNumber = localStorage.getItem('policyReferenceNumber');
     const currentUserId = getActiveUserId();
@@ -219,13 +317,21 @@ const Payment = () => {
       return;
     }
 
+    const vehicleInfo = getVehiclePayloadDetails();
+    
+    // ✅ Extract Tenure directly from browser local storage environment mapping
+    const storedTenure = localStorage.getItem("tenure") || "1";
+
     try {
       const response = await fetch(`${API_BASE_URL}/upi/confirm`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           policyReferenceNumber,
-          userId: currentUserId // 👈 FIX: Appended verification requirement
+          userId: currentUserId,
+          amount: totalAmount, 
+          tenure: parseInt(storedTenure, 10), // ✅ Attached securely to body pipeline
+          ...vehicleInfo 
         })
       });
       const data = await response.json();
@@ -242,7 +348,6 @@ const Payment = () => {
     }
   };
 
-  // 4. Net Banking Details Form Handlers
   const handleNetBankSubmit = (e) => {
     e.preventDefault();
     const { account, ifsc, holder } = netBankData;
@@ -260,7 +365,6 @@ const Payment = () => {
     setNetBankStage('otp');
   };
 
-  // 5. Net Banking OTP Verification (FIXED PAYLOAD WITH USERID)
   const verifyNetBankOtp = async (e) => {
     e.preventDefault();
     if (enteredOtp !== otp) {
@@ -275,13 +379,21 @@ const Payment = () => {
       return;
     }
 
+    const vehicleInfo = getVehiclePayloadDetails();
+    
+    // ✅ Extract Tenure directly from browser local storage environment mapping
+    const storedTenure = localStorage.getItem("tenure") || "1";
+
     try {
       const response = await fetch(`${API_BASE_URL}/net-banking/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...netBankData,
-          userId: currentUserId // 👈 FIX: Attached account matching context trace
+          userId: currentUserId,
+          amount: totalAmount, 
+          tenure: parseInt(storedTenure, 10), // ✅ Attached securely to body pipeline
+          ...vehicleInfo 
         })
       });
       const data = await response.json();
@@ -310,11 +422,11 @@ const Payment = () => {
           </div>
 
           <div className="price-card">
-            <span className="price-label">Total Premium</span>
-            <h2 className="price-amount">$700.00</h2>
+            <span className="price-label">{selectedPlanTitle} Portfolio</span>
+            <h2 className="price-amount">{currencySymbol}{formattedTotalDisplay}</h2>
             <div className="price-breakdown">
-              <p>Basic Coverage: <span>$500.00</span></p>
-              <p>Add-ons: <span>$200.00</span></p>
+              <p>Basic Coverage: <span>{currencySymbol}{basicCoverageDisplay}</span></p>
+              <p>Add-ons: <span>{currencySymbol}{addOnsDisplay}</span></p>
             </div>
           </div>
 
@@ -443,7 +555,7 @@ const Payment = () => {
                     />
                     {errors.upi && <span className="error-msg">{errors.upi}</span>}
                   </div>
-                  <p className="upi-instruction">Enter your UPI ID to generate the payment QR code for ₹{UPI_AMOUNT}.</p>
+                  <p className="upi-instruction">Enter your UPI ID to generate the payment QR code for {currencySymbol}{formattedTotalDisplay}.</p>
                   <button type="submit" className="complete-pay-btn">
                     Generate QR Code <i className="fa-solid fa-qrcode"></i>
                   </button>
@@ -485,7 +597,7 @@ const Payment = () => {
                     <input name="account" placeholder="1234567890" value={netBankData.account} onChange={handleNetBankInputChange} />
                   </div>
                   <div className="form-input-group">
-                    <label>IFSC Code</label>
+                    <label>App/IFSC Code</label>
                     <input name="ifsc" placeholder="ABCD0123456" value={netBankData.ifsc} onChange={handleNetBankInputChange} />
                   </div>
                   <div className="form-input-group">
