@@ -11,7 +11,6 @@ export default function ClaimForm() {
   const [incidentDate, setIncidentDate] = useState("");
   const [files, setFiles] = useState([]);
   
-  // New State variables for active database lookups
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [validationError, setValidationError] = useState("");
@@ -19,9 +18,8 @@ export default function ClaimForm() {
 
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
-  const API_BASE_URL = "http://localhost:5000/api/insurance";
+  const API_BASE_URL = "http://localhost:5000/api/claims";
 
-  // Dynamic Reasons: Now relies on validated DB properties rather than fragile frontend string sniffing
   const getReasons = () => {
     const isTravel = policyNumber.toUpperCase().startsWith("TRV");
     if (isTravel) {
@@ -33,7 +31,6 @@ export default function ClaimForm() {
       ];
     }
     
-    // Motor policies grid defaults mapping safely
     return [
       { id: "Natural Disaster", icon: "fa-solid fa-cloud-showers-heavy", desc: "Flood, Storm, Earthquakes" },
       { id: "Man-Made Disaster", icon: "fa-solid fa-fire-extinguisher", desc: "Fire, Vandalism, Riots" },
@@ -47,9 +44,6 @@ export default function ClaimForm() {
     setFiles((prev) => [...prev, ...uploadedFiles]);
   };
 
-  // =========================================================================
-  // LIVE DATABASE RECORD CHECKER
-  // =========================================================================
   const handleVerifyPolicy = async () => {
     if (!policyNumber.trim() || !linkedMobile.trim()) {
       setValidationError("Please complete both policy code and telephone fields to run check logs.");
@@ -60,7 +54,7 @@ export default function ClaimForm() {
     setValidationError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/verify-claim-eligibility`, {
+      const response = await fetch("http://localhost:5000/api/claims/verify-claim-eligibility", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -86,7 +80,7 @@ export default function ClaimForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!isVerified) {
@@ -99,22 +93,42 @@ export default function ClaimForm() {
       return;
     }
 
-    const existingRequests = JSON.parse(localStorage.getItem('adminClaimRequests') || '[]');
-    const newRequest = {
-      id: `CLM-${Date.now()}`,
-      policy: policyNumber,
-      mobile: linkedMobile,
-      reason: selectedReason,
-      date: incidentDate,
-      vehicleType: detectedVehicleType,
-      attachments: files.length,
-      status: 'Pending',
-      createdAt: new Date().toLocaleString(),
-    };
+    if (files.length === 0) {
+      window.alert('Please attach at least one supporting proof document.');
+      return;
+    }
 
-    localStorage.setItem('adminClaimRequests', JSON.stringify([newRequest, ...existingRequests]));
-    window.alert('Claim details securely logged. The review matrix pipeline is initialized.');
-    navigate('/dashboard');
+    const isTravel = policyNumber.toUpperCase().startsWith("TRV");
+    const endpointUrl = isTravel ? `${API_BASE_URL}/submit` : `${API_BASE_URL}/vehicle/submit`;
+
+    const formData = new FormData();
+    formData.append(isTravel ? "policyNo" : "registration", policyNumber.trim());
+    formData.append("mobileNo", linkedMobile.trim());
+    formData.append("date", incidentDate);
+    formData.append("incidentType", selectedReason);
+    
+    files.forEach(file => {
+      formData.append("supportDocs", file);
+    });
+
+    try {
+      const response = await fetch(endpointUrl, {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        window.alert('Claim details securely logged. The review matrix pipeline is initialized.');
+        navigate('/dashboard');
+      } else {
+        window.alert('Submission Mismatch Error: ' + result.message);
+      }
+    } catch (error) {
+      console.error("Networking tracking layer fault:", error);
+      window.alert('Unable to transmit data stream across server nodes.');
+    }
   };
 
   return (
@@ -131,8 +145,6 @@ export default function ClaimForm() {
           </div>
 
           <form onSubmit={handleSubmit} className="claim-form-layout">
-            
-            {/* Verification Inputs Block */}
             <div className="input-group-modern">
               <div className="floating-field">
                 <input 
@@ -144,7 +156,7 @@ export default function ClaimForm() {
                   value={policyNumber} 
                   onChange={(e) => { setPolicyNumber(e.target.value); setValidationError(""); }} 
                 />
-                <label htmlFor="policy"><i className="fa-solid fa-hashtag"></i> Policy Number</label>
+                <label htmlFor="policy"><i className="fa-solid fa-hashtag"></i> Policy Number Reference</label>
               </div>
               <div className="floating-field">
                 <input 
@@ -164,7 +176,6 @@ export default function ClaimForm() {
               </div>
             </div>
 
-            {/* Validation Control Action Center */}
             <div style={{ marginBottom: '25px' }}>
               {!isVerified ? (
                 <button 
@@ -174,7 +185,7 @@ export default function ClaimForm() {
                   disabled={isVerifying}
                   style={{ background: '#3498db', color: '#fff', padding: '10px 20px', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                 >
-                  {isVerifying ? "Verifying Reference..." : "Verify Policy Status"}
+                  {isVerifying ? "Verifying Matrix Record..." : "Verify Policy Status"}
                 </button>
               ) : (
                 <div style={{ color: '#2ecc71', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -196,10 +207,8 @@ export default function ClaimForm() {
               )}
             </div>
 
-            {/* Render interactive sections only if policy checks succeed */}
             {isVerified && (
               <>
-                {/* Grid: Reasons */}
                 <div className="reason-grid-section">
                   <h3 className="grid-label">Nature of Incident</h3>
                   <div className="reason-grid">
@@ -216,7 +225,6 @@ export default function ClaimForm() {
                   </div>
                 </div>
 
-                {/* Addition: Elegant Document Upload */}
                 <div className="upload-section">
                   <h3 className="grid-label">Evidence & Documentation</h3>
                   <div className="upload-dropzone" onClick={() => fileInputRef.current.click()}>

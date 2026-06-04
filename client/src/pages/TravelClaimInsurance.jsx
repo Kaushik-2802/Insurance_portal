@@ -37,7 +37,6 @@ export default function TravelClaimInsurance() {
       return;
     }
 
-    // Construct Multipart Form Data for backend multer middleware configuration
     const formData = new FormData();
     formData.append("policyNo", policyNumber.trim());
     formData.append("mobileNo", linkedMobile.trim());
@@ -51,37 +50,20 @@ export default function TravelClaimInsurance() {
     try {
       const response = await fetch("http://localhost:5000/api/claims/submit", {
         method: "POST",
-        body: formData, // Browser handles multi-part boundary headers automatically
+        body: formData,
       });
 
       const result = await response.json();
 
-      if (result.success) {
-        // Only run dashboard storage synchronization if server verification checks pass successfully
-        const existingRequests = JSON.parse(localStorage.getItem('adminClaimRequests') || '[]');
-        const newRequest = {
-          id: result.claimId || `TRV-CLM-${Date.now()}`,
-          policy: policyNumber.trim(),
-          mobile: linkedMobile.trim(),
-          reason: selectedReason,
-          date: incidentDate,
-          attachments: files.length,
-          type: 'Travel',
-          status: 'Pending',
-          createdAt: new Date().toLocaleString(),
-        };
-
-        localStorage.setItem('adminClaimRequests', JSON.stringify([newRequest, ...existingRequests]));
-        
-        window.alert('Travel claim submitted and verified successfully. Our team will reach out soon.');
+      if (response.ok && result.success) {
+        window.alert('Travel claim submitted and verified successfully.');
         navigate('/dashboard');
       } else {
-        // Captures "Policy was not found in our database records" error messages from backend
         window.alert('Verification / Submission Warning: ' + result.message);
       }
     } catch (error) {
-      console.error("Networking tracking layer fault architecture log: ", error);
-      window.alert('Unable to transmit data stream. Please verify your microservice connectivity pipeline.');
+      console.error("Network layer execution fault: ", error);
+      window.alert('Unable to transmit data stream. Verify your backend server status.');
     }
   };
 
