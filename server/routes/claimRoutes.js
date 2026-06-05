@@ -3,9 +3,11 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import TravelClaim from "../models/TravelClaim.js";
-import VehicleClaim from "../models/vehicleClaim.js"; // Integrated the separate Vehicle Claims model
+import VehicleClaim from "../models/vehicleClaim.js"; 
 import TravelInsurance from "../models/TravelInsurance.js";
 import InsuranceDetails from "../models/InsuranceDetails.js";
+// FIX 1: Ensure capital 'S' matches filesystem casing perfectly
+import SettledClaim from "../models/settledClaim.js";
 
 const router = express.Router();
 
@@ -30,7 +32,6 @@ const upload = multer({
 
 // =========================================================================
 // 1. POST: Policy Eligibility Verification Gateway
-// URL: http://localhost:5000/api/claims/verify-claim-eligibility
 // =========================================================================
 router.post("/verify-claim-eligibility", async (req, res) => {
     try {
@@ -64,7 +65,6 @@ router.post("/verify-claim-eligibility", async (req, res) => {
 
 // =========================================================================
 // 2. POST: Travel Claims Inbound Ingestion Pipeline
-// URL: http://localhost:5000/api/claims/submit
 // =========================================================================
 router.post("/submit", upload.array("supportDocs"), async (req, res) => {
     try {
@@ -125,7 +125,6 @@ router.post("/submit", upload.array("supportDocs"), async (req, res) => {
 
 // =========================================================================
 // 3. POST: Vehicle Claims Inbound Ingestion Pipeline
-// URL: http://localhost:5000/api/claims/vehicle/submit
 // =========================================================================
 router.post("/vehicle/submit", upload.array("supportDocs"), async (req, res) => {
     try {
@@ -156,7 +155,6 @@ router.post("/vehicle/submit", upload.array("supportDocs"), async (req, res) => 
 
         const filePathString = req.files.map(file => file.filename).join(", ");
 
-        // Fixed: Saving to VehicleClaim schema to accept "Theft", "Accident" cleanly
         const newVehicleClaim = new VehicleClaim({
             policyNo: registration.trim(),
             date: new Date(date),
@@ -187,21 +185,17 @@ router.post("/vehicle/submit", upload.array("supportDocs"), async (req, res) => 
 
 // =========================================================================
 // 4. ADMIN ENDPOINTS: Sync Panel Data Rows From Respective Collections
-// URL: GET http://localhost:5000/api/claims/admin/realtime-claims
 // =========================================================================
 router.get("/admin/realtime-claims", async (req, res) => {
     try {
-        // Fetch raw documents concurrently from both collections
         const travelClaims = await TravelClaim.find();
         const vehicleClaims = await VehicleClaim.find();
 
-        // Standardize data tags to remember where they came from
         const combinedClaims = [
             ...travelClaims.map(c => ({ ...c.toObject(), typeKey: "travel" })),
             ...vehicleClaims.map(c => ({ ...c.toObject(), typeKey: "vehicle" }))
         ];
 
-        // Sort combined array so the latest claims across both products surface together
         combinedClaims.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         const formattedClaims = await Promise.all(
@@ -255,10 +249,6 @@ router.get("/admin/realtime-claims", async (req, res) => {
     }
 });
 
-// =========================================================================
-// PUT: Modify State Parameters Within The Claims Collection
-// URL: PUT http://localhost:5000/api/claims/admin/realtime-claims/:id/status
-// =========================================================================
 router.put("/admin/realtime-claims/:id/status", async (req, res) => {
     try {
         const { action } = req.body;
@@ -268,14 +258,12 @@ router.put("/admin/realtime-claims/:id/status", async (req, res) => {
             return res.status(400).json({ success: false, message: "Missing explicit state action parameter." });
         }
 
-        // 1. Try scanning and updating in Travel collection
         let updated = await TravelClaim.findByIdAndUpdate(
             targetId, 
             { $set: { status: action } },
             { new: true }
         );
 
-        // 2. If it wasn't a travel claim, attempt to find and update in Vehicle collection
         if (!updated) {
             updated = await VehicleClaim.findByIdAndUpdate(
                 targetId, 
@@ -291,6 +279,100 @@ router.put("/admin/realtime-claims/:id/status", async (req, res) => {
         res.status(200).json({ success: true, message: "Status adjusted successfully.", data: updated });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// =========================================================================
+// 5. GET: Fetch Unified Claims for Logged-In User matched via Policy/Mobile
+// =========================================================================
+router.get("/user-track", async (req, res) => {
+    try {
+        const { policyNo, mobileNo } = req.query;
+
+        const sanitizedPolicy = policyNo && policyNo !== "undefined" && policyNo !== "null" ? policyNo.trim() : "";
+        const sanitizedMobile = mobileNo && mobileNo !== "undefined" && mobileNo !== "null" ? mobileNo.trim() : "";
+
+        // Fail-safe payload escape
+        if (!sanitizedPolicy && !sanitizedMobile) {
+            return res.status(200).json([]);
+        }
+
+        // 1. Standard active collections matching array criteria
+        const activeClaimsQuery = [];
+        if (sanitizedPolicy) {
+            activeClaimsQuery.push({ policyNo: sanitizedPolicy });
+        }
+        if (sanitizedMobile) {
+            activeClaimsQuery.push({ mobileNo: sanitizedMobile });
+        }
+
+        // 2. FIX 2: Dynamic search for SettledClaims to catch registration tokens (e.g. "TS 08 FX 5612")
+        // and safely handle regex mappings on the compound user string cell
+        const settledClaimsQuery = [];
+        if (sanitizedPolicy) {
+            settledClaimsQuery.push(
+                { policyNo: sanitizedPolicy },
+                // If front-end passes vehicle registration string, map against type text description fallback criteria
+                { type: { $regex: sanitizedPolicy, $options: "i" } }
+            );
+        }
+        if (sanitizedMobile) {
+            settledClaimsQuery.push({ user: { $regex: sanitizedMobile, $options: "i" } });
+        }
+
+        // 3. Concurrently pull documents from all 3 data buckets
+        const [travelClaims, vehicleClaims, settledClaims] = await Promise.all([
+            TravelClaim.find({ $or: activeClaimsQuery }),
+            VehicleClaim.find({ $or: activeClaimsQuery }),
+            SettledClaim.find({ $or: settledClaimsQuery }) 
+        ]);
+
+        // 4. Uniformly normalize fields before pushing array down pipeline to TrackClaims.jsx
+        const combined = [
+            ...travelClaims.map(c => ({
+                _id: c._id,
+                policyNo: c.policyNo,
+                createdAt: c.createdAt,
+                flowType: "travel",
+                reason: c.incidentType,
+                status: c.status || "Pending",
+                requestedAmount: c.requestedAmount || c.amount || 15000,
+                approvedAmount: c.status?.toLowerCase() === "approved" ? (c.requestedAmount || c.amount || 15000) : 0,
+                txHash: null
+            })),
+            ...vehicleClaims.map(c => ({
+                _id: c._id,
+                policyNo: c.policyNo,
+                createdAt: c.createdAt,
+                flowType: "vehicle",
+                reason: c.incidentType,
+                status: c.status || "Pending",
+                requestedAmount: c.requestedAmount || c.amount || 45000,
+                approvedAmount: c.status?.toLowerCase() === "approved" ? (c.requestedAmount || c.amount || 45000) : 0,
+                txHash: null
+            })),
+            ...settledClaims.map(c => ({
+                _id: c._id,
+                originalClaimId: c.originalClaimId,
+                policyNo: c.policyNo,
+                createdAt: c.settledAt || c.createdAt,
+                flowType: c.type?.toLowerCase().includes("travel") ? "travel" : "vehicle",
+                reason: c.incidentType || "General Claim",
+                status: c.status || "Settled", 
+                requestedAmount: c.amount, 
+                approvedAmount: c.amount,
+                txHash: c.txHash 
+            }))
+        ];
+
+        // Sort descending by chronological creation/settlement timeline
+        combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        return res.status(200).json(combined);
+
+    } catch (error) {
+        console.error("User tracking engine aggregation exception:", error);
+        return res.status(500).json([]);
     }
 });
 

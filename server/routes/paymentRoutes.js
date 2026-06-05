@@ -7,7 +7,6 @@ const router = express.Router();
 
 const generatePolicyRef = () => `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
-
 const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, vehicleInfo = {}, tenure = 1) => {
   const userProfile = await User.findById(userId);
   
@@ -38,7 +37,7 @@ const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, 
     }
   } else {
     formattedInsuredValue = "₹2,22,000"; 
-  }m
+  }
 
   const activePolicy = new insuranceDetails({
     userId: userId, 
@@ -58,7 +57,6 @@ const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, 
   await activePolicy.save();
   return activePolicy;
 };
-
 
 // 1. Credit Card Gateway
 router.post("/credit-card", async (req, res) => {

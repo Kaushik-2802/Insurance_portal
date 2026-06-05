@@ -27,6 +27,7 @@ import ChooseInsurance from './pages/ChooseInsurance'
 import TravelPolicySuccess from './pages/TravelPolicySuccess'
 import ClaimInsuranceChoice from './pages/ClaimInsuranceChoice'
 import TravelClaimInsurance from './pages/TravelClaimInsurance'
+import TrackClaims from './pages/TrackClaims'
 import './App.css'
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
         <Route path='/claim-insurance/vehicle' element={<ClaimInsurance />} />
         <Route path='/claim-insurance/travel' element={<TravelClaimInsurance />} />
         <Route path='/travel-success' element={<TravelPolicySuccess />} />
+        <Route path='/track-claims' element={<TrackClaims />} />
       </Routes>
     </BrowserRouter>
   )

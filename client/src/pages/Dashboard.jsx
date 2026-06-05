@@ -66,6 +66,9 @@ export default function Dashboard() {
               <a href="/claim-insurance" className="action-btn">
                 <i className="fa-solid fa-hand-holding-dollar"></i> Claim Insurance
               </a>
+              <a href="/track-claims" className="action-btn">
+                <i className="fa-solid fa-hand-holding-dollar"></i> Track Your Claims
+              </a>
               <a href="/calculate-premium" className="action-btn outline">
                 <i className="fa-solid fa-calculator"></i> Calculate Premium
               </a>

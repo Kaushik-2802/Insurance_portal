@@ -81,27 +81,35 @@ export default function TravelInsurance() {
     setStep(flows[step] || 'type');
   };
 
-  const handleProceedToPayment =async () => {
-    // localStorage.setItem("activeFlow",'travel');
-    // localStorage.setItem('travelInsuranceData', JSON.stringify({ travelType, tripData, members, selectedAddons, healthAnswers }));
-    // navigate('/payment');
-    const payload={travelType,tripData,members,selectedAddons,healthAnswers};
-    try{
-      const response=await fetch("http://localhost:5000/api/travel/booking",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(payload)
+  const handleProceedToPayment = async () => {
+    // 1. Capture the exact premium calculated on the UI
+    const payload = {
+      travelType,
+      tripData,
+      members,
+      selectedAddons,
+      healthAnswers,
+      amountToPay: totalPremium // Add this line to pass the cost forward
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/travel/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
-      const result=await response.json();
-      if(result.success){
-        localStorage.setItem("activeFlow",'travel');
-        localStorage.setItem("travelInsuranceData",JSON.stringify(payload));
+      const result = await response.json();
+      
+      if (result.success) {
+        localStorage.setItem("activeFlow", 'travel');
+        // Storing the payload with amountToPay included
+        localStorage.setItem("travelInsuranceData", JSON.stringify(payload));
         navigate("/payment");
-      }else{
-        alert("Failed to save the data: "+ result.message)
+      } else {
+        alert("Failed to save the data: " + result.message);
       }
-    }catch(error){
-      console.error("Network integration layer fault: ",error);
+    } catch (error) {
+      console.error("Network integration layer fault: ", error);
       alert("Connection lost to server. Please try again later");
     }
   };

@@ -15,4 +15,5 @@ const SettledClaimSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("SettledClaim", SettledClaimSchema);
+// CRASH PROTECTION: Check if the model already exists before compiling a new one
+export default mongoose.models.SettledClaim || mongoose.model("SettledClaim", SettledClaimSchema);
