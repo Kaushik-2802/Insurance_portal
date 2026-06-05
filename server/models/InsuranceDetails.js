@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const insuranceDetailsSchema = new mongoose.Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId, // Connects directly to the User collection _id
+      type: mongoose.Schema.Types.ObjectId, 
       ref: "User",
       required: true
     },
@@ -11,7 +11,7 @@ const insuranceDetailsSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true // Ensure policy references remain unique
+      unique: true 
     },
     name: {
       type: String,
@@ -42,8 +42,6 @@ const insuranceDetailsSchema = new mongoose.Schema(
     },
     insuredValue: {
       type: String,
-      required: true,
-      default: "₹2,85,000"
     },
     amount: {
       type: String,

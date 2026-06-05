@@ -94,16 +94,14 @@ const Payment = () => {
   
   const API_BASE_URL = "http://localhost:5000/api/payments";
 
-  // Dynamic calculations for display breakdowns
   const parsedAmount = parseFloat(totalAmount) || 700.00;
   const basicCoverageDisplay = (parsedAmount * 0.75).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
   const addOnsDisplay = (parsedAmount * 0.25).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
   const formattedTotalDisplay = parsedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  // =========================================================================
-  // DYNAMIC VEHICLE EXTRACTION HOOKS
-  // =========================================================================
   const getVehiclePayloadDetails = () => {
+    const savedInsuredValue = localStorage.getItem("policyInsuredValue") || localStorage.getItem("insuredValue");
+
     try {
       const localFormSaved = localStorage.getItem("vehicleDetails") || localStorage.getItem("insuranceForm");
       if (localFormSaved) {
@@ -112,7 +110,7 @@ const Payment = () => {
           model: parsed.bikeModel || parsed.carModel || parsed.model || "Dynamic Vehicle Model",
           registrationNumber: parsed.regNo || parsed.registrationNumber || "TS-09-DYNAMIC",
           vehicleType: parsed.vehicleType || (parsed.carModel ? "Four Wheeler" : "Two Wheeler"),
-          insuredValue: parsed.insuredValue || "₹2,500,000"
+          insuredValue: savedInsuredValue || parsed.insuredValue || "₹2,22,000"
         };
       }
     } catch (e) {
@@ -122,7 +120,7 @@ const Payment = () => {
       model: localStorage.getItem("selectedBikeModel") || localStorage.getItem("selectedCarModel") || "Selected Vehicle Model",
       registrationNumber: localStorage.getItem("selectedRegNo") || "TS-09-XX-9999",
       vehicleType: "Two Wheeler",
-      insuredValue: "₹2,85,000"
+      insuredValue: savedInsuredValue || "₹2,22,000" 
     };
   };
 
@@ -242,8 +240,6 @@ const Payment = () => {
     }
 
     const vehicleInfo = getVehiclePayloadDetails();
-    
-    // ✅ Extract Tenure directly from browser local storage environment mapping
     const storedTenure = localStorage.getItem("tenure") || "1";
 
     try {
@@ -257,7 +253,8 @@ const Payment = () => {
           cvv: cardData.cvv,
           userId: currentUserId,
           amount: totalAmount, 
-          tenure: parseInt(storedTenure, 10), // ✅ Attached securely to body pipeline
+          tenure: parseInt(storedTenure, 10),
+          policyInsuredValue: vehicleInfo.insuredValue, 
           ...vehicleInfo 
         })
       });
@@ -318,8 +315,6 @@ const Payment = () => {
     }
 
     const vehicleInfo = getVehiclePayloadDetails();
-    
-    // ✅ Extract Tenure directly from browser local storage environment mapping
     const storedTenure = localStorage.getItem("tenure") || "1";
 
     try {
@@ -330,7 +325,8 @@ const Payment = () => {
           policyReferenceNumber,
           userId: currentUserId,
           amount: totalAmount, 
-          tenure: parseInt(storedTenure, 10), // ✅ Attached securely to body pipeline
+          tenure: parseInt(storedTenure, 10),
+          policyInsuredValue: vehicleInfo.insuredValue, 
           ...vehicleInfo 
         })
       });
@@ -380,8 +376,6 @@ const Payment = () => {
     }
 
     const vehicleInfo = getVehiclePayloadDetails();
-    
-    // ✅ Extract Tenure directly from browser local storage environment mapping
     const storedTenure = localStorage.getItem("tenure") || "1";
 
     try {
@@ -392,7 +386,8 @@ const Payment = () => {
           ...netBankData,
           userId: currentUserId,
           amount: totalAmount, 
-          tenure: parseInt(storedTenure, 10), // ✅ Attached securely to body pipeline
+          tenure: parseInt(storedTenure, 10),
+          policyInsuredValue: vehicleInfo.insuredValue, 
           ...vehicleInfo 
         })
       });

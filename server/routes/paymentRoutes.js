@@ -7,9 +7,7 @@ const router = express.Router();
 
 const generatePolicyRef = () => `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
-// =========================================================================
-// UPDATED HELPER FUNCTION: Securely parses tenure and dynamic object keys
-// =========================================================================
+
 const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, vehicleInfo = {}, tenure = 1) => {
   const userProfile = await User.findById(userId);
   
@@ -20,11 +18,27 @@ const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, 
   const startDate = new Date();
   const endDate = new Date();
   
-  // ✅ READS PASSED TENURE: Safe integer parsing from req.body source
   const parsedTenure = parseInt(tenure, 10) || 1;
   endDate.setFullYear(endDate.getFullYear() + parsedTenure);
 
   const generatedTxnId = "TXN" + Math.floor(100000000000 + Math.random() * 900000000000);
+
+  const rawInsuredValue = vehicleInfo.insuredValue || vehicleInfo.policyInsuredValue;
+  
+  let formattedInsuredValue = "Third-Party Only (₹0)";
+  
+  if (rawInsuredValue && rawInsuredValue !== "0") {
+    const cleanNumericString = rawInsuredValue.toString().replace(/[^0-9]/g, '');
+    const numericValue = parseInt(cleanNumericString, 10);
+    
+    if (!isNaN(numericValue) && numericValue > 0) {
+      formattedInsuredValue = `₹${numericValue.toLocaleString('en-IN')}`;
+    } else {
+      formattedInsuredValue = rawInsuredValue; 
+    }
+  } else {
+    formattedInsuredValue = "₹2,22,000"; 
+  }m
 
   const activePolicy = new insuranceDetails({
     userId: userId, 
@@ -33,10 +47,9 @@ const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, 
     startDate: startDate,
     endDate: endDate,
     vehicleType: vehicleInfo.vehicleType || "Two Wheeler",
-    // Compatibility fallbacks for frontend vehicle key combinations
     bikeModel: vehicleInfo.bikeModel || vehicleInfo.model || "Livo", 
     regNo: vehicleInfo.regNo || vehicleInfo.registrationNumber || "TS 08 FX 5612",      
-    insuredValue: vehicleInfo.insuredValue || "₹2,85,000",
+    insuredValue: formattedInsuredValue, 
     amount: paymentAmount.toString().startsWith('₹') ? paymentAmount : `₹${Number(paymentAmount).toLocaleString('en-IN')}`,
     paymentMethod: methodUsed.toUpperCase(),
     transactionId: generatedTxnId
@@ -46,14 +59,11 @@ const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, 
   return activePolicy;
 };
 
-// =========================================================================
-// API ROUTES 
-// =========================================================================
 
 // 1. Credit Card Gateway
 router.post("/credit-card", async (req, res) => {
   try {
-    const { number, name, expiry, cvv, userId, model, bikeModel, registrationNumber, regNo, vehicleType, tenure, amount, insuredValue } = req.body;
+    const { number, name, expiry, cvv, userId, model, bikeModel, registrationNumber, regNo, vehicleType, tenure, amount, insuredValue, policyInsuredValue } = req.body;
 
     if (!number || !name || !expiry || !cvv || !userId) {
       return res.status(400).json({ success: false, message: "Missing required fields, including userId" });
@@ -79,10 +89,9 @@ router.post("/credit-card", async (req, res) => {
       bikeModel: bikeModel || model, 
       regNo: regNo || registrationNumber, 
       vehicleType, 
-      insuredValue 
+      insuredValue: insuredValue || policyInsuredValue 
     };
     
-    // ✅ Tenure passed directly from request body
     await createActivePolicy(policyRef, cardAmount, "CREDIT-CARD", userId, vehicleInfo, tenure);
 
     return res.status(200).json({ success: true, policyReferenceNumber: policyRef });
@@ -117,7 +126,7 @@ router.post("/upi/initiate", async (req, res) => {
 // 3. Confirm UPI Payment
 router.post("/upi/confirm", async (req, res) => {
   try {
-    const { policyReferenceNumber, userId, model, bikeModel, registrationNumber, regNo, vehicleType, tenure, insuredValue } = req.body;
+    const { policyReferenceNumber, userId, model, bikeModel, registrationNumber, regNo, vehicleType, tenure, insuredValue, policyInsuredValue } = req.body;
     
     if (!userId) {
       return res.status(400).json({ success: false, message: "userId is required to tie the transaction." });
@@ -135,10 +144,9 @@ router.post("/upi/confirm", async (req, res) => {
       bikeModel: bikeModel || model, 
       regNo: regNo || registrationNumber, 
       vehicleType, 
-      insuredValue 
+      insuredValue: insuredValue || policyInsuredValue 
     };
     
-    // ✅ Tenure passed directly from request body
     await createActivePolicy(policyReferenceNumber, payment.amount || 700.00, "UPI", userId, vehicleInfo, tenure);
 
     return res.status(200).json({ success: true, message: "Payment verified" });
@@ -150,7 +158,7 @@ router.post("/upi/confirm", async (req, res) => {
 // 4. Net Banking Gateway
 router.post("/net-banking/verify", async (req, res) => {
   try {
-    const { account, ifsc, holder, userId, model, bikeModel, registrationNumber, regNo, vehicleType, tenure, amount, insuredValue } = req.body;
+    const { account, ifsc, holder, userId, model, bikeModel, registrationNumber, regNo, vehicleType, tenure, amount, insuredValue, policyInsuredValue } = req.body;
     if (!account || !ifsc || !holder || !userId) {
       return res.status(400).json({ success: false, message: "All fields are required, including userId!!" });
     }
@@ -173,10 +181,9 @@ router.post("/net-banking/verify", async (req, res) => {
       bikeModel: bikeModel || model, 
       regNo: regNo || registrationNumber, 
       vehicleType, 
-      insuredValue 
+      insuredValue: insuredValue || policyInsuredValue
     };
     
-    // ✅ Tenure passed directly from request body
     await createActivePolicy(policyRef, netBankingAmount, "NET-BANKING", userId, vehicleInfo, tenure);
 
     return res.status(200).json({ success: true, policyReferenceNumber: policyRef });

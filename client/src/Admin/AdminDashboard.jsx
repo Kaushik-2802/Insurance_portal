@@ -7,6 +7,10 @@ export default function AdminDashboard() {
   const [claimRequests, setClaimRequests] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [txHash, setTxHash] = useState(null);
+  
+  // Tracks which live claim document is currently staged inside the Smart Engine
+  const [selectedClaim, setSelectedClaim] = useState(null); 
+  
   const navigate = useNavigate();
   
   const [aiChecks, setAiChecks] = useState({
@@ -23,7 +27,9 @@ export default function AdminDashboard() {
       const response = await fetch(`${API_BASE_URL}/realtime-claims`);
       const data = await response.json();
       if (response.ok && data.success) {
-        setClaimRequests(data.claims);
+        // Exclude claims that have already been marked as 'Settled'
+        const activeClaims = data.claims.filter(claim => claim.docs !== "Settled");
+        setClaimRequests(activeClaims);
       }
     } catch (error) {
       console.error("Critical dashboard synchronization mismatch error: ", error);
@@ -32,7 +38,6 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchRealtimeClaims();
-    // Optional: Set up polling to check for new claims every 10 seconds
     const interval = setInterval(fetchRealtimeClaims, 10000);
     return () => clearInterval(interval);
   }, []);
@@ -43,32 +48,45 @@ export default function AdminDashboard() {
     setAuditLogs(prev => [{ id: Date.now(), time, msg: message }, ...prev]);
   };
 
+  // --- Stage a Claim Into the Settlement Engine ---
+  const handleStageForApproval = (claim) => {
+    setSelectedClaim(claim);
+    setSettlementStatus("Idle");
+    setTxHash(null);
+    setAiChecks({ identity: false, fraudScore: false, ledgerSync: false });
+    logSystemActivity(`ENGINE STAGING: Loaded Claim ID [${claim.id.slice(-6).toUpperCase()}] into active settlement buffer.`);
+  };
+
   // --- Live State Transaction Action Handlers ---
-  const handleUpdateStatus = async (id, actionStatus, userLabel) => {
+  const handleRejectStatus = async (id, userLabel) => {
     try {
       const response = await fetch(`${API_BASE_URL}/realtime-claims/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: actionStatus })
+        body: JSON.stringify({ action: "Rejected" })
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        logSystemActivity(`DATABASE UPDATE: Claim ID [${id}] for ${userLabel} changed state to ${actionStatus.toUpperCase()}.`);
-        // Re-sync UI records array
+        logSystemActivity(`DATABASE UPDATE: Claim ID [${id}] for ${userLabel} changed state to REJECTED.`);
+        if (selectedClaim?.id === id) setSelectedClaim(null);
         fetchRealtimeClaims();
       } else {
         window.alert(`Database transaction rejected: ${data.message}`);
       }
     } catch (err) {
       console.error("Network communication fault:", err);
-      window.alert("Unable to reach backend gateway processing pipelines.");
     }
   };
 
   // --- Multi-Step Settlement Logic Engine Sequence ---
   const startSettlementSequence = () => {
+    if (!selectedClaim) {
+      window.alert("Please stage a claim from the queue grid matrix to process first.");
+      return;
+    }
+
     setSettlementStatus("Verifying");
     setTxHash(null);
     setAiChecks({ identity: false, fraudScore: false, ledgerSync: false });
@@ -90,11 +108,37 @@ export default function AdminDashboard() {
     }, 2400);
   };
 
-  const processFinalPayment = () => {
+  const processFinalPayment = async () => {
+    if (!selectedClaim) return;
+
     const hash = "0x" + Math.random().toString(16).slice(2, 14).toUpperCase();
-    setTxHash(hash);
-    setSettlementStatus("Paid");
-    logSystemActivity(`FINANCE TRANSMISSION OUTBOUND: Dispatched. Cryptographic Transaction Trace: ${hash}`);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/realtime-claims/${selectedClaim.id}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          action: "Settled",
+          txHash: hash
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setTxHash(hash);
+        setSettlementStatus("Paid");
+        // FIX: Replaced $ with ₹ symbol in activity tracking stream
+        logSystemActivity(`FINANCE TRANSMISSION OUTBOUND: Dispatched ₹${selectedClaim.amount.toLocaleString('en-IN')}. Hash: ${hash}`);
+        
+        setSelectedClaim(null);
+        fetchRealtimeClaims();
+      } else {
+        window.alert(`Database transaction rejected: ${data.message}`);
+      }
+    } catch (err) {
+      console.error("Payment pipeline mutation execution exception failure:", err);
+    }
   };
 
   return (
@@ -124,7 +168,10 @@ export default function AdminDashboard() {
                 <p className="arc-dim" style={{ padding: '20px', textAlign: 'center' }}>No pipeline insurance requests indexed inside database ledger files.</p>
               ) : (
                 claimRequests.map((claim) => (
-                  <div key={claim.id} className={`arc-verify-card arc-state-${claim.docs.toLowerCase()}`}>
+                  <div 
+                    key={claim.id} 
+                    className={`arc-verify-card arc-state-${claim.docs.toLowerCase()} ${selectedClaim?.id === claim.id ? "arc-staged-active" : ""}`}
+                  >
                     <div className="arc-verify-info">
                       <div className="arc-user-meta">
                         <span className="arc-id-pill">{claim.id.slice(-6).toUpperCase()}</span>
@@ -134,6 +181,8 @@ export default function AdminDashboard() {
                         <p className="arc-label">Policy Reference: <strong>{claim.policyNo}</strong></p>
                         <p className="arc-label">Classification: <span style={{ color: '#3498db', fontWeight: 'bold' }}>{claim.type}</span></p>
                         <p className="arc-label">Incident Context: <em>{claim.incidentType}</em></p>
+                        {/* FIX: Replaced $ with ₹ symbol here */}
+                        <p className="arc-label">Stated Value Match: <strong style={{color: '#2ecc71'}}>₹{claim.amount.toLocaleString('en-IN')}</strong></p>
                         <p className="arc-label" style={{ marginTop: '5px' }}>
                           Status Ledger: <span className={`arc-txt-${claim.docs.toLowerCase()}`} style={{ fontWeight: 'bold' }}>{claim.docs}</span>
                         </p>
@@ -141,14 +190,14 @@ export default function AdminDashboard() {
                     </div>
                     <div className="arc-verify-actions">
                       <button 
-                        onClick={() => handleUpdateStatus(claim.id, "Verified", claim.user)} 
+                        onClick={() => handleStageForApproval(claim)} 
                         className="arc-action-btn arc-confirm"
-                        disabled={claim.docs === "Verified"}
+                        disabled={selectedClaim?.id === claim.id}
                       >
-                        <i className="fa-solid fa-check-double"></i> Auto-Approve
+                        <i className="fa-solid fa-microchip"></i> {selectedClaim?.id === claim.id ? "Staged" : "Auto-Approve"}
                       </button>
                       <button 
-                        onClick={() => handleUpdateStatus(claim.id, "Rejected", claim.user)} 
+                        onClick={() => handleRejectStatus(claim.id, claim.user)} 
                         className="arc-action-btn arc-deny"
                         disabled={claim.docs === "Rejected"}
                       >
@@ -203,12 +252,19 @@ export default function AdminDashboard() {
 
               <div className="arc-finance-details">
                 <div className="arc-data-row">
+                  <label>Target Account Holder Identity</label>
+                  <span style={{ fontWeight: 'bold', color: '#f39c12' }}>
+                    {selectedClaim ? selectedClaim.user : "None Selected"}
+                  </span>
+                </div>
+                <div className="arc-data-row">
                   <label>Payout Liquidity Pool</label>
                   <span className="arc-liquidity-high">98.4% Operational</span>
                 </div>
                 <div className="arc-data-row">
                   <label>Settlement Capital Target</label>
-                  <span className="arc-price">$4,500.00</span>
+                  {/* FIX: Replaced $ with ₹ symbol here and implemented Indian numeric formatting standard */}
+                  <span className="arc-price">₹{selectedClaim ? selectedClaim.amount.toLocaleString('en-IN') : "0.00"}</span>
                 </div>
                 {txHash && (
                   <div className="arc-data-row arc-hash-row">
@@ -221,9 +277,10 @@ export default function AdminDashboard() {
               <button 
                 className={`arc-settle-btn arc-btn-${settlementStatus.toLowerCase()}`}
                 onClick={settlementStatus === "Idle" || settlementStatus === "Paid" ? startSettlementSequence : processFinalPayment}
-                disabled={settlementStatus === "Verifying"}
+                disabled={settlementStatus === "Verifying" || !selectedClaim}
               >
-                {settlementStatus === "Idle" && "Initiate Pre-Payment Audit"}
+                {!selectedClaim && "Select a Claim from Queue Matrix"}
+                {selectedClaim && settlementStatus === "Idle" && "Initiate Pre-Payment Audit"}
                 {settlementStatus === "Verifying" && "Scanning Security Nodes..."}
                 {settlementStatus === "Ready" && "Execute Instant Transfer"}
                 {settlementStatus === "Paid" && "Restart Audit Engine"}
