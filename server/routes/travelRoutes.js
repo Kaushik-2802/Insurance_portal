@@ -11,7 +11,7 @@ const router = express.Router();
 // =========================================================================
 router.post("/booking", async (req, res) => {
   try {
-    const { travelType, tripData, members, selectedAddons, healthAnswers } = req.body;
+    const { travelType, tripData, members, selectedAddons, healthAnswers,userId } = req.body;
 
     if (!tripData || !tripData.destination || !tripData.startDate || !tripData.endDate) {
       return res.status(400).json({ success: false, message: "Missing core trip logistics details." });
@@ -21,6 +21,7 @@ router.post("/booking", async (req, res) => {
 
     // Save Core Policy
     const newTravelInsurance = new TravelInsurance({
+      userId: userId,
       policyNo: sharedPolicyNo,
       travelType: travelType,          
       destination: tripData.destination,

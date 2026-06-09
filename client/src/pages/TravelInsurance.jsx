@@ -80,10 +80,12 @@ export default function TravelInsurance() {
     const flows = { trip: 'type', members: 'trip', addons: 'members', health: 'addons', confirmation: 'health' };
     setStep(flows[step] || 'type');
   };
+  const userId=localStorage.getItem("userId");
 
   const handleProceedToPayment = async () => {
     // 1. Capture the exact premium calculated on the UI
     const payload = {
+      userId,
       travelType,
       tripData,
       members,

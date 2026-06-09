@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const travelInsuranceSchema = new mongoose.Schema(
   {
+    userId:{
+      type: mongoose.Schema.Types.ObjectId,
+      required:true,
+    },
     policyNo: {
       type: String,
       required: true,
