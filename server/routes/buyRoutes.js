@@ -85,34 +85,68 @@ router.get("/verify-policy/:policyNo", async (req, res) => {
 
 router.put("/renew-policy", async (req, res) => {
   try {
+
     const { policyNo, amount, address } = req.body;
+
     if (!policyNo) {
-      return res.status(400).json({ success: false, message: "Policy reference number required for tracking." });
+      return res.status(400).json({
+        success: false,
+        message: "Policy reference number required."
+      });
     }
-    const targetPolicy = await InsuranceDetails.findOne({ refNo: policyNo });
+
+    const targetPolicy = await InsuranceDetails.findOne({
+      refNo: policyNo
+    });
+
     if (!targetPolicy) {
-      return res.status(404).json({ success: false, message: "Policy reference number is missing" });
+      return res.status(404).json({
+        success: false,
+        message: "Policy not found"
+      });
     }
-    const baseDate = new Date(targetPolicy.endDate) > new Date() ? new Date(targetPolicy.endDate) : new Date();
-    const extendedEndDate = new Date(baseDate);
-    extendedEndDate.setFullYear(extendedEndDate.getFullYear() + 1);
-    
-    const updatedPolicy = await InsuranceDetails.findOneAndUpdate(
-      { refNo: policyNo },
-      {
-        $set: {
-          startDate: new Date(),
-          endDate: extendedEndDate,
-          amount: amount || targetPolicy.amount,
-          deliveryAddress: address || "Digital delivery only"
-        }
-      },
-      { new: true }
+
+    // CURRENT POLICY END DATE
+    const oldEndDate = new Date(targetPolicy.endDate);
+
+    // CREATE NEW DATE OBJECT
+    const newEndDate = new Date(oldEndDate.getTime());
+
+    // ADD 1 YEAR
+    newEndDate.setFullYear(
+      newEndDate.getFullYear() + 1
     );
-    return res.status(200).json({ success: true, message: "Insurance protection policy coverage successfully renewed!", policy: updatedPolicy });
+
+    console.log("Old End Date:", oldEndDate);
+    console.log("New End Date:", newEndDate);
+
+    // UPDATE POLICY
+    targetPolicy.endDate = newEndDate;
+
+    // OPTIONAL
+    targetPolicy.amount =
+      amount || targetPolicy.amount;
+
+    targetPolicy.deliveryAddress =
+      address || "Digital delivery only";
+
+    await targetPolicy.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Policy renewed successfully!",
+      policy: targetPolicy
+    });
+
   } catch (error) {
-    console.error("Policy updating processing block failure:", error);
-    return res.status(500).json({ success: false, message: "Failed to update target policy framework state parameters.", error: error.message });
+
+    console.error("Renewal Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Renewal failed",
+      error: error.message
+    });
   }
 });
 

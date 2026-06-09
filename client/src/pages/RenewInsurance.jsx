@@ -86,10 +86,21 @@ export default function RenewInsurance() {
     
     // Save vehicle parameters structure to map properties accurately inside payload targets
     localStorage.setItem("vehicleDetails", JSON.stringify({
-      bikeModel: vehicleType === "Two Wheeler" ? "Renewed Motorcycle Profile" : "Renewed Private Car Profile",
-      regNo: formData.regNo
-    }));
+    bikeModel:
+      vehicleType === "Two Wheeler"
+        ? "Renewed Motorcycle Profile"
+        : "Renewed Private Car Profile",
 
+    regNo: formData.regNo,
+
+    vehicleType: vehicleType,
+
+    insuredValue:
+      vehicleType === "Two Wheeler"
+        ? "₹2,85,000"
+        : "₹7,50,000"
+  }));
+    localStorage.setItem("activeFlow", "motor");
     // Explicitly seed the renewal request tracking data so payment confirms update operations
     localStorage.setItem("renewalPolicyNo", formData.policyNo);
     localStorage.setItem("renewalAddress", formData.address);
