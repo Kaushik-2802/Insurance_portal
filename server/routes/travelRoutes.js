@@ -129,14 +129,16 @@ router.get("/user-policies/:userId", async (req, res) => {
       return res.status(404).json({ success: false, message: "User profile not found." });
     }
 
-    const userProfileName = `${userProfile.firstName} ${userProfile.lastName}`.trim();
+    // const userProfileName = `${userProfile.firstName} ${userProfile.lastName}`.trim();
+    const custId= User._id;
 
     // Find policies matching either the document field or nested member data rosters
     const travelPolicies = await TravelInsurance.find({
-      $or: [
-        { name: { $regex: new RegExp(`^${userProfileName}$`, "i") } },
-        { "members.name": { $regex: new RegExp(`^${userProfileName}$`, "i") } }
-      ]
+    //   $or: [
+    //     { name: { $regex: new RegExp(`^${userProfileName}$`, "i") } },
+    //     { "members.name": { $regex: new RegExp(`^${userProfileName}$`, "i") } }
+    //   ]
+          custId
     }).sort({ createdAt: -1 });
 
     const formattedTravel = travelPolicies.map(policy => {
@@ -146,7 +148,7 @@ router.get("/user-policies/:userId", async (req, res) => {
         holder: primaryHolder,
         category: "Travel",
         detailLabel: "Trip Destination",
-        detailValue: `Trip to ${policy.destination} (${policy.travelType || "International"})`,
+        detailValue: `Trip to ${policy.destination} (${policy.travelType})`,
         premium: "Paid",
         expiry: new Date(policy.endDate).toLocaleDateString("en-US", {
           year: "numeric",

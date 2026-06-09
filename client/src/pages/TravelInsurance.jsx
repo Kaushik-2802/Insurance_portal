@@ -84,6 +84,7 @@ export default function TravelInsurance() {
 
   const handleProceedToPayment = async () => {
     // 1. Capture the exact premium calculated on the UI
+    localStorage.removeItem("vehicleDetails");
     const payload = {
       userId,
       travelType,

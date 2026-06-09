@@ -91,14 +91,18 @@ const BuyInsurance = () => {
           // 🚀 THE BRIDGE FIX: Align payload structure exactly with Payment.js hooks
           // =========================================================================
           const localPayloadStaging = {
-            bikeModel: formData.model, 
-            regNo: formData.registrationNumber, // Maps exactly to parsed.regNo lookup in Payment.js
+            bikeModel: formData.model,
+            regNo: formData.registrationNumber,
             vehicleType: activeForm === "bike" ? "Two Wheeler" : "Four Wheeler",
-            insuredValue: activeForm === "bike" ? "₹2,85,000" : "₹7,50,000"
+            insuredValue: activeForm === "bike" ? "₹2,85,000" : "₹7,50,000",
+
+  // IMPORTANT
+            insuranceType: "vehicle"
           };
 
           // Save tracking block explicitly so downstream payments pick it up seamlessly
           localStorage.setItem("vehicleDetails", JSON.stringify(localPayloadStaging));
+          localStorage.setItem("activeFlow", "vehicle");
           // =========================================================================
 
           navigate("/policy-type", { state: { policy: data.policy } });

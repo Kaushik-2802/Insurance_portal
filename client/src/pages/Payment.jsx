@@ -314,6 +314,7 @@ const Payment = () => {
 
     const vehicleInfo = getVehiclePayloadDetails();
     const storedTenure = localStorage.getItem("tenure") || "1";
+    const activeFlow = localStorage.getItem("activeFlow");
 
     try {
       const response = await fetch(`${API_BASE_URL}/credit-card`, {
@@ -325,10 +326,13 @@ const Payment = () => {
           expiry: cardData.expiry,
           cvv: cardData.cvv,
           userId: currentUserId,
-          amount: totalAmount, 
+          amount: totalAmount,
           tenure: parseInt(storedTenure, 10),
-          policyInsuredValue: vehicleInfo.insuredValue, 
-          ...vehicleInfo 
+
+          policyInsuredValue: vehicleInfo.insuredValue,
+          ...vehicleInfo,
+
+          insuranceType: activeFlow
         })
       });
       const data = await response.json();
@@ -389,18 +393,22 @@ const Payment = () => {
 
     const vehicleInfo = getVehiclePayloadDetails();
     const storedTenure = localStorage.getItem("tenure") || "1";
+    const activeFlow = localStorage.getItem("activeFlow");
 
     try {
       const response = await fetch(`${API_BASE_URL}/upi/confirm`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           policyReferenceNumber,
           userId: currentUserId,
-          amount: totalAmount, 
+          amount: totalAmount,
           tenure: parseInt(storedTenure, 10),
-          policyInsuredValue: vehicleInfo.insuredValue, 
-          ...vehicleInfo 
+
+          policyInsuredValue: vehicleInfo.insuredValue,
+          ...vehicleInfo,
+
+          insuranceType: activeFlow
         })
       });
       const data = await response.json();
@@ -450,6 +458,7 @@ const Payment = () => {
 
     const vehicleInfo = getVehiclePayloadDetails();
     const storedTenure = localStorage.getItem("tenure") || "1";
+    const activeFlow = localStorage.getItem("activeFlow");
 
     try {
       const response = await fetch(`${API_BASE_URL}/net-banking/verify`, {
@@ -458,10 +467,13 @@ const Payment = () => {
         body: JSON.stringify({
           ...netBankData,
           userId: currentUserId,
-          amount: totalAmount, 
+          amount: totalAmount,
           tenure: parseInt(storedTenure, 10),
-          policyInsuredValue: vehicleInfo.insuredValue, 
-          ...vehicleInfo 
+
+          policyInsuredValue: vehicleInfo.insuredValue,
+          ...vehicleInfo,
+
+          insuranceType: activeFlow
         })
       });
       const data = await response.json();
