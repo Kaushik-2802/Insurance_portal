@@ -22,7 +22,7 @@ export default function TravelPolicySuccess() {
   if (!data) return null;
 
   // Destructure policyNo along with the other properties
-  const { travelType, tripData, members, selectedAddons, policyNo } = data;
+  const { travelType, tripData, members, selectedAddons, policyNo,amountToPay } = data;
 
   // Fallback placeholder display value if something is missing in cache
   const cleanPolicyNumber = policyNo ;
@@ -87,7 +87,7 @@ export default function TravelPolicySuccess() {
 
             <div className="info-row">
               <span>Destination</span>
-              <strong>{tripData?.country || "N/A"}</strong>
+              <strong>{tripData?.destination || "N/A"}</strong>
             </div>
 
             <div className="info-row">
@@ -113,7 +113,7 @@ export default function TravelPolicySuccess() {
 
           <div className="info-row">
             <span>Paid Amount</span>
-            <strong>₹1,607</strong>
+            <strong>{data.amountToPay}</strong>
           </div>
 
           <div className="info-row">
