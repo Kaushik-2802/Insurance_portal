@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function MyPolicies() {
   const navigate = useNavigate();
   
-  // Dynamic State declarations replacing raw array variables
+  // Dynamic State declarations for policy tracking, loading states, and error handling
   const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,18 +24,36 @@ export default function MyPolicies() {
       return;
     }
 
-    // 2. Append the specific userId directly onto the path route parameter
-    fetch(`http://localhost:5000/api/payments/user-policies/${currentUserId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Could not download client records.");
+    // 2. Query both backend endpoints concurrently using Promise.all
+    Promise.all([
+      fetch(`http://localhost:5000/api/payments/user-policies/${currentUserId}`).then((res) => {
+        if (!res.ok) throw new Error("Could not download vehicle records.");
+        return res.json();
+      }),
+      fetch(`http://localhost:5000/api/travel/user-policies/${currentUserId}`).then((res) => {
+        if (!res.ok) throw new Error("Could not download travel records.");
         return res.json();
       })
-      .then((data) => {
-        if (data.success) {
-          setPolicies(data.policies);
-        } else {
-          setError(data.message);
+    ])
+      .then(([vehicleData, travelData]) => {
+        let combinedPolicies = [];
+
+        if (vehicleData.success && vehicleData.policies) {
+          // Standardize vehicle entries if needed to match custom display keys
+          const normalizedVehicles = vehicleData.policies.map(p => ({
+            ...p,
+            detailLabel: p.detailLabel || "Vehicle Details",
+            detailValue: p.detailValue || p.vehicle // safety fallback for original property names
+          }));
+          combinedPolicies = [...combinedPolicies, ...normalizedVehicles];
         }
+
+        if (travelData.success && travelData.policies) {
+          combinedPolicies = [...combinedPolicies, ...travelData.policies];
+        }
+
+        // Sort combined array by expiry date or order received to keep things neat
+        setPolicies(combinedPolicies);
         setLoading(false);
       })
       .catch((err) => {
@@ -44,8 +62,9 @@ export default function MyPolicies() {
         setLoading(false);
       });
   }, []);
+
   // Determine user context profile name card display 
-  // (Uses the name from the newest active policy, defaults back to standard otherwise)
+  // (Uses the name from the newest active policy, defaults back to standard fallback otherwise)
   const primaryHolderName = policies.length > 0 ? policies[0].holder : "Valued Member";
 
   return (
@@ -64,6 +83,7 @@ export default function MyPolicies() {
           </div>
         </div>
 
+        {/* Loading Spinner State */}
         {loading && (
           <div className="policy-loading-state">
             <div className="loader-ring"></div>
@@ -71,18 +91,21 @@ export default function MyPolicies() {
           </div>
         )}
 
+        {/* Error Alert Box */}
         {error && (
           <div className="policy-error-banner" style={{ color: "#ef4444", padding: "10px", textAlign: "center" }}>
              <i className="fa-solid fa-triangle-exclamation"></i> {error}
           </div>
         )}
 
+        {/* Empty State Banner */}
         {!loading && policies.length === 0 && !error && (
           <div className="policy-empty-state" style={{ textAlign: "center", padding: "40px 10px" }}>
             <p style={{ color: "#9ca3af" }}>No verified insurance protection sheets found on this profile database link.</p>
           </div>
         )}
 
+        {/* Dynamic List Render for Vehicle & Travel Insurances */}
         {!loading && policies.map((policy) => (
           <div key={policy.id} className="profile-section" style={{ marginBottom: '40px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -95,16 +118,20 @@ export default function MyPolicies() {
                 <span className="address-label">Policy Number</span>
                 <span className="address-value">{policy.id}</span>
               </div>
+
+              {/* Dynamic Key Row: Displays 'Vehicle Details' or 'Trip Destination' contextually */}
               <div className="address-item">
-                <span className="address-label">Vehicle Details</span>
-                <span className="address-value">{policy.vehicle}</span>
+                <span className="address-label">{policy.detailLabel || "Details"}</span>
+                <span className="address-value">{policy.detailValue}</span>
               </div>
+
               <div className="address-item">
-                <span className="address-label">Annual Premium</span>
+                <span className="address-label">Premium Status</span>
                 <span className="address-value" style={{ color: '#22d3ee' }}>{policy.premium}</span>
               </div>
+
               <div className="address-item">
-                <span className="address-label">Renewal Date</span>
+                <span className="address-label">Coverage Ends</span>
                 <span className="address-value">{policy.expiry}</span>
               </div>
             </div>

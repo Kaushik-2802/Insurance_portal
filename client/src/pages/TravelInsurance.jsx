@@ -103,7 +103,13 @@ export default function TravelInsurance() {
       if (result.success) {
         localStorage.setItem("activeFlow", 'travel');
         // Storing the payload with amountToPay included
-        localStorage.setItem("travelInsuranceData", JSON.stringify(payload));
+        const dataToStore = {
+          ...payload,
+          // Extract the policyNo sent by your backend router logic
+          policyNo: result.policyNo || result.data?.policyNo 
+        };
+
+        localStorage.setItem("travelInsuranceData", JSON.stringify(dataToStore));
         navigate("/payment");
       } else {
         alert("Failed to save the data: " + result.message);

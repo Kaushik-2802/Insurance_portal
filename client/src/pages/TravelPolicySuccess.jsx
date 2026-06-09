@@ -10,12 +10,22 @@ export default function TravelPolicySuccess() {
 
   useEffect(() => {
     const stored = localStorage.getItem('travelInsuranceData');
-    if (stored) setData(JSON.parse(stored));
+    if (stored) {
+      try {
+        setData(JSON.parse(stored));
+      } catch (err) {
+        console.error("Error parsing travel insurance data from localStorage:", err);
+      }
+    }
   }, []);
 
   if (!data) return null;
 
-  const { travelType, tripData, members, selectedAddons } = data;
+  // Destructure policyNo along with the other properties
+  const { travelType, tripData, members, selectedAddons, policyNo } = data;
+
+  // Fallback placeholder display value if something is missing in cache
+  const cleanPolicyNumber = policyNo ;
 
   return (
     <div className="travel-success-wrapper">
@@ -36,7 +46,8 @@ export default function TravelPolicySuccess() {
           <div className="brand">✈ SecureTrip Insurance</div>
           <div className="policy-ref">
             <span>POLICY REFERENCE</span>
-            <strong>TRV{Date.now().toString().slice(-8)}</strong>
+            {/* FIX: Now reads the actual stored database/API reference code */}
+            <strong>{cleanPolicyNumber}</strong>
           </div>
         </div>
 
@@ -47,7 +58,7 @@ export default function TravelPolicySuccess() {
           <div className="info-box">
             <h3>Policy Holder</h3>
 
-            {members.map((m, i) => (
+            {members && members.map((m, i) => (
               <div className="info-row" key={i}>
                 <span>Name</span>
                 <strong>{m.name}</strong>
@@ -56,12 +67,12 @@ export default function TravelPolicySuccess() {
 
             <div className="info-row">
               <span>No. of Travelers</span>
-              <strong>{members.length}</strong>
+              <strong>{members ? members.length : 0}</strong>
             </div>
 
             <div className="info-row">
               <span>Travel Type</span>
-              <strong>{travelType.toUpperCase()}</strong>
+              <strong>{travelType ? travelType.toUpperCase() : "INTERNATIONAL"}</strong>
             </div>
 
             <div className="info-row">
@@ -76,17 +87,17 @@ export default function TravelPolicySuccess() {
 
             <div className="info-row">
               <span>Destination</span>
-              <strong>{tripData.country}</strong>
+              <strong>{tripData?.country || "N/A"}</strong>
             </div>
 
             <div className="info-row">
               <span>Valid From</span>
-              <strong>{new Date(tripData.startDate).toLocaleDateString('en-IN')}</strong>
+              <strong>{tripData?.startDate ? new Date(tripData.startDate).toLocaleDateString('en-IN') : "N/A"}</strong>
             </div>
 
             <div className="info-row">
               <span>Valid Till</span>
-              <strong>{new Date(tripData.endDate).toLocaleDateString('en-IN')}</strong>
+              <strong>{tripData?.endDate ? new Date(tripData.endDate).toLocaleDateString('en-IN') : "N/A"}</strong>
             </div>
 
             <div className="info-row">
@@ -112,7 +123,7 @@ export default function TravelPolicySuccess() {
 
           <div className="info-row">
             <span>Add-ons</span>
-            <strong>{selectedAddons.length} Selected</strong>
+            <strong>{selectedAddons ? selectedAddons.length : 0} Selected</strong>
           </div>
 
           <div className="info-row">
@@ -122,6 +133,7 @@ export default function TravelPolicySuccess() {
 
           <div className="info-row">
             <span>Transaction ID</span>
+            {/* Optional: Replace with a value from backend if you save it to local storage */}
             <strong>TXN{Date.now()}</strong>
           </div>
         </div>
@@ -135,7 +147,12 @@ export default function TravelPolicySuccess() {
       {/* ACTIONS */}
       <div className="policy-actions">
         <button className="outline" onClick={() => window.print()}>Download PDF</button>
-        <button className="outline" onClick={() => window.location.href=`mailto:?subject=Insurance&body=${referenceNumber}`}>Email Policy</button>
+        <button 
+          className="outline" 
+          onClick={() => window.location.href=`mailto:?subject=Your Insurance Policy&body=Your policy reference number is: ${cleanPolicyNumber}`}
+        >
+          Email Policy
+        </button>
       </div>
 
       <button className="home-btn" onClick={() => navigate('/dashboard')}>
