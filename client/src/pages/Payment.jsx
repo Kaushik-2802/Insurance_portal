@@ -27,64 +27,137 @@ const Payment = () => {
   const [currencySymbol, setCurrencySymbol] = useState('₹');
   const [selectedPlanTitle, setSelectedPlanTitle] = useState('Vehicle Insurance Plan');
 
-  // =========================================================================
-  // DYNAMIC AMOUNT, TITLE & CURRENCY SYNC HOOK
-  // =========================================================================
-  useEffect(() => {
-    try {
-      let rawAmount = '';
-      let rawTitle = '';
+ useEffect(() => {
+  try {
 
-      // 1. Prioritize React Router Link/Navigate state (passed directly from previous screen)
-      if (location.state && location.state.price) {
-        rawAmount = String(location.state.price);
-        rawTitle = location.state.title || '';
-      } else {
-        // 2. Fallback check: Standalone policy type screen keys next
-        const policyPriceField = localStorage.getItem("policyPrice");
-        const policyTitleField = localStorage.getItem("policyTitle");
+    let rawAmount = '';
+    let rawTitle = '';
 
-        // 3. Keep existing fallback checks for form structures intact
-        const standalonePremium = localStorage.getItem("calculatedPremium") || localStorage.getItem("premiumAmount");
-        const localFormSaved = localStorage.getItem("vehicleDetails") || localStorage.getItem("insuranceForm");
-        
-        if (policyPriceField) {
-          rawAmount = String(policyPriceField);
-          rawTitle = policyTitleField || '';
-        } else if (standalonePremium) {
-          rawAmount = String(standalonePremium);
-        } else if (localFormSaved) {
-          const parsed = JSON.parse(localFormSaved);
-          rawAmount = String(parsed.premium || parsed.finalPremium || parsed.planPrice || parsed.totalAmount || parsed.amount || '');
-        }
+    // =====================================================
+    // 1. TRAVEL INSURANCE FLOW
+    // =====================================================
+
+    const activeFlow = localStorage.getItem("activeFlow");
+
+    if (activeFlow === "travel") {
+
+      const savedTravelData =
+        localStorage.getItem("travelInsuranceData");
+
+      if (savedTravelData) {
+
+        const parsedTravel = JSON.parse(savedTravelData);
+
+        rawAmount = String(
+          parsedTravel.amountToPay ||
+          parsedTravel.totalPremium ||
+          ''
+        );
+
+        rawTitle = parsedTravel.travelType
+          ? `${parsedTravel.travelType.toUpperCase()} Travel Insurance`
+          : "Travel Insurance Plan";
       }
+    }
 
-      // Sync detected configurations to state fields
-      if (rawTitle) {
-        setSelectedPlanTitle(rawTitle);
+    // =====================================================
+    // 2. REACT ROUTER STATE
+    // =====================================================
+
+    if (!rawAmount && location.state && location.state.price) {
+
+      rawAmount = String(location.state.price);
+
+      rawTitle = location.state.title || '';
+    }
+
+    // =====================================================
+    // 3. EXISTING VEHICLE INSURANCE FLOW
+    // =====================================================
+
+    if (!rawAmount) {
+
+      const policyPriceField =
+        localStorage.getItem("policyPrice");
+
+      const policyTitleField =
+        localStorage.getItem("policyTitle");
+
+      const standalonePremium =
+        localStorage.getItem("calculatedPremium") ||
+        localStorage.getItem("premiumAmount");
+
+      const localFormSaved =
+        localStorage.getItem("vehicleDetails") ||
+        localStorage.getItem("insuranceForm");
+
+      if (policyPriceField) {
+
+        rawAmount = String(policyPriceField);
+
+        rawTitle = policyTitleField || '';
+
+      } else if (standalonePremium) {
+
+        rawAmount = String(standalonePremium);
+
+      } else if (localFormSaved) {
+
+        const parsed = JSON.parse(localFormSaved);
+
+        rawAmount = String(
+          parsed.premium ||
+          parsed.finalPremium ||
+          parsed.planPrice ||
+          parsed.totalAmount ||
+          parsed.amount ||
+          ''
+        );
       }
+    }
 
-      if (rawAmount) {
-        // Detect currency symbol dynamically
-        if (rawAmount.includes('$')) {
-          setCurrencySymbol('$');
-        } else {
-          setCurrencySymbol('₹');
-        }
+    // =====================================================
+    // APPLY TITLE
+    // =====================================================
 
-        // Extract numbers and decimals safely (Removes strings like "/year" or "Starts")
-        const cleanedAmount = rawAmount.replace(/[^0-9.]/g, '');
-        if (cleanedAmount) {
-          setTotalAmount(cleanedAmount);
-        }
+    if (rawTitle) {
+      setSelectedPlanTitle(rawTitle);
+    }
+
+    // =====================================================
+    // APPLY AMOUNT
+    // =====================================================
+
+    if (rawAmount) {
+
+      if (rawAmount.includes('$')) {
+        setCurrencySymbol('$');
       } else {
-        setTotalAmount('700.00');
         setCurrencySymbol('₹');
       }
-    } catch (e) {
-      console.error("Could not parse dynamic premium from allocation workflow context", e);
+
+      const cleanedAmount =
+        rawAmount.replace(/[^0-9.]/g, '');
+
+      if (cleanedAmount) {
+        setTotalAmount(cleanedAmount);
+      }
+
+    } else {
+
+      setTotalAmount('700.00');
+      setCurrencySymbol('₹');
     }
-  }, [location.state]); // Dependencies monitor state transitions seamlessly
+
+  } catch (e) {
+
+    console.error(
+      "Could not parse dynamic premium",
+      e
+    );
+  }
+
+}, [location.state]);
 
   const [netBankData, setNetBankData] = useState({ account: '', ifsc: '', holder: '' });
   const [netBankStage, setNetBankStage] = useState('details');

@@ -12,7 +12,7 @@ const createActivePolicy = async (policyRef, paymentAmount, methodUsed, userId, 
   
   const fullName = userProfile 
     ? `${userProfile.firstName} ${userProfile.lastName}`.trim()
-    : "Chiru Chiru";
+    : "N/A";
 
   const startDate = new Date();
   const endDate = new Date();
