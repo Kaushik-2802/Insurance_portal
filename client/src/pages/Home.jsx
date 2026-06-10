@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
+import OuterFooter from "../components/outerFooter";
 import "./Home.css";
 
 export default function Home() {
@@ -170,7 +170,7 @@ export default function Home() {
               <i className="fa-solid fa-headset"></i>
               <div>
                 <span>Call Center</span>
-                <p>1800-SHIELD-01</p>
+                <p>1800-1050-01</p>
               </div>
             </div>
           </div>
@@ -188,7 +188,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer />
+      <OuterFooter />
     </div>
   );
 }
