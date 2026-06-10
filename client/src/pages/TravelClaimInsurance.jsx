@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "./ClaimInsurance.css";
 import InnerHeader from "../components/InnerHeader";
@@ -12,6 +12,59 @@ export default function TravelClaimInsurance() {
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  useEffect(() => {
+
+  const fetchProfile = async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      if (!token) {
+
+        navigate("/login");
+
+        return;
+      }
+
+      const response = await fetch(
+        "http://localhost:5000/api/profile",
+        {
+          method: "GET",
+
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      console.log(data);
+
+      if (response.ok) {
+
+        setLinkedMobile(
+          data.mobile || ""
+        );
+
+      } else {
+
+        alert(
+          "Unable to load profile."
+        );
+      }
+
+    } catch (err) {
+
+      console.error(err);
+    }
+  };
+
+  fetchProfile();
+
+}, [navigate]);
 
   const travelReasons = [
     { id: "Medical Emergency", icon: "fa-solid fa-hospital", desc: "Medical care or evacuation while traveling" },
@@ -31,7 +84,6 @@ export default function TravelClaimInsurance() {
 
   if (
     !policyNumber ||
-    !linkedMobile ||
     !selectedReason ||
     !incidentDate
   ) {
@@ -169,7 +221,14 @@ export default function TravelClaimInsurance() {
                 <label htmlFor="policy"><i className="fa-solid fa-hashtag"></i> Policy Number</label>
               </div>
               <div className="floating-field">
-                <input type="tel" id="mobile" placeholder=" " required value={linkedMobile} onChange={(e) => setLinkedMobile(e.target.value)} />
+                <input
+                type="tel"
+                id="mobile"
+                placeholder=" "
+                required
+                disabled
+                value={linkedMobile}
+              />
                 <label htmlFor="mobile"><i className="fa-solid fa-phone"></i> Linked Mobile</label>
               </div>
               <div className="floating-field full-width-mobile">

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "./ClaimInsurance.css";
 import InnerHeader from "../components/InnerHeader";
@@ -39,6 +39,59 @@ export default function ClaimForm() {
     ];
   };
 
+  useEffect(() => {
+
+  const fetchProfile = async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      if (!token) {
+
+        navigate("/login");
+
+        return;
+      }
+
+      const response = await fetch(
+        "http://localhost:5000/api/profile",
+        {
+          method: "GET",
+
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      console.log(data);
+
+      if (response.ok) {
+
+        setLinkedMobile(
+          data.mobile || ""
+        );
+
+      } else {
+
+        alert(
+          "Unable to load profile."
+        );
+      }
+
+    } catch (err) {
+
+      console.error(err);
+    }
+  };
+
+  fetchProfile();
+
+}, [navigate]);
   const handleFileChange = (e) => {
     const uploadedFiles = Array.from(e.target.files);
     setFiles((prev) => [...prev, ...uploadedFiles]);
@@ -93,10 +146,7 @@ export default function ClaimForm() {
 
         body: JSON.stringify({
           policyNumber:
-            policyNumber.trim(),
-
-          linkedMobile:
-            linkedMobile.trim()
+            policyNumber.trim()
         })
       }
     );
@@ -140,8 +190,15 @@ export default function ClaimForm() {
   }
 };
   const handleSubmit = async (e) => {
-
+  const token=localStorage.getItem("token");
   e.preventDefault();
+  const response=await fetch("http://localhost:5000/api/profile",{
+    method:"GET",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${token}`
+    }
+  })
 
   if (!isVerified) {
 
@@ -305,15 +362,14 @@ export default function ClaimForm() {
                 <label htmlFor="policy"><i className="fa-solid fa-hashtag"></i> Policy Number Reference</label>
               </div>
               <div className="floating-field">
-                <input 
-                  type="tel" 
-                  id="mobile" 
-                  placeholder=" " 
-                  required 
-                  disabled={isVerified}
-                  value={linkedMobile} 
-                  onChange={(e) => { setLinkedMobile(e.target.value); setValidationError(""); }} 
-                />
+                <input
+                    type="tel"
+                    id="mobile"
+                    placeholder=" "
+                    required
+                    disabled
+                    value={linkedMobile}
+                  />
                 <label htmlFor="mobile"><i className="fa-solid fa-phone"></i> Linked Mobile</label>
               </div>
               <div className="floating-field full-width-mobile">

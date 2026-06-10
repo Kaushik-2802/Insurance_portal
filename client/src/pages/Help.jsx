@@ -18,10 +18,12 @@ export default function Help() {
 
   const nameChange = async (e) => {
     const userId = localStorage.getItem("userId");
+    const token=localStorage.getItem("token")
     const response = await fetch(`http://localhost:5000/api/profile?userId=${userId}`,{
       method:"GET",
       headers:{
-        "Content-Type":"application/json"
+        "Content-Type":"application/json",
+        Authorization: `Bearer ${token}`
       },
       
     })
