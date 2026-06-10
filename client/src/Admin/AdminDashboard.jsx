@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   
   // Tracks which live claim document is currently staged inside the Smart Engine
   const [selectedClaim, setSelectedClaim] = useState(null); 
+  const [userQueries,setUserQueries]=useState([])
   
   const navigate = useNavigate();
   
@@ -35,12 +36,30 @@ export default function AdminDashboard() {
       console.error("Critical dashboard synchronization mismatch error: ", error);
     }
   };
-
   useEffect(() => {
     fetchRealtimeClaims();
     const interval = setInterval(fetchRealtimeClaims, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const queryData=async(e)=>{
+    const response=await fetch(`${API_BASE_URL}/user-message`,{
+      method:"GET",
+      headers:{
+        "Content-Type":"application/json"
+      },
+    })
+    const data=await response.json()
+    if(!response.ok){
+      console.log("error fetching details");
+    }else{
+      setUserQueries(data.queries);
+    }
+  }
+
+  useEffect(()=>{
+    queryData();
+  },[])
 
   // --- Automated System Logger Tracker ---
   const logSystemActivity = (message) => {
@@ -285,6 +304,32 @@ export default function AdminDashboard() {
                 {settlementStatus === "Ready" && "Execute Instant Transfer"}
                 {settlementStatus === "Paid" && "Restart Audit Engine"}
               </button>
+            </div>
+          </section>
+          {/* User Queries Section */}
+          <section className="arc-glass-panel">
+            <div className="arc-panel-head">
+              <h3>
+                <i className="fa-solid fa-envelope-open-text"></i> User Queries Inbox
+              </h3>
+            </div>
+
+            <div className="arc-log-container">
+              {userQueries.length === 0 ? (
+                <p className="arc-dim">No user queries available.</p>
+              ) : (
+                userQueries.map((q) => (
+                  <div key={q._id} className="arc-log-entry">
+                    <div>
+                      <strong>{q.fullName}</strong> ({q.email})
+                    </div>
+                    <p style={{ margin: "5px 0" }}>{q.textContent}</p>
+                    <small className="arc-timestamp">
+                      {new Date(q.createdAt).toLocaleString()}
+                    </small>
+                  </div>
+                ))
+              )}
             </div>
           </section>
         </div>

@@ -2,6 +2,7 @@ import express from "express";
 import TravelClaim from "../models/TravelClaim.js"; 
 import VehicleClaim from "../models/vehicleClaim.js"; 
 import SettledClaim from "../models/SettledClaim.js"; 
+import Query from "../models/query.js"
 
 const router = express.Router();
 
@@ -206,6 +207,54 @@ router.get("/settled-history/:userName", async (req, res) => {
       success: false,
       message: "Could not read historic ledger files",
       error: error.message
+    });
+  }
+});
+
+// query-route: sending user queries
+router.post("/user-queries",async (req,res)=>{
+  try{
+    const {name,email,query} = req.body;
+    const newQuery=new Query({fullName:name,email:email,textContent:query})
+    await newQuery.save()
+    res.status(200).json({
+      success:true,
+      message:"Data send to admin"
+    })
+  }
+  catch(e){
+    console.error(e)
+    return res.status(500).json({
+      success:false,
+      message:"could not post message to admin",
+      error: e.message
+    });
+  }
+})
+
+//
+router.get("/user-message", async (req, res) => {
+  try {
+    const queryData = await Query.find({}).sort({ createdAt: -1 });
+
+    if (queryData.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No queries available"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      queries: queryData
+    });
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      success: false,
+      message: "Couldn't fetch data from server",
+      error: e.message
     });
   }
 });
