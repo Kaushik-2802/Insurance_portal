@@ -26,8 +26,8 @@ export default function Footer() {
           <div className="footer-section">
             <h3>Ecosystem</h3>
             <ul>
-              <li><Link to="/buy">Policy Purchase</Link></li>
-              <li><Link to="/claims">FastTrack Claims</Link></li>
+              <li><Link to="/buy-insurance">Policy Purchase</Link></li>
+              <li><Link to="/claim-insurance">FastTrack Claims</Link></li>
               <li><Link to="/renew">Renewal Hub</Link></li>
               <li><Link to="/calculate-premium">Calculate Premium</Link></li>
             </ul>
