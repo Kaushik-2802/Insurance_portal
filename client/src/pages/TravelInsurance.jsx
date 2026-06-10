@@ -96,11 +96,30 @@ export default function TravelInsurance() {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/travel/booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      const token = localStorage.getItem("token");
+
+if (!token) {
+
+  alert("Session expired. Please login again.");
+
+  navigate("/login");
+
+  return;
+}
+
+const response = await fetch(
+  "http://localhost:5000/api/travel/booking",
+  {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+
+    body: JSON.stringify(payload)
+  }
+);
       const result = await response.json();
       
       if (result.success) {

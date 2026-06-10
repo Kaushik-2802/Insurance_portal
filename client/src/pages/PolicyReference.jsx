@@ -17,41 +17,111 @@ const PolicyReference = () => {
   const API_BASE_URL = "http://localhost:5000/api/payments";
 
   useEffect(() => {
-    const paymentStatus = localStorage.getItem('paymentCompleted');
-    const storedReferenceNumber = localStorage.getItem('policyReferenceNumber');
-    const localIdv = localStorage.getItem('policyInsuredValue'); 
 
-    if (localIdv) {
-      setFallbackIdv(localIdv);
+  const paymentStatus =
+    localStorage.getItem(
+      "paymentCompleted"
+    );
+
+  const storedReferenceNumber =
+    localStorage.getItem(
+      "policyReferenceNumber"
+    );
+
+  const localIdv =
+    localStorage.getItem(
+      "policyInsuredValue"
+    );
+
+  if (localIdv) {
+    setFallbackIdv(localIdv);
+  }
+
+  if (
+    paymentStatus === "true" &&
+    storedReferenceNumber
+  ) {
+
+    setReferenceNumber(
+      storedReferenceNumber
+    );
+
+    setPaymentCompleted(true);
+
+    setShowConfetti(true);
+
+    setTimeout(() =>
+      setShowConfetti(false),
+      5000
+    );
+
+    // ✅ JWT TOKEN
+    const token =
+      localStorage.getItem("token");
+
+    if (!token) {
+
+      alert(
+        "Session expired. Please login again."
+      );
+
+      navigate("/login");
+
+      return;
     }
 
-    if (paymentStatus === 'true' && storedReferenceNumber) {
-      setReferenceNumber(storedReferenceNumber);
-      setPaymentCompleted(true);
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000);
+    fetch(
+      `${API_BASE_URL}/summary/${storedReferenceNumber}`,
+      {
+        method: "GET",
 
-      fetch(`${API_BASE_URL}/summary/${storedReferenceNumber}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setPolicyDetails(data);
-            setLoading(false);
-          } else {
-            alert("Error reading payment documents: " + data.message);
-            navigate('/payment');
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          alert("Network failure pulling transaction data logs.");
-          navigate('/payment');
-        });
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+      .then((res) => res.json())
 
-    } else {
-      setTimeout(() => navigate('/payment'), 3000);
-    }
-  }, [navigate]);
+      .then((data) => {
+
+        if (data.success) {
+
+          setPolicyDetails(data);
+
+          setLoading(false);
+
+        } else {
+
+          alert(
+            "Error fetching policy details: " +
+            data.message
+          );
+
+          navigate("/payment");
+        }
+      })
+
+      .catch((err) => {
+
+        console.error(err);
+
+        alert(
+          "Network error loading summary."
+        );
+
+        navigate("/payment");
+      });
+
+  } else {
+
+    setTimeout(() => {
+
+      navigate("/payment");
+
+    }, 3000);
+  }
+
+}, [navigate]);
 
   const copyToClipboard = () => {
     if (!referenceNumber) return;

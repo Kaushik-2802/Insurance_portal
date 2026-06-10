@@ -317,24 +317,35 @@ const Payment = () => {
     const activeFlow = localStorage.getItem("activeFlow");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/credit-card`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          number: cardData.number,
-          name: cardData.name,
-          expiry: cardData.expiry,
-          cvv: cardData.cvv,
-          userId: currentUserId,
-          amount: totalAmount,
-          tenure: parseInt(storedTenure, 10),
+      const response = await fetch(
+  `${API_BASE_URL}/credit-card`,
+  {
+    method: "POST",
 
-          policyInsuredValue: vehicleInfo.insuredValue,
-          ...vehicleInfo,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
 
-          insuranceType: activeFlow
-        })
-      });
+    body: JSON.stringify({
+      number: cardData.number,
+      name: cardData.name,
+      expiry: cardData.expiry,
+      cvv: cardData.cvv,
+
+      amount: totalAmount,
+
+      tenure: parseInt(storedTenure, 10),
+
+      policyInsuredValue:
+        vehicleInfo.insuredValue,
+
+      ...vehicleInfo,
+
+      insuranceType: activeFlow
+    })
+  }
+);
       const data = await response.json();
 
       if (data.success) {
@@ -360,14 +371,22 @@ const Payment = () => {
     setErrors({});
 
     try {
-      const response = await fetch(`${API_BASE_URL}/upi/initiate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          upiId,
-          amount: totalAmount
-        })
-      });
+      const response = await fetch(
+  `${API_BASE_URL}/upi/initiate`,
+  {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+
+    body: JSON.stringify({
+      upiId,
+      amount: totalAmount
+    })
+  }
+);
       const data = await response.json();
 
       if (data.success) {
@@ -396,21 +415,30 @@ const Payment = () => {
     const activeFlow = localStorage.getItem("activeFlow");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/upi/confirm`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          policyReferenceNumber,
-          userId: currentUserId,
-          amount: totalAmount,
-          tenure: parseInt(storedTenure, 10),
+     const response = await fetch(
+  `${API_BASE_URL}/upi/confirm`,
+  {
+    method: "POST",
 
-          policyInsuredValue: vehicleInfo.insuredValue,
-          ...vehicleInfo,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
 
-          insuranceType: activeFlow
-        })
-      });
+    body: JSON.stringify({
+      policyReferenceNumber,
+      amount: totalAmount,
+      tenure: parseInt(storedTenure, 10),
+
+      policyInsuredValue:
+        vehicleInfo.insuredValue,
+
+      ...vehicleInfo,
+
+      insuranceType: activeFlow
+    })
+  }
+);
       const data = await response.json();
 
       if (data.success) {
@@ -461,21 +489,32 @@ const Payment = () => {
     const activeFlow = localStorage.getItem("activeFlow");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/net-banking/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...netBankData,
-          userId: currentUserId,
-          amount: totalAmount,
-          tenure: parseInt(storedTenure, 10),
+      const response = await fetch(
+  `${API_BASE_URL}/net-banking/verify`,
+  {
+    method: "POST",
 
-          policyInsuredValue: vehicleInfo.insuredValue,
-          ...vehicleInfo,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
 
-          insuranceType: activeFlow
-        })
-      });
+    body: JSON.stringify({
+      ...netBankData,
+
+      amount: totalAmount,
+
+      tenure: parseInt(storedTenure, 10),
+
+      policyInsuredValue:
+        vehicleInfo.insuredValue,
+
+      ...vehicleInfo,
+
+      insuranceType: activeFlow
+    })
+  }
+);
       const data = await response.json();
 
       if (data.success) {

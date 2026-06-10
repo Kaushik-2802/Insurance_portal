@@ -2,6 +2,7 @@ import express from "express";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import multer from "multer"
+import jwt from "jsonwebtoken"
 
 const router = express.Router();
 
@@ -69,8 +70,9 @@ router.post("/login", async (req, res) => {
         if (!isPasswordMatch) {
             return res.status(401).json({ msg: "Password does not match. Please enter correct password" });
         }
+        const token=jwt.sign({userId:user._id,email:user.email},"LTI_INSURANCE_IS_THE_BEST",{expiresIn:"7d"})
 
-        return res.status(200).json({ msg: "Successful login",userId: user._id });
+        return res.status(200).json({ msg: "Successful login",token,userId: user._id });
 
     } catch (err) {
         return res.status(500).json({ err: err.message });

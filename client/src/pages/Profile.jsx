@@ -20,44 +20,66 @@ export default function Profile() {
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    const fetchProfileDetails = async () => {
-      try {
-        const storedUserId = localStorage.getItem("userId");
-        if (!storedUserId) {
-          throw new Error("No session found. Please log in first.");
-        }
 
-        const response = await fetch(`http://localhost:5000/api/profile?userId=${storedUserId}`, {
+  const fetchProfileDetails = async () => {
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error(
+          "No session found. Please log in first."
+        );
+      }
+
+      const response = await fetch(
+        "http://localhost:5000/api/profile",
+        {
           method: "GET",
           headers: {
-            "Content-Type": "application/json"
-          },
-        });
-        
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || data.msg || data.err || "Something is wrong");
+            Authorization: `Bearer ${token}`
+          }
         }
-        
-        setUserData(data);
-        setFormData({
-          firstName: data.firstName || "",
-          middleName: data.middleName || "",
-          lastName: data.lastName || "",
-          mobile: data.mobile || "",
-          street: data.street || "",
-          city: data.city || "",
-          country: data.country || "India",
-          pincode: data.pincode || ""
-        });
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+          data.msg ||
+          data.err ||
+          "Something went wrong"
+        );
       }
-    };
-    fetchProfileDetails();
-  }, []);
+
+      setUserData(data);
+
+      setFormData({
+        firstName: data.firstName || "",
+        middleName: data.middleName || "",
+        lastName: data.lastName || "",
+        mobile: data.mobile || "",
+        street: data.street || "",
+        city: data.city || "",
+        country: data.country || "India",
+        pincode: data.pincode || ""
+      });
+
+    } catch (err) {
+
+      setError(err.message);
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  fetchProfileDetails();
+
+}, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -136,26 +158,49 @@ export default function Profile() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/profile/update?userId=${storedUserId}`, {
-        method: "PUT",
-        body: uploadData 
-      });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update profile changes.");
-      }
+  const token = localStorage.getItem("token");
 
-      alert("Profile updated successfully!");
-      setUserData(data.user); 
-      setIsEditing(false);
-      setSelectedFile(null);
-      setEditImagePreview(null);
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setIsUpdating(false);
+  const response = await fetch(
+    "http://localhost:5000/api/profile/update",
+    {
+      method: "PUT",
+
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+
+      body: uploadData
     }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+      "Failed to update profile changes."
+    );
+  }
+
+  alert("Profile updated successfully!");
+
+  setUserData(data.user);
+
+  setIsEditing(false);
+
+  setSelectedFile(null);
+
+  setEditImagePreview(null);
+
+} catch (err) {
+
+  alert(err.message);
+
+} finally {
+
+  setIsUpdating(false);
+}
   };
 
   if (loading) {

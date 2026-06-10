@@ -15,53 +15,154 @@ export default function MyPolicies() {
   };
 
   useEffect(() => {
-    // 1. Fetch the active logged-in userId from local storage space
-    const currentUserId = localStorage.getItem("userId");
 
-    if (!currentUserId) {
-      setError("User session profile trace missing. Please re-login.");
-      setLoading(false);
-      return;
-    }
+  const currentUserId =
+    localStorage.getItem("userId");
 
-    // 2. Query both backend endpoints concurrently using Promise.all
-    Promise.all([
-      fetch(`http://localhost:5000/api/payments/user-policies/${currentUserId}`).then((res) => {
-        if (!res.ok) throw new Error("Could not download vehicle records.");
-        return res.json();
-      }),
-      fetch(`http://localhost:5000/api/travel/user-policies/${currentUserId}`).then((res) => {
-        if (!res.ok) throw new Error("Could not download travel records.");
-        return res.json();
-      })
-    ])
-      .then(([vehicleData, travelData]) => {
-        let combinedPolicies = [];
+  const token =
+    localStorage.getItem("token");
 
-        if (vehicleData.success && vehicleData.policies) {
-          // Standardize vehicle entries if needed to match custom display keys
-          const normalizedVehicles = vehicleData.policies.map(p => ({
+  // ✅ SESSION CHECK
+
+  if (!currentUserId || !token) {
+
+    setError(
+      "Session expired. Please login again."
+    );
+
+    setLoading(false);
+
+    navigate("/login");
+
+    return;
+  }
+
+  Promise.all([
+
+    // ============================================
+    // VEHICLE POLICIES
+    // ============================================
+
+    fetch(
+      `http://localhost:5000/api/payments/user-policies/${currentUserId}`,
+      {
+        method: "GET",
+
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization: `Bearer ${token}`
+        }
+      }
+    ).then((res) => {
+
+      if (!res.ok) {
+
+        throw new Error(
+          "Could not download vehicle records."
+        );
+      }
+
+      return res.json();
+    }),
+
+    // ============================================
+    // TRAVEL POLICIES
+    // ============================================
+
+    fetch(
+      `http://localhost:5000/api/travel/user-policies/${currentUserId}`,
+      {
+        method: "GET",
+
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization: `Bearer ${token}`
+        }
+      }
+    ).then((res) => {
+
+      if (!res.ok) {
+
+        throw new Error(
+          "Could not download travel records."
+        );
+      }
+
+      return res.json();
+    })
+
+  ])
+
+    .then(([vehicleData, travelData]) => {
+
+      let combinedPolicies = [];
+
+      // ============================================
+      // VEHICLE POLICIES
+      // ============================================
+
+      if (
+        vehicleData.success &&
+        vehicleData.policies
+      ) {
+
+        const normalizedVehicles =
+          vehicleData.policies.map((p) => ({
             ...p,
-            detailLabel: p.detailLabel || "Vehicle Details",
-            detailValue: p.detailValue || p.vehicle // safety fallback for original property names
+
+            detailLabel:
+              p.detailLabel ||
+              "Vehicle Details",
+
+            detailValue:
+              p.detailValue ||
+              p.vehicle
           }));
-          combinedPolicies = [...combinedPolicies, ...normalizedVehicles];
-        }
 
-        if (travelData.success && travelData.policies) {
-          combinedPolicies = [...combinedPolicies, ...travelData.policies];
-        }
+        combinedPolicies = [
+          ...combinedPolicies,
+          ...normalizedVehicles
+        ];
+      }
 
-        // Sort combined array by expiry date or order received to keep things neat
-        setPolicies(combinedPolicies);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Policy retrieval breakdown: ", err);
-        setError("Network configuration error reaching database arrays.");
-        setLoading(false);
-      });
-  }, []);
+      // ============================================
+      // TRAVEL POLICIES
+      // ============================================
+
+      if (
+        travelData.success &&
+        travelData.policies
+      ) {
+
+        combinedPolicies = [
+          ...combinedPolicies,
+          ...travelData.policies
+        ];
+      }
+
+      setPolicies(combinedPolicies);
+
+      setLoading(false);
+    })
+
+    .catch((err) => {
+
+      console.error(
+        "Policy retrieval breakdown:",
+        err
+      );
+
+      setError(
+        "Network configuration error reaching database arrays."
+      );
+
+      setLoading(false);
+    });
+
+}, [navigate]);
+``
 
   // Determine user context profile name card display 
   // (Uses the name from the newest active policy, defaults back to standard fallback otherwise)

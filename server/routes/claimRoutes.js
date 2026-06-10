@@ -8,6 +8,7 @@ import TravelInsurance from "../models/TravelInsurance.js";
 import InsuranceDetails from "../models/InsuranceDetails.js";
 // FIX 1: Ensure capital 'S' matches filesystem casing perfectly
 import SettledClaim from "../models/settledClaim.js";
+import authMiddleware from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ const upload = multer({
 // =========================================================================
 // 1. POST: Policy Eligibility Verification Gateway
 // =========================================================================
-router.post("/verify-claim-eligibility", async (req, res) => {
+router.post("/verify-claim-eligibility",authMiddleware, async (req, res) => {
     try {
         const { policyNumber, linkedMobile } = req.body;
 
@@ -66,7 +67,7 @@ router.post("/verify-claim-eligibility", async (req, res) => {
 // =========================================================================
 // 2. POST: Travel Claims Inbound Ingestion Pipeline
 // =========================================================================
-router.post("/submit", upload.array("supportDocs"), async (req, res) => {
+router.post("/submit",authMiddleware, upload.array("supportDocs"), async (req, res) => {
     try {
         const { policyNo, date, mobileNo, incidentType } = req.body;
 
@@ -126,7 +127,7 @@ router.post("/submit", upload.array("supportDocs"), async (req, res) => {
 // =========================================================================
 // 3. POST: Vehicle Claims Inbound Ingestion Pipeline
 // =========================================================================
-router.post("/vehicle/submit", upload.array("supportDocs"), async (req, res) => {
+router.post("/vehicle/submit", upload.array("supportDocs"),authMiddleware, async (req, res) => {
     try {
         const { registration, date, mobileNo, incidentType } = req.body;
 
@@ -186,7 +187,7 @@ router.post("/vehicle/submit", upload.array("supportDocs"), async (req, res) => 
 // =========================================================================
 // 4. ADMIN ENDPOINTS: Sync Panel Data Rows From Respective Collections
 // =========================================================================
-router.get("/admin/realtime-claims", async (req, res) => {
+router.get("/admin/realtime-claims",authMiddleware, async (req, res) => {
     try {
         const travelClaims = await TravelClaim.find();
         const vehicleClaims = await VehicleClaim.find();
@@ -249,7 +250,7 @@ router.get("/admin/realtime-claims", async (req, res) => {
     }
 });
 
-router.put("/admin/realtime-claims/:id/status", async (req, res) => {
+router.put("/admin/realtime-claims/:id/status",authMiddleware, async (req, res) => {
     try {
         const { action } = req.body;
         const targetId = req.params.id;
@@ -285,7 +286,7 @@ router.put("/admin/realtime-claims/:id/status", async (req, res) => {
 // =========================================================================
 // 5. GET: Fetch Unified Claims for Logged-In User matched via Policy/Mobile
 // =========================================================================
-router.get("/user-track", async (req, res) => {
+router.get("/user-track",authMiddleware, async (req, res) => {
     try {
         const { policyNo, mobileNo } = req.query;
 

@@ -45,91 +45,237 @@ export default function ClaimForm() {
   };
 
   const handleVerifyPolicy = async () => {
-    if (!policyNumber.trim() || !linkedMobile.trim()) {
-      setValidationError("Please complete both policy code and telephone fields to run check logs.");
+
+  if (
+    !policyNumber.trim() ||
+    !linkedMobile.trim()
+  ) {
+
+    setValidationError(
+      "Please complete both policy code and telephone fields."
+    );
+
+    return;
+  }
+
+  setIsVerifying(true);
+
+  setValidationError("");
+
+  try {
+
+    const token =
+      localStorage.getItem("token");
+
+    if (!token) {
+
+      alert(
+        "Session expired. Please login again."
+      );
+
+      navigate("/login");
+
       return;
     }
 
-    setIsVerifying(true);
-    setValidationError("");
-
-    try {
-      const response = await fetch("http://localhost:5000/api/claims/verify-claim-eligibility", {
+    const response = await fetch(
+      "http://localhost:5000/api/claims/verify-claim-eligibility",
+      {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          Authorization:
+            `Bearer ${token}`
+        },
+
         body: JSON.stringify({
-          policyNumber: policyNumber.trim(),
-          linkedMobile: linkedMobile.trim()
+          policyNumber:
+            policyNumber.trim(),
+
+          linkedMobile:
+            linkedMobile.trim()
         })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setIsVerified(true);
-        setDetectedVehicleType(data.vehicleType);
-        setValidationError("");
-      } else {
-        setIsVerified(false);
-        setValidationError(data.message || "Verification failed. Record not discovered.");
       }
-    } catch (err) {
-      setValidationError("Communication block with validation authority error.");
-    } finally {
-      setIsVerifying(false);
-    }
-  };
+    );
 
+    const data = await response.json();
+
+    if (
+      response.ok &&
+      data.success
+    ) {
+
+      setIsVerified(true);
+
+      setDetectedVehicleType(
+        data.vehicleType
+      );
+
+      setValidationError("");
+
+    } else {
+
+      setIsVerified(false);
+
+      setValidationError(
+        data.message ||
+        "Verification failed."
+      );
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+    setValidationError(
+      "Communication error with verification server."
+    );
+
+  } finally {
+
+    setIsVerifying(false);
+  }
+};
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!isVerified) {
-      window.alert('You must run and pass an account identity validation lookup before registering requests.');
+
+  e.preventDefault();
+
+  if (!isVerified) {
+
+    alert(
+      "You must verify policy first."
+    );
+
+    return;
+  }
+
+  if (
+    !selectedReason ||
+    !incidentDate
+  ) {
+
+    alert(
+      "Please complete all fields."
+    );
+
+    return;
+  }
+
+  if (files.length === 0) {
+
+    alert(
+      "Please upload supporting documents."
+    );
+
+    return;
+  }
+
+  const isTravel =
+    policyNumber
+      .toUpperCase()
+      .startsWith("TRV");
+
+  const endpointUrl = isTravel
+    ? `${API_BASE_URL}/submit`
+    : `${API_BASE_URL}/vehicle/submit`;
+
+  const formData = new FormData();
+
+  formData.append(
+    isTravel
+      ? "policyNo"
+      : "registration",
+
+    policyNumber.trim()
+  );
+
+  formData.append(
+    "mobileNo",
+    linkedMobile.trim()
+  );
+
+  formData.append(
+    "date",
+    incidentDate
+  );
+
+  formData.append(
+    "incidentType",
+    selectedReason
+  );
+
+  files.forEach((file) => {
+
+    formData.append(
+      "supportDocs",
+      file
+    );
+  });
+
+  try {
+
+    const token =
+      localStorage.getItem("token");
+
+    if (!token) {
+
+      alert(
+        "Session expired. Please login again."
+      );
+
+      navigate("/login");
+
       return;
     }
 
-    if (!selectedReason || !incidentDate) {
-      window.alert('Please complete all fields, including the incident date.');
-      return;
-    }
-
-    if (files.length === 0) {
-      window.alert('Please attach at least one supporting proof document.');
-      return;
-    }
-
-    const isTravel = policyNumber.toUpperCase().startsWith("TRV");
-    const endpointUrl = isTravel ? `${API_BASE_URL}/submit` : `${API_BASE_URL}/vehicle/submit`;
-
-    const formData = new FormData();
-    formData.append(isTravel ? "policyNo" : "registration", policyNumber.trim());
-    formData.append("mobileNo", linkedMobile.trim());
-    formData.append("date", incidentDate);
-    formData.append("incidentType", selectedReason);
-    
-    files.forEach(file => {
-      formData.append("supportDocs", file);
-    });
-
-    try {
-      const response = await fetch(endpointUrl, {
+    const response = await fetch(
+      endpointUrl,
+      {
         method: "POST",
+
+        headers: {
+          Authorization:
+            `Bearer ${token}`
+        },
+
         body: formData
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        window.alert('Claim details securely logged. The review matrix pipeline is initialized.');
-        navigate('/dashboard');
-      } else {
-        window.alert('Submission Mismatch Error: ' + result.message);
       }
-    } catch (error) {
-      console.error("Networking tracking layer fault:", error);
-      window.alert('Unable to transmit data stream across server nodes.');
+    );
+
+    const result =
+      await response.json();
+
+    if (
+      response.ok &&
+      result.success
+    ) {
+
+      alert(
+        "Claim submitted successfully."
+      );
+
+      navigate("/dashboard");
+
+    } else {
+
+      alert(
+        "Submission Error: " +
+        result.message
+      );
     }
-  };
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Unable to connect to server."
+    );
+  }
+};
 
   return (
     <div className="claim-page-wrapper">

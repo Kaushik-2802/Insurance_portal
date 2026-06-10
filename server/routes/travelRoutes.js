@@ -3,15 +3,17 @@ import User from "../models/User.js";
 import TravelInsurance from "../models/TravelInsurance.js";
 import PassengerDetails from "../models/PasengerDetails.js";
 import TravelDetails from "../models/TravelDetails.js";
+import authMiddleware from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
 // =========================================================================
 // 1. CREATE BOOKING: Compiles and saves travel documents upon checkout
 // =========================================================================
-router.post("/booking", async (req, res) => {
+router.post("/booking",authMiddleware, async (req, res) => {
   try {
-    const { travelType, tripData, members, selectedAddons, healthAnswers,userId } = req.body;
+    const userId=req.user.userId;
+    const { travelType, tripData, members, selectedAddons, healthAnswers } = req.body;
 
     if (!tripData || !tripData.destination || !tripData.startDate || !tripData.endDate) {
       return res.status(400).json({ success: false, message: "Missing core trip logistics details." });
@@ -90,7 +92,7 @@ router.post("/booking", async (req, res) => {
 // =========================================================================
 // 2. FETCH SUMMARY: Single policy configuration view for confirmation pages
 // =========================================================================
-router.get("/summary/:policyNo", async (req, res) => {
+router.get("/summary/:policyNo",authMiddleware, async (req, res) => {
   try {
     const { policyNo } = req.params;
     const travelPolicy = await TravelInsurance.findOne({ policyNo });
@@ -120,7 +122,7 @@ router.get("/summary/:policyNo", async (req, res) => {
 // =========================================================================
 // 3. FETCH PROFILE POLICIES: Dashboard aggregation matching profile names
 // =========================================================================
-router.get("/user-policies/:userId", async (req, res) => {
+router.get("/user-policies/:userId",authMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
 

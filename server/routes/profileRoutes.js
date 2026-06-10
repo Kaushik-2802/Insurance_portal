@@ -2,6 +2,7 @@ import express from "express";
 import User from "../models/User.js";
 import multer from "multer"; 
 import path from "path";
+import authMiddleware from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
@@ -26,9 +27,9 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter });
 
 // ─── ROUTE TO GET PROFILE DETAILS ───
-router.get("/profile", async (req, res) => {
+router.get("/profile",authMiddleware, async (req, res) => {
     try {
-        const { userId } = req.query; 
+        const userId=req.user.userId;
 
         if (!userId) {
             return res.status(400).json({ message: "No user ID provided!" });
@@ -46,9 +47,9 @@ router.get("/profile", async (req, res) => {
 });
 
 // ─── ROUTE TO UPDATE PROFILE DETAILS ───
-router.put("/profile/update", upload.single("profileImage"), async (req, res) => {
+router.put("/profile/update",authMiddleware, upload.single("profileImage"), async (req, res) => {
     try {
-        const { userId } = req.query; 
+        const userId=req.user.userId;
 
         if (!userId) {
             return res.status(400).json({ message: "No user ID provided for update!" });

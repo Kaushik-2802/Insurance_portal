@@ -38,43 +38,97 @@ export default function RenewInsurance() {
   // BACKEND LOOKUP VERIFICATION HOOK
   // =========================================================================
   const handleVerifyAndContinue = async () => {
-    if (!formData.policyNo.trim()) {
-      setValidationError("Please input an existing policy tracking reference number.");
+
+  if (!formData.policyNo.trim()) {
+
+    setValidationError(
+      "Please input an existing policy tracking reference number."
+    );
+
+    return;
+  }
+
+  setIsVerifying(true);
+
+  setValidationError("");
+
+  try {
+
+    const token =
+      localStorage.getItem("token");
+
+    if (!token) {
+
+      alert(
+        "Session expired. Please login again."
+      );
+
+      navigate("/login");
+
       return;
     }
 
-    setIsVerifying(true);
-    setValidationError('');
+    const response = await fetch(
+      `${API_BASE_URL}/verify-policy/${formData.policyNo.trim()}`,
+      {
+        method: "GET",
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/verify-policy/${formData.policyNo.trim()}`);
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // ✅ Policy validation verified! Seed form with official system records
-        setFormData(prev => ({
-          ...prev,
-          name: data.policy.name || prev.name || "Verified Holder",
-          regNo: data.policy.regNo || prev.regNo,
-        }));
-        
-        // Match the category variant safely
-        if (data.policy.vehicleType) {
-          setVehicleType(data.policy.vehicleType);
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-
-        // Advance layout context structures
-        setCurrentStep(2);
-      } else {
-        // ❌ Policy reference mismatch error notification
-        setValidationError(data.message || "Invalid database identification record.");
       }
-    } catch (err) {
-      setValidationError("Error contacting validation server. Check backend connections.");
-    } finally {
-      setIsVerifying(false);
+    );
+
+    const data = await response.json();
+
+    if (
+      response.ok &&
+      data.success
+    ) {
+
+      setFormData((prev) => ({
+        ...prev,
+
+        name:
+          data.policy.name ||
+          prev.name ||
+          "Verified Holder",
+
+        regNo:
+          data.policy.regNo ||
+          prev.regNo,
+      }));
+
+      if (data.policy.vehicleType) {
+
+        setVehicleType(
+          data.policy.vehicleType
+        );
+      }
+
+      setCurrentStep(2);
+
+    } else {
+
+      setValidationError(
+        data.message ||
+        "Invalid database identification record."
+      );
     }
-  };
+
+  } catch (err) {
+
+    console.error(err);
+
+    setValidationError(
+      "Error contacting validation server."
+    );
+
+  } finally {
+
+    setIsVerifying(false);
+  }
+};
 
   // =========================================================================
   // SUBMIT RENEWAL TRANSACTION PARAMETERS TO PAYMENT HANDLING FLOW

@@ -84,39 +84,85 @@ const TrackClaims = () => {
   // =========================================================================
   // 2. NETWORK ENGINE: Fetch Unified Aggregate Array Streams
   // =========================================================================
-  const fetchUserClaims = async (policyNum, mobileNum) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const fetchUserClaims = async (
+  policyNum,
+  mobileNum
+) => {
 
-      const queryParams = new URLSearchParams({
+  try {
+
+    setLoading(true);
+
+    setError(null);
+
+    const token =
+      localStorage.getItem("token");
+
+    if (!token) {
+
+      alert(
+        "Session expired. Please login again."
+      );
+
+      navigate("/login");
+
+      return;
+    }
+
+    const queryParams =
+      new URLSearchParams({
         policyNo: policyNum,
         mobileNo: mobileNum
       }).toString();
 
-      console.log(`[NETWORK PULL] URL Param Assembly: /user-track?${queryParams}`);
+    console.log(
+      `[NETWORK PULL] /user-track?${queryParams}`
+    );
 
-      const response = await fetch(`${API_BASE_URL}/user-track?${queryParams}`, {
+    const response = await fetch(
+      `${API_BASE_URL}/user-track?${queryParams}`,
+      {
         method: "GET",
+
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+            "application/json",
+
+          Authorization:
+            `Bearer ${token}`
         }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server execution exception error status: ${response.status}`);
       }
+    );
 
-      const data = await response.json();
-      setClaims(data);
+    if (!response.ok) {
 
-    } catch (err) {
-      console.error("Unified network claims pipeline error:", err);
-      setError(err.message || "Failed to load tracking data timelines.");
-    } finally {
-      setLoading(false);
+      throw new Error(
+        `Server error: ${response.status}`
+      );
     }
-  };
+
+    const data =
+      await response.json();
+
+    setClaims(data);
+
+  } catch (err) {
+
+    console.error(
+      "Unified claims pipeline error:",
+      err
+    );
+
+    setError(
+      err.message ||
+      "Failed to load tracking data."
+    );
+
+  } finally {
+
+    setLoading(false);
+  }
+};
 
   // =========================================================================
   // 3. FILTERING REGISTRY: Split Dataset Based on Tab Configurations

@@ -26,46 +26,128 @@ export default function TravelClaimInsurance() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!policyNumber || !linkedMobile || !selectedReason || !incidentDate) {
-      window.alert('Please complete all fields before submitting your travel claim.');
-      return;
-    }
-    if (files.length === 0) {
-      window.alert('Please upload supporting documentation to validate your claim.');
+
+  e.preventDefault();
+
+  if (
+    !policyNumber ||
+    !linkedMobile ||
+    !selectedReason ||
+    !incidentDate
+  ) {
+
+    window.alert(
+      "Please complete all fields before submitting your travel claim."
+    );
+
+    return;
+  }
+
+  if (files.length === 0) {
+
+    window.alert(
+      "Please upload supporting documentation."
+    );
+
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append(
+    "policyNo",
+    policyNumber.trim()
+  );
+
+  formData.append(
+    "mobileNo",
+    linkedMobile.trim()
+  );
+
+  formData.append(
+    "date",
+    incidentDate
+  );
+
+  formData.append(
+    "incidentType",
+    selectedReason
+  );
+
+  files.forEach((file) => {
+
+    formData.append(
+      "supportDocs",
+      file
+    );
+  });
+
+  try {
+
+    // ✅ JWT TOKEN
+
+    const token =
+      localStorage.getItem("token");
+
+    if (!token) {
+
+      alert(
+        "Session expired. Please login again."
+      );
+
+      navigate("/login");
+
       return;
     }
 
-    const formData = new FormData();
-    formData.append("policyNo", policyNumber.trim());
-    formData.append("mobileNo", linkedMobile.trim());
-    formData.append("date", incidentDate);
-    formData.append("incidentType", selectedReason);
-    
-    files.forEach((file) => {
-      formData.append("supportDocs", file);
-    });
-
-    try {
-      const response = await fetch("http://localhost:5000/api/claims/submit", {
+    const response = await fetch(
+      "http://localhost:5000/api/claims/submit",
+      {
         method: "POST",
+
+        headers: {
+          Authorization:
+            `Bearer ${token}`
+        },
+
         body: formData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        window.alert('Travel claim submitted and verified successfully.');
-        navigate('/dashboard');
-      } else {
-        window.alert('Verification / Submission Warning: ' + result.message);
       }
-    } catch (error) {
-      console.error("Network layer execution fault: ", error);
-      window.alert('Unable to transmit data stream. Verify your backend server status.');
+    );
+
+    const result =
+      await response.json();
+
+    if (
+      response.ok &&
+      result.success
+    ) {
+
+      window.alert(
+        "Travel claim submitted successfully."
+      );
+
+      navigate("/dashboard");
+
+    } else {
+
+      window.alert(
+        "Verification / Submission Warning: " +
+        result.message
+      );
     }
-  };
+
+  } catch (error) {
+
+    console.error(
+      "Network layer execution fault:",
+      error
+    );
+
+    window.alert(
+      "Unable to connect to server."
+    );
+  }
+  }
 
   return (
     <div className="claim-page-wrapper">

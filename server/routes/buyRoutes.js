@@ -4,12 +4,13 @@ import mongoose from "mongoose";
 import BuyInsurance from "../models/BuyInsurance.js"; 
 import InsuranceDetails from "../models/InsuranceDetails.js"; 
 import User from "../models/User.js";
+import authMiddleware from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
 // POST: http://localhost:5000/api/insurance/create-policy
 
-router.post("/create-policy", async (req, res) => {
+router.post("/create-policy",authMiddleware, async (req, res) => {
   try {
     const {
       activeForm,
@@ -66,7 +67,7 @@ router.post("/create-policy", async (req, res) => {
 
 // GET: http://localhost:5000/api/insurance/verify-policy/:policyNo
 
-router.get("/verify-policy/:policyNo", async (req, res) => {
+router.get("/verify-policy/:policyNo",authMiddleware, async (req, res) => {
   try {
     const { policyNo } = req.params;
     const policy = await InsuranceDetails.findOne({ refNo: policyNo });
@@ -83,7 +84,7 @@ router.get("/verify-policy/:policyNo", async (req, res) => {
 
 // PUT: http://localhost:5000/api/insurance/renew-policy
 
-router.put("/renew-policy", async (req, res) => {
+router.put("/renew-policy",authMiddleware, async (req, res) => {
   try {
 
     const { policyNo, amount, address } = req.body;
@@ -153,7 +154,7 @@ router.put("/renew-policy", async (req, res) => {
 
 // POST: Verify Policy and Phone Compatibility For Filing Claims
 
-router.post("/verify-claim-eligibility", async (req, res) => {
+router.post("/verify-claim-eligibility",authMiddleware, async (req, res) => {
   try {
     const { policyNumber, linkedMobile } = req.body;
 

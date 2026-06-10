@@ -2,6 +2,7 @@ import express from "express";
 import Payment from "../models/Payment.js";
 import User from "../models/User.js";
 import insuranceDetails from "../models/InsuranceDetails.js";
+import authMiddleware from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
@@ -83,14 +84,14 @@ const createActivePolicy = async (
 // =========================================================
 // 1. CREDIT CARD PAYMENT
 // =========================================================
-router.post("/credit-card", async (req, res) => {
+router.post("/credit-card",authMiddleware, async (req, res) => {
   try {
+    const userId=req.user.userId;
     const {
       number,
       name,
       expiry,
       cvv,
-      userId,
 
       model,
       bikeModel,
@@ -174,7 +175,7 @@ router.post("/credit-card", async (req, res) => {
 // =========================================================
 // 2. UPI INITIATE
 // =========================================================
-router.post("/upi/initiate", async (req, res) => {
+router.post("/upi/initiate",authMiddleware, async (req, res) => {
   try {
     const { upiId, amount } = req.body;
 
@@ -212,11 +213,11 @@ router.post("/upi/initiate", async (req, res) => {
 // =========================================================
 // 3. UPI CONFIRM
 // =========================================================
-router.post("/upi/confirm", async (req, res) => {
+router.post("/upi/confirm",authMiddleware, async (req, res) => {
   try {
+    const userId=req.user.userId;
     const {
       policyReferenceNumber,
-      userId,
 
       model,
       bikeModel,
@@ -289,13 +290,13 @@ router.post("/upi/confirm", async (req, res) => {
 // =========================================================
 // 4. NET BANKING
 // =========================================================
-router.post("/net-banking/verify", async (req, res) => {
+router.post("/net-banking/verify",authMiddleware, async (req, res) => {
   try {
+    const userId=req.user.userId;
     const {
       account,
       ifsc,
       holder,
-      userId,
 
       model,
       bikeModel,
@@ -378,7 +379,7 @@ router.post("/net-banking/verify", async (req, res) => {
 // =========================================================
 // 5. SUMMARY
 // =========================================================
-router.get("/summary/:policyRef", async (req, res) => {
+router.get("/summary/:policyRef",authMiddleware, async (req, res) => {
   try {
     const { policyRef } = req.params;
 
@@ -437,7 +438,7 @@ router.get("/summary/:policyRef", async (req, res) => {
 // =========================================================
 // 6. USER POLICIES
 // =========================================================
-router.get("/user-policies/:userId", async (req, res) => {
+router.get("/user-policies/:userId",authMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
 
