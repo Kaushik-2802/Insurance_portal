@@ -373,7 +373,7 @@ export default function ClaimForm() {
                 <label htmlFor="mobile"><i className="fa-solid fa-phone"></i> Linked Mobile</label>
               </div>
               <div className="floating-field full-width-mobile">
-                <input type="date" id="date" required value={incidentDate} onChange={(e) => setIncidentDate(e.target.value)} />
+                <input type="date" id="date" required value={incidentDate} onChange={(e) => setIncidentDate(e.target.value)} max={new Date().toISOString().split("T")[0]} />
                 <label htmlFor="date" className="fixed-label">Incident Date</label>
               </div>
             </div>
