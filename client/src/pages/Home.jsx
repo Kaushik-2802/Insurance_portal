@@ -2,8 +2,25 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./Home.css";
+import { useState } from "react";
 
 export default function Home() {
+  const [name,setName]=useState("");
+  const [email,setEmail]=useState("");
+  const [query,setQuery]=useState("");
+  const queryPost=async(e)=>{
+    e.preventDefault()
+    const response=await fetch("http://localhost:5000/api/admin/user-queries",{
+      method:"POST",
+      headers:{
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({name,email,query})
+
+    })
+    const data = await response.json();
+    
+  }
   return (
     <div className="home-wrapper">
       <Header />
@@ -175,12 +192,12 @@ export default function Home() {
             </div>
           </div>
 
-          <form className="contact-form-premium">
+          <form className="contact-form-premium" onSubmit={queryPost}>
             <div className="input-group-row">
-              <input type="text" placeholder="Full Name" />
-              <input type="email" placeholder="Email Address" />
+              <input type="text" placeholder="Full Name" id="fullname" value={name} onChange={(e)=>setName(e.target.value)} required/>
+              <input type="email" placeholder="Email Address" id="email" value={email} onChange={(e)=>setEmail(e.target.value)} required/>
             </div>
-            <textarea placeholder="How can we help you?" rows="4"></textarea>
+            <textarea placeholder="How can we help you?" rows="4" id="textbox" value={query} onChange={(e)=>setQuery(e.target.value)} required></textarea>
             <button type="submit" className="submit-btn-premium">
               Send Message
             </button>
