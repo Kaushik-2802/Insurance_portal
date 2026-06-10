@@ -273,7 +273,6 @@ export default function RenewInsurance() {
                 <div className="floating-badge"><i className="fa-solid fa-check-double"></i></div>
              </div>
           </div>
-
         </div>
       </div>
       <Footer />
