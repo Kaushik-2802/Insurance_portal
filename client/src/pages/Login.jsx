@@ -151,6 +151,12 @@ export default function Login() {
             <label>Password</label>
 
           </div>
+          <div className="form-options">
+            {/* <label className="remember-me">
+              <input type="checkbox" /> Remember me
+            </label> */}
+            <Link to="/forgot" className="forgot-pass">Forgot Password?</Link>
+          </div>
 
           <button
             type="submit"
@@ -168,6 +174,7 @@ export default function Login() {
             )}
 
           </button>
+
 
         </form>
 
