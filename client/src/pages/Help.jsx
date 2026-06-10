@@ -1,4 +1,5 @@
 import React from "react";
+import { useState,useEffect } from "react";
 import "./Help.css"; 
 import { useNavigate } from "react-router-dom";
 
@@ -9,17 +10,37 @@ export default function Help() {
     { title: "Payments", desc: "Manage premium schedules and payment methods." },
     { title: "Documents", desc: "Download your tax certificates and ID cards." }
   ];
+  const [name,setName]= useState(null);
   const navigate=useNavigate();
   const handleBack=()=>{
     navigate("/dashboard")
   }
+
+  const nameChange = async (e) => {
+    const userId = localStorage.getItem("userId");
+    const response = await fetch(`http://localhost:5000/api/profile?userId=${userId}`,{
+      method:"GET",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      
+    })
+    const data = await response.json();
+    setName(data)
+
+  }
+
+  
+useEffect(() => {
+    nameChange();
+  }, []);
 
   return (
     <div className="profile-wrapper">
       <div className="profile-page">
         <div style={{ textAlign: 'center', marginBottom: '50px' }}>
           <h1 className="profile-title" style={{ textAlign: 'center', border: 'none' }}>
-            How can we help, John?
+            How can we help, {name ? `${name.firstName} ${name.lastName}` : "User"}?
           </h1>
           <p style={{ color: '#94a3b8', marginTop: '-20px' }}>
             Search our knowledge base or contact a support specialist.
@@ -48,11 +69,11 @@ export default function Help() {
           <div className="emergency-container">
             <div className="contact-box">
               <span className="address-label">24/7 Roadside Support:</span>
-              <span className="address-value" style={{ fontSize: '1.4rem' }}> 1-800-MOTOR-HELP</span>
+              <span className="address-value" style={{ fontSize: '1.4rem' }}> 1-800-90000-5000</span>
             </div>
             <div className="contact-box">
               <span className="address-label">Email Support:</span>
-              <span className="address-value"> support@arctic-insurance.com</span>
+              <span className="address-value"> support@LTI-insurance.com</span>
             </div>
           </div>
         </div>

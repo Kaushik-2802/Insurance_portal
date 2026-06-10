@@ -99,9 +99,9 @@ export default function Login() {
           </div>
 
           <div className="form-options">
-            <label className="remember-me">
+            {/* <label className="remember-me">
               <input type="checkbox" /> Remember me
-            </label>
+            </label> */}
             <Link to="/forgot" className="forgot-pass">Forgot Password?</Link>
           </div>
 

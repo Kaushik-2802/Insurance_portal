@@ -166,22 +166,23 @@ export default function RenewInsurance() {
                       <input 
                         type="text" 
                         name="policyNo" 
+                        id="policyNo"
                         value={formData.policyNo} 
                         onChange={handleInputChange} 
                         placeholder=" " 
                         required 
                       />
-                      <label>Existing Policy No. (Required Verification)</label>
+                      <label htmlFor="policyNo">Existing Policy No. (Required Verification)</label>
                     </div>
 
                     <div className="input-row">
                         <div className="floating-input">
-                            <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder=" " />
-                            <label>Full Name (Optional Lookup)</label>
+                            <input type="text" id="fname" name="name" value={formData.name} onChange={handleInputChange} placeholder=" " />
+                            <label htmlFor="fname">Full Name (Optional Lookup)</label>
                         </div>
                         <div className="floating-input">
-                            <input type="text" name="regNo" value={formData.regNo} onChange={handleInputChange} placeholder=" " />
-                            <label>Registration No. (Optional Lookup)</label>
+                            <input type="text" id="regNo" name="regNo" value={formData.regNo} onChange={handleInputChange} placeholder=" " />
+                            <label htmlFor="regNo">Registration No. (Optional Lookup)</label>
                         </div>
                     </div>
                   </div>

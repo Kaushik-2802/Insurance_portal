@@ -203,7 +203,7 @@ const BuyInsurance = () => {
 
                 <div className={`input-box full-width ${errors.purchaseDate ? "error" : ""}`}>
                   <label>Date of Purchase</label>
-                  <input type="date" name="purchaseDate" onChange={handleInputChange} />
+                  <input type="date" name="purchaseDate" onChange={handleInputChange} max={new Date().toISOString().split("T")[0]}/>
                   {errors.purchaseDate && <span className="error-text">{errors.purchaseDate}</span>}
                 </div>
               </div>

@@ -210,12 +210,12 @@ export default function TravelInsurance() {
                 <div className="neo-row">
                   <div className="neo-input-group">
                     <label htmlFor="startDate">Take-off Date</label>
-                    <input id="startDate" type="date" name="startDate" value={tripData.startDate} onChange={handleTripInputChange} className={errors.startDate ? 'error' : ''} />
+                    <input id="startDate" type="date" name="startDate" value={tripData.startDate} onChange={handleTripInputChange} className={errors.startDate ? 'error' : ''}  min={new Date().toISOString().split("T")[0]} />
                     {errors.startDate && <span className="neo-error">{errors.startDate}</span>}
                   </div>
                   <div className="neo-input-group">
                     <label htmlFor="endDate">Return Date</label>
-                    <input id="endDate" type="date" name="endDate" value={tripData.endDate} onChange={handleTripInputChange} className={errors.endDate ? 'error' : ''} />
+                    <input id="endDate" type="date" name="endDate" value={tripData.endDate} onChange={handleTripInputChange} className={errors.endDate ? 'error' : ''} min={tripData.startDate}/>
                     {errors.endDate && <span className="neo-error">{errors.endDate}</span>}
                   </div>
                 </div>
