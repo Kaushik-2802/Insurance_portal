@@ -300,7 +300,7 @@ export default function RenewInsurance() {
              <div className="live-policy-card">
                 <div className="card-inner">
                     <div className="card-head">
-                        <div className="logo-stub">LTI INSURANCE</div>
+                        <div className="logo-stub">CTS INSURANCE</div>
                         <div className="status-pill">{currentStep === 3 ? "VERIFIED" : "PREVIEW"}</div>
                     </div>
                     <div className="card-main">

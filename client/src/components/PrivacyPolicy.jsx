@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
     <div className="legal-page">
       <h1>Privacy Policy</h1>
       <p>
-        At LTI Insurance, we value your privacy. This page outlines how we collect,
+        At CTS Insurance, we value your privacy. This page outlines how we collect,
         use, and protect your personal information in compliance with IRDAI regulations.
       </p>
       <button onClick={() => navigate("/")}>Back to Home</button>

@@ -120,7 +120,7 @@ export default function InnerHeader() {
         onClick={() => navigate("/dashboard")}
         style={{ cursor: "pointer" }}
       >
-        <h1>LTI Insurance</h1>
+        <h1>CTS Insurance</h1>
 
         <p className="tagline">
           PREMIUM PROTECTION

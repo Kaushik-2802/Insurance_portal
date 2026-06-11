@@ -12,7 +12,7 @@ export default function Dashboard() {
         {/* Left Section: Information */}
         <section className="left-info">
           <div className="section-header">
-            <span className="subtitle">LTI General Protection</span>
+            <span className="subtitle">CTS General Protection</span>
             <h1>Why Insurance?</h1>
             <p className="description">
               Secure your future with comprehensive coverage designed for modern life.

@@ -221,18 +221,12 @@ const BuyInsurance = () => {
         "http://localhost:5000/api/insurance/create-policy",
         {
           method: "POST",
-
           headers: {
-            "Content-Type":
-              "application/json",
-
-            Authorization:
-              `Bearer ${token}`
+            "Content-Type":"application/json",
+            Authorization:`Bearer ${token}`
           },
 
-          body: JSON.stringify(
-            submissionPayload
-          ),
+          body: JSON.stringify(submissionPayload),
         }
       );
 

@@ -9,7 +9,7 @@ export default function Footer() {
           
           {/* Brand & Purpose */}
           <div className="footer-section footer-logo-box">
-            <h2>LTI Insurance</h2>
+            <h2>CTS Insurance</h2>
             <p className="footer-desc">
               Redefining automotive security through smart insurance tech. 
               Delivering data-driven protection and seamless digital coverage for modern drivers.

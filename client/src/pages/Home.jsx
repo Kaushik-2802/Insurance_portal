@@ -35,12 +35,12 @@ export default function Home() {
           <div className="carousel-inner">
             <div className="carousel-item active">
               <div className="overlay-gradient"></div>
-              <img src="1.png" className="d-block w-100 hero-img" alt="Car Insurance" />
+              <img src="img5.png" className="d-block w-100 hero-img" alt="Car Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
                 <h1>The Digital Evolution of Insurance</h1>
                 <p>
-                  LTI Insurance modernizes traditional coverage by bringing a simple,
+                  CTS Insurance modernizes traditional coverage by bringing a simple,
                   fair, and digital experience directly to your smartphone.
                 </p>
               </div>
@@ -48,7 +48,7 @@ export default function Home() {
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="2.png" className="d-block w-100 hero-img" alt="Scooter Insurance" />
+              <img src="img2.png" className="d-block w-100 hero-img" alt="Scooter Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
                 <h1>Smarter Protection for Every Ride</h1>
@@ -61,7 +61,7 @@ export default function Home() {
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="3.png" className="d-block w-100 hero-img" alt="Family Insurance" />
+              <img src="img3.png" className="d-block w-100 hero-img" alt="Family Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
                 <h1>Comprehensive Peace of Mind for Your Family</h1>
@@ -74,7 +74,7 @@ export default function Home() {
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="4.png" className="d-block w-100 hero-img" alt="Claims Insurance" />
+              <img src="img4.png" className="d-block w-100 hero-img" alt="Claims Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
                 <h1>Instant Claims at Your Fingertips</h1>
@@ -87,7 +87,7 @@ export default function Home() {
 
             <div className="carousel-item">
               <div className="overlay-gradient"></div>
-              <img src="5.png" className="d-block w-100 hero-img" alt="Mobility Insurance" />
+              <img src="img1.png" className="d-block w-100 hero-img" alt="Mobility Insurance" />
               <div className="carousel-caption custom-caption">
                 <span className="badge-premium">Premium Coverage</span>
                 <h1>A Shield for All Your Mobility Needs</h1>
@@ -144,7 +144,7 @@ export default function Home() {
           <span className="section-subtitle">Since 1998</span>
           <h2>Protecting What <br /> Matters To You</h2>
           <p>
-            At Shield General, we don't just sell policies; we build safety nets.
+            At CTS General, we don't just sell policies; we build safety nets.
             From commercial fleets to your first bike, we ensure accidents don't
             become financial burdens.
           </p>
@@ -170,7 +170,7 @@ export default function Home() {
         </p>
         <ul>
           <li><i className="fa-solid fa-phone"></i> Call us anytime</li>
-          <li><i className="fa-solid fa-envelope"></i> support@shieldinsurance.com</li>
+          <li><i className="fa-solid fa-envelope"></i> support@ctsinsurance.com</li>
         </ul>
       </section>
 

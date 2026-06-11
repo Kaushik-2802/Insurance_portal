@@ -6,7 +6,7 @@ export default function Header() {
   return (
     <header className="header">
       <div className="logo">
-        <h1>LTI Insurance</h1>
+        <h1>CTS Insurance</h1>
         <p className="tagline">Secure your ride, secure your life</p>
       </div>
       <nav className="nav">

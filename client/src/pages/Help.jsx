@@ -75,7 +75,7 @@ useEffect(() => {
             </div>
             <div className="contact-box">
               <span className="address-label">Email Support:</span>
-              <span className="address-value"> support@LTI-insurance.com</span>
+              <span className="address-value"> support@CTS-insurance.com</span>
             </div>
           </div>
         </div>

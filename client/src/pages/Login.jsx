@@ -99,7 +99,7 @@ export default function Login() {
             <i className="fa-solid fa-shield-halved"></i>
           </div>
 
-          <h2>LTI Insurance</h2>
+          <h2>CTS Insurance</h2>
 
           <p>Secure Portal Login</p>
 
@@ -179,7 +179,7 @@ export default function Login() {
         </form>
 
         <p className="auth-footer">
-          New to LTI?
+          New to CTS?
           <Link to="/register">
             Create Account
           </Link>

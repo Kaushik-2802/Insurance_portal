@@ -44,14 +44,9 @@ export default function ClaimForm() {
   const fetchProfile = async () => {
 
     try {
-
-      const token =
-        localStorage.getItem("token");
-
+      const token = localStorage.getItem("token");
       if (!token) {
-
         navigate("/login");
-
         return;
       }
 
@@ -59,7 +54,6 @@ export default function ClaimForm() {
         "http://localhost:5000/api/profile",
         {
           method: "GET",
-
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -67,22 +61,16 @@ export default function ClaimForm() {
       );
 
       const data = await response.json();
-
       console.log(data);
 
       if (response.ok) {
 
-        setLinkedMobile(
-          data.mobile || ""
-        );
-
+        setLinkedMobile( data.mobile || "");
       } else {
-
         alert(
           "Unable to load profile."
         );
       }
-
     } catch (err) {
 
       console.error(err);
@@ -99,15 +87,8 @@ export default function ClaimForm() {
 
   const handleVerifyPolicy = async () => {
 
-  if (
-    !policyNumber.trim() ||
-    !linkedMobile.trim()
-  ) {
-
-    setValidationError(
-      "Please complete both policy code and telephone fields."
-    );
-
+  if (!policyNumber.trim() || !linkedMobile.trim()) {
+    setValidationError("Please complete both policy code and telephone fields.");
     return;
   }
 
@@ -117,33 +98,22 @@ export default function ClaimForm() {
 
   try {
 
-    const token =
-      localStorage.getItem("token");
-
+    const token = localStorage.getItem("token");
     if (!token) {
-
-      alert(
-        "Session expired. Please login again."
-      );
-
+      alert("Session expired. Please login again.");
       navigate("/login");
-
       return;
     }
 
-    const response = await fetch(
-      "http://localhost:5000/api/claims/verify-claim-eligibility",
+    const response = await fetch("http://localhost:5000/api/claims/verify-claim-eligibility",
       {
         method: "POST",
-
         headers: {
           "Content-Type":
-            "application/json",
-
+          "application/json",
           Authorization:
             `Bearer ${token}`
         },
-
         body: JSON.stringify({
           policyNumber:
             policyNumber.trim()
@@ -153,39 +123,24 @@ export default function ClaimForm() {
 
     const data = await response.json();
 
-    if (
-      response.ok &&
-      data.success
-    ) {
-
+    if (response.ok && data.success) {
       setIsVerified(true);
-
       setDetectedVehicleType(
         data.vehicleType
       );
-
       setValidationError("");
 
     } else {
 
       setIsVerified(false);
-
-      setValidationError(
-        data.message ||
-        "Verification failed."
-      );
+      setValidationError( data.message || "Verification failed.");
     }
 
   } catch (err) {
 
     console.error(err);
-
-    setValidationError(
-      "Communication error with verification server."
-    );
-
+    setValidationError( "Communication error with verification server.");
   } finally {
-
     setIsVerifying(false);
   }
 };
@@ -202,89 +157,44 @@ export default function ClaimForm() {
 
   if (!isVerified) {
 
-    alert(
-      "You must verify policy first."
-    );
-
+    alert("You must verify policy first.");
     return;
   }
 
-  if (
-    !selectedReason ||
-    !incidentDate
-  ) {
+  if (!selectedReason || !incidentDate) {
 
-    alert(
-      "Please complete all fields."
-    );
-
+    alert("Please complete all fields.");
     return;
   }
 
   if (files.length === 0) {
 
-    alert(
-      "Please upload supporting documents."
-    );
-
+    alert("Please upload supporting documents.");
     return;
   }
 
-  const isTravel =
-    policyNumber
-      .toUpperCase()
-      .startsWith("TRV");
+  const isTravel = policyNumber.toUpperCase().startsWith("TRV");
 
-  const endpointUrl = isTravel
-    ? `${API_BASE_URL}/submit`
-    : `${API_BASE_URL}/vehicle/submit`;
+  const endpointUrl = isTravel ? `${API_BASE_URL}/submit` : `${API_BASE_URL}/vehicle/submit`;
 
   const formData = new FormData();
 
-  formData.append(
-    isTravel
-      ? "policyNo"
-      : "registration",
-
-    policyNumber.trim()
-  );
-
-  formData.append(
-    "mobileNo",
-    linkedMobile.trim()
-  );
-
-  formData.append(
-    "date",
-    incidentDate
-  );
-
-  formData.append(
-    "incidentType",
-    selectedReason
-  );
+  formData.append(isTravel ? "policyNo" : "registration", policyNumber.trim());
+  formData.append("mobileNo", linkedMobile.trim());
+  formData.append("date", incidentDate);
+  formData.append("incidentType", selectedReason);
 
   files.forEach((file) => {
-
-    formData.append(
-      "supportDocs",
-      file
-    );
+    formData.append("supportDocs", file);
   });
 
   try {
 
-    const token =
-      localStorage.getItem("token");
-
+    const token = localStorage.getItem("token");
     if (!token) {
 
-      alert(
-        "Session expired. Please login again."
-      );
-
+      alert("Session expired. Please login again.");
       navigate("/login");
-
       return;
     }
 
@@ -292,45 +202,31 @@ export default function ClaimForm() {
       endpointUrl,
       {
         method: "POST",
-
         headers: {
           Authorization:
             `Bearer ${token}`
         },
-
         body: formData
       }
     );
 
-    const result =
-      await response.json();
+    const result = await response.json();
 
-    if (
-      response.ok &&
-      result.success
-    ) {
+    if (response.ok && result.success) {
 
-      alert(
-        "Claim submitted successfully."
-      );
-
+      alert("Claim submitted successfully.");
       navigate("/dashboard");
 
     } else {
 
-      alert(
-        "Submission Error: " +
-        result.message
-      );
+      alert("Submission Error: " + result.message);
     }
 
   } catch (error) {
 
     console.error(error);
 
-    alert(
-      "Unable to connect to server."
-    );
+    alert("Unable to connect to server.");
   }
 };
 

@@ -10,7 +10,7 @@ export default function Footer() {
           
           {/* Brand & Purpose */}
           <div className="footer-section footer-logo-box">
-            <h2>LTI Insurance</h2>
+            <h2>CTS Insurance</h2>
             <p className="footer-desc">
               Redefining automotive security through smart insurance tech. 
               Licensed and regulated by IRDAI.
@@ -69,7 +69,7 @@ export default function Footer() {
         {/* Global Legal Bar */}
         <div className="footer-bottom">
           <p style={{ fontSize: '0.8rem', color: '#8892b0' }}>
-            &copy; {new Date().getFullYear()} LTI Insurance Co. Ltd.
+            &copy; {new Date().getFullYear()} CTS Insurance Co. Ltd.
           </p>
           <div className="footer-legal">
             <Link to="/privacy">Privacy Policy</Link>

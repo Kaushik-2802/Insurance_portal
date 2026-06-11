@@ -6,25 +6,12 @@ import authMiddleware from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
-const generatePolicyRef = () =>
-  `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+const generatePolicyRef = () => `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
-// =========================================================
-// CREATE VEHICLE POLICY ONLY
-// =========================================================
-const createActivePolicy = async (
-  policyRef,
-  paymentAmount,
-  methodUsed,
-  userId,
-  vehicleInfo = {},
-  tenure = 1
-) => {
+const createActivePolicy = async (policyRef,paymentAmount,methodUsed,userId,vehicleInfo = {},tenure = 1) => {
   const userProfile = await User.findById(userId);
 
-  const fullName = userProfile
-    ? `${userProfile.firstName} ${userProfile.lastName}`.trim()
-    : "";
+  const fullName = userProfile ? `${userProfile.firstName} ${userProfile.lastName}`.trim(): "";
 
   const startDate = new Date();
   const endDate = new Date();
@@ -32,19 +19,13 @@ const createActivePolicy = async (
   const parsedTenure = parseInt(tenure, 10) || 1;
   endDate.setFullYear(endDate.getFullYear() + parsedTenure);
 
-  const generatedTxnId =
-    "TXN" + Math.floor(100000000000 + Math.random() * 900000000000);
+  const generatedTxnId ="TXN" + Math.floor(100000000000 + Math.random() * 900000000000);
 
-  const rawInsuredValue =
-    vehicleInfo.insuredValue || vehicleInfo.policyInsuredValue;
-
+  const rawInsuredValue = vehicleInfo.insuredValue || vehicleInfo.policyInsuredValue;
   let formattedInsuredValue = "Third-Party Only (₹0)";
 
   if (rawInsuredValue && rawInsuredValue !== "0") {
-    const cleanNumericString = rawInsuredValue
-      .toString()
-      .replace(/[^0-9]/g, "");
-
+    const cleanNumericString = rawInsuredValue.toString().replace(/[^0-9]/g, "");
     const numericValue = parseInt(cleanNumericString, 10);
 
     if (!isNaN(numericValue) && numericValue > 0) {
@@ -58,20 +39,13 @@ const createActivePolicy = async (
     userId,
     refNo: policyRef,
     name: fullName,
-
     startDate,
     endDate,
-
     vehicleType: vehicleInfo.vehicleType || "",
     bikeModel: vehicleInfo.bikeModel || vehicleInfo.model || "",
     regNo: vehicleInfo.regNo || vehicleInfo.registrationNumber || "",
-
     insuredValue: formattedInsuredValue,
-
-    amount: paymentAmount.toString().startsWith("₹")
-      ? paymentAmount
-      : `₹${Number(paymentAmount).toLocaleString("en-IN")}`,
-
+    amount: paymentAmount.toString().startsWith("₹") ? paymentAmount : `₹${Number(paymentAmount).toLocaleString("en-IN")}`,
     paymentMethod: methodUsed.toUpperCase(),
     transactionId: generatedTxnId
   });
@@ -81,30 +55,12 @@ const createActivePolicy = async (
   return activePolicy;
 };
 
-// =========================================================
 // 1. CREDIT CARD PAYMENT
-// =========================================================
+
 router.post("/credit-card",authMiddleware, async (req, res) => {
   try {
     const userId=req.user.userId;
-    const {
-      number,
-      name,
-      expiry,
-      cvv,
-
-      model,
-      bikeModel,
-      registrationNumber,
-      regNo,
-      vehicleType,
-      tenure,
-      amount,
-      insuredValue,
-      policyInsuredValue,
-
-      insuranceType
-    } = req.body;
+    const {number,name,expiry,cvv,model,bikeModel,registrationNumber,regNo,vehicleType,tenure,amount,insuredValue,policyInsuredValue,insuranceType} = req.body;
 
     if (!number || !name || !expiry || !cvv || !userId) {
       return res.status(400).json({
@@ -119,17 +75,10 @@ router.post("/credit-card",authMiddleware, async (req, res) => {
     const cardAmount = amount ? amount : 700.0;
 
     const newPayment = new Payment({
-      amount:
-        typeof cardAmount === "string"
-          ? parseFloat(cardAmount.replace(/[^0-9.]/g, ""))
-          : cardAmount,
-
+      amount:typeof cardAmount === "string" ? parseFloat(cardAmount.replace(/[^0-9.]/g, "")): cardAmount,
       paymentMethod: "credit-card",
-
       status: "SUCCESS",
-
       policyReferenceNumber: policyRef,
-
       paymentDetails: {
         cardHolderName: name,
         lastFourDigits: cleanCard.slice(-4)
@@ -137,10 +86,6 @@ router.post("/credit-card",authMiddleware, async (req, res) => {
     });
 
     await newPayment.save();
-
-    // =================================================
-    // CREATE VEHICLE POLICY ONLY FOR VEHICLE INSURANCE
-    // =================================================
 
     if (insuranceType === "motor") {
       const vehicleInfo = {
@@ -150,14 +95,7 @@ router.post("/credit-card",authMiddleware, async (req, res) => {
         insuredValue: insuredValue || policyInsuredValue
       };
 
-      await createActivePolicy(
-        policyRef,
-        cardAmount,
-        "CREDIT-CARD",
-        userId,
-        vehicleInfo,
-        tenure
-      );
+      await createActivePolicy(policyRef, cardAmount,"CREDIT-CARD",userId,vehicleInfo,tenure);
     }
 
     return res.status(200).json({
@@ -172,9 +110,8 @@ router.post("/credit-card",authMiddleware, async (req, res) => {
   }
 });
 
-// =========================================================
 // 2. UPI INITIATE
-// =========================================================
+
 router.post("/upi/initiate",authMiddleware, async (req, res) => {
   try {
     const { upiId, amount } = req.body;
@@ -210,15 +147,13 @@ router.post("/upi/initiate",authMiddleware, async (req, res) => {
   }
 });
 
-// =========================================================
 // 3. UPI CONFIRM
-// =========================================================
+
 router.post("/upi/confirm",authMiddleware, async (req, res) => {
   try {
     const userId=req.user.userId;
     const {
       policyReferenceNumber,
-
       model,
       bikeModel,
       registrationNumber,
@@ -227,7 +162,6 @@ router.post("/upi/confirm",authMiddleware, async (req, res) => {
       tenure,
       insuredValue,
       policyInsuredValue,
-
       insuranceType
     } = req.body;
 
@@ -253,10 +187,6 @@ router.post("/upi/confirm",authMiddleware, async (req, res) => {
 
     await payment.save();
 
-    // =================================================
-    // CREATE VEHICLE POLICY ONLY FOR VEHICLE INSURANCE
-    // =================================================
-
     if (insuranceType === "motor") {
       const vehicleInfo = {
         bikeModel: bikeModel || model,
@@ -265,14 +195,7 @@ router.post("/upi/confirm",authMiddleware, async (req, res) => {
         insuredValue: insuredValue || policyInsuredValue
       };
 
-      await createActivePolicy(
-        policyReferenceNumber,
-        payment.amount || 700.0,
-        "UPI",
-        userId,
-        vehicleInfo,
-        tenure
-      );
+      await createActivePolicy(policyReferenceNumber, payment.amount || 700.0, "UPI",userId, vehicleInfo, tenure);
     }
 
     return res.status(200).json({
@@ -287,9 +210,8 @@ router.post("/upi/confirm",authMiddleware, async (req, res) => {
   }
 });
 
-// =========================================================
 // 4. NET BANKING
-// =========================================================
+
 router.post("/net-banking/verify",authMiddleware, async (req, res) => {
   try {
     const userId=req.user.userId;
@@ -297,7 +219,6 @@ router.post("/net-banking/verify",authMiddleware, async (req, res) => {
       account,
       ifsc,
       holder,
-
       model,
       bikeModel,
       registrationNumber,
@@ -307,7 +228,6 @@ router.post("/net-banking/verify",authMiddleware, async (req, res) => {
       amount,
       insuredValue,
       policyInsuredValue,
-
       insuranceType
     } = req.body;
 
@@ -319,21 +239,12 @@ router.post("/net-banking/verify",authMiddleware, async (req, res) => {
     }
 
     const policyRef = generatePolicyRef();
-
     const netBankingAmount = amount ? amount : 700.0;
-
     const newPayment = new Payment({
-      amount:
-        typeof netBankingAmount === "string"
-          ? parseFloat(netBankingAmount.replace(/[^0-9.]/g, ""))
-          : netBankingAmount,
-
+      amount: typeof netBankingAmount === "string" ? parseFloat(netBankingAmount.replace(/[^0-9.]/g, "")): netBankingAmount,
       paymentMethod: "net-banking",
-
       status: "SUCCESS",
-
       policyReferenceNumber: policyRef,
-
       paymentDetails: {
         cardHolderName: holder,
         bankAccountMasked: `******${account.slice(-4)}`
@@ -341,10 +252,6 @@ router.post("/net-banking/verify",authMiddleware, async (req, res) => {
     });
 
     await newPayment.save();
-
-    // =================================================
-    // CREATE VEHICLE POLICY ONLY FOR VEHICLE INSURANCE
-    // =================================================
 
     if (insuranceType === "motor") {
       const vehicleInfo = {
@@ -354,14 +261,7 @@ router.post("/net-banking/verify",authMiddleware, async (req, res) => {
         insuredValue: insuredValue || policyInsuredValue
       };
 
-      await createActivePolicy(
-        policyRef,
-        netBankingAmount,
-        "NET-BANKING",
-        userId,
-        vehicleInfo,
-        tenure
-      );
+      await createActivePolicy( policyRef,netBankingAmount, "NET-BANKING",userId,vehicleInfo,tenure);
     }
 
     return res.status(200).json({
@@ -376,9 +276,8 @@ router.post("/net-banking/verify",authMiddleware, async (req, res) => {
   }
 });
 
-// =========================================================
 // 5. SUMMARY
-// =========================================================
+
 router.get("/summary/:policyRef",authMiddleware, async (req, res) => {
   try {
     const { policyRef } = req.params;
@@ -396,35 +295,25 @@ router.get("/summary/:policyRef",authMiddleware, async (req, res) => {
 
     return res.status(200).json({
       success: true,
-
       policyReferenceNumber: policy.refNo,
-
       ownerName: policy.name,
-
       bikeModel: policy.bikeModel,
-
       registrationNo: policy.regNo,
-
       insuredValue: policy.insuredValue,
-
       startTime:
         new Date(policy.startDate).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric"
         }) + " | 10:00 AM",
-
       endTime:
         new Date(policy.endDate).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric"
         }) + " | 11:59 PM",
-
       paymentAmount: policy.amount,
-
       paymentMethod: policy.paymentMethod,
-
       transactionId: policy.transactionId
     });
   } catch (error) {
@@ -435,9 +324,8 @@ router.get("/summary/:policyRef",authMiddleware, async (req, res) => {
   }
 });
 
-// =========================================================
 // 6. USER POLICIES
-// =========================================================
+
 router.get("/user-policies/:userId",authMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
@@ -448,21 +336,15 @@ router.get("/user-policies/:userId",authMiddleware, async (req, res) => {
 
     const formattedPolicies = activePolicies.map((policy) => ({
       id: policy.refNo,
-
       holder: policy.name,
-
       category: policy.vehicleType,
-
       vehicle: `${policy.bikeModel} (${policy.regNo})`,
-
       premium: policy.amount,
-
       expiry: new Date(policy.endDate).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric"
       }),
-
       status: "Active"
     }));
 

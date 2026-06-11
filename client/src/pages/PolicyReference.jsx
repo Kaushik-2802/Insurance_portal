@@ -168,7 +168,7 @@ const PolicyReference = () => {
               <div className="cert-header">
                 <div className="cert-logo">
                   <i className="fa-solid fa-shield-halved"></i>
-                  <span>LTI Insurance</span>
+                  <span>CTS Insurance</span>
                 </div>
                 <div className="cert-ref">
                   <small>Policy Reference</small>
