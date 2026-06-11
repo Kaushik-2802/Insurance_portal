@@ -21,13 +21,14 @@ export default function VehiclePolicies() {
       let detectedType = null;
 
       if (rawVehicleDetails) {
-        const parsed = JSON.parse(rawVehicleDetails);
-        if (parsed.bikeModel || parsed.vehicleType === "Two Wheeler" || parsed.vehicleType === "twoWheeler") {
-          detectedType = "twoWheeler";
-        } else if (parsed.carModel || parsed.vehicleType === "Four Wheeler" || parsed.vehicleType === "fourWheeler") {
-          detectedType = "fourWheeler";
-        }
-      } 
+  const parsed = JSON.parse(rawVehicleDetails);
+
+  if (parsed.vehicleType === "Two Wheeler") {
+    detectedType = "twoWheeler";
+  } else if (parsed.vehicleType === "Four Wheeler") {
+    detectedType = "fourWheeler";
+  }
+}
       
       if (!detectedType && rawInsuranceForm) {
         const parsedForm = JSON.parse(rawInsuranceForm);
