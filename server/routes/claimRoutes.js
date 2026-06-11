@@ -78,6 +78,7 @@ router.post("/verify-claim-eligibility",authMiddleware,async (req, res) => {
                         message:"This travel policy does not belong to your account."
                     });
                 }
+                //it set's policy type
                 return res.status(200).json({
                     success: true,
                     vehicleType:"Travel Insurance"

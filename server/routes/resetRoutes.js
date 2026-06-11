@@ -15,8 +15,8 @@ const sendOtpEmail = async (targetEmail, otpCode) => {
     port:587,
     secure:false,
     auth: {
-      user: "ltigeneral01@gmail.com", 
-      pass: "bqyzsqytwtbglaxv", 
+      user: "sheildgeneral01@gmail.com", 
+      pass: "njkgjuoafvmifkxg", 
     },
     tls:{
         rejectUnauthorized:false,
@@ -25,7 +25,7 @@ const sendOtpEmail = async (targetEmail, otpCode) => {
   });
 
   const mailOptions = {
-    from: `"LTI Secure Auth System" <LTIGeneral@gmail.com>`,
+    from: `"CTS Secure Auth System" <ctsGeneral02@gmail.com>`,
     to: targetEmail,
     subject: "Your Password Reset OTP Code",
     html: `
