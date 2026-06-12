@@ -19,7 +19,14 @@ export default function Home() {
 
     })
     const data = await response.json();
-    
+
+    if(!data){
+      alert("Data not submitted!!");
+    }
+    alert("Query raised to the admin. Will reach back to you via your mail");
+    setName("")
+    setEmail("")
+    setQuery("")
   }
   return (
     <div className="home-wrapper">
@@ -192,13 +199,13 @@ export default function Home() {
             </div>
           </div>
 
-          <form className="contact-form-premium" onSubmit={queryPost}>
+          <form className="contact-form-premium" id="form-submit" onSubmit={queryPost}>
             <div className="input-group-row">
               <input type="text" placeholder="Full Name" id="fullname" value={name} onChange={(e)=>setName(e.target.value)} required/>
               <input type="email" placeholder="Email Address" id="email" value={email} onChange={(e)=>setEmail(e.target.value)} required/>
             </div>
             <textarea placeholder="How can we help you?" rows="4" id="textbox" value={query} onChange={(e)=>setQuery(e.target.value)} required></textarea>
-            <button type="submit" className="submit-btn-premium">
+            <button type="submit" id="form-submit-btn" className="submit-btn-premium">
               Send Message
             </button>
           </form>

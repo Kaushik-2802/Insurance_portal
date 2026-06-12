@@ -6,8 +6,7 @@ import Footer from "../components/Footer";
 
 const BuyInsurance = () => {
 
-  const [activeForm, setActiveForm] =
-    useState("bike");
+  const [activeForm, setActiveForm] = useState("bike");
 
   const [formData, setFormData] =
     useState({
@@ -20,105 +19,61 @@ const BuyInsurance = () => {
       chasisNumber: "",
     });
 
-  const [errors, setErrors] =
-    useState({});
-
-  const [isSubmitting, setIsSubmitting] =
-    useState(false);
-
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // ==========================================
   // VALIDATION
-  // ==========================================
-
   const validate = () => {
 
     let tempErrors = {};
-
     if (!formData.manufacturer.trim()) {
-      tempErrors.manufacturer =
-        "Manufacturer is required";
+      tempErrors.manufacturer = "Manufacturer is required";
     }
 
     if (!formData.model.trim()) {
-      tempErrors.model =
-        "Model is required";
+      tempErrors.model = "Model is required";
     }
-
-    const regRegex =
-      /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/i;
+    const regRegex = /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/i;
 
     if (!formData.registrationNumber) {
+      tempErrors.registrationNumber = "Registration number is required";
 
-      tempErrors.registrationNumber =
-        "Registration number is required";
-
-    } else if (
-      !regRegex.test(
-        formData.registrationNumber
-      )
-    ) {
-
+    } else if (!regRegex.test( formData.registrationNumber)) {
       tempErrors.registrationNumber =
         "Format: XX 00 XX 0000";
     }
 
-    if (
-      formData.drivingLicense.length < 5
-    ) {
-
-      tempErrors.drivingLicense =
-        "Enter valid DL number";
+    if (formData.drivingLicense.length < 5) {
+      tempErrors.drivingLicense = "Enter valid DL number";
     }
 
-    if (
-      formData.engineNumber.length < 6
-    ) {
-
-      tempErrors.engineNumber =
-        "Invalid Engine Number";
+    if (formData.engineNumber.length < 6) {
+      tempErrors.engineNumber = "Invalid Engine Number";
     }
 
-    if (
-      formData.chasisNumber.length < 10
-    ) {
-
-      tempErrors.chasisNumber =
-        "Invalid Chassis Number";
+    if (formData.chasisNumber.length < 10) {
+      tempErrors.chasisNumber = "Invalid Chassis Number";
     }
 
-    const selectedDate =
-      new Date(formData.purchaseDate);
-
+    const selectedDate = new Date(formData.purchaseDate);
     const today = new Date();
 
     if (!formData.purchaseDate) {
+      tempErrors.purchaseDate = "Purchase date is required";
 
-      tempErrors.purchaseDate =
-        "Purchase date is required";
-
-    } else if (
-      selectedDate > today
-    ) {
-
-      tempErrors.purchaseDate =
-        "Purchase date cannot be future date";
+    } else if ( selectedDate > today) {
+      tempErrors.purchaseDate = "Purchase date cannot be future date";
     }
 
     setErrors(tempErrors);
 
-    return (
-      Object.keys(tempErrors).length === 0
-    );
+    return ( Object.keys(tempErrors).length === 0);
   };
 
-  // ==========================================
   // INPUT CHANGE
-  // ==========================================
 
   const handleInputChange = (e) => {
-
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -135,87 +90,37 @@ const BuyInsurance = () => {
     }
   };
 
-  // ==========================================
   // SUBMIT
-  // ==========================================
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
-
     if (!validate()) {
       return;
     }
-
     setIsSubmitting(true);
-
     try {
-
-      // ✅ JWT TOKEN
-
-      const token =
-        localStorage.getItem("token");
-
+      const token = localStorage.getItem("token");
       console.log("TOKEN:", token);
-
       if (!token) {
-
-        alert(
-          "Session expired. Please login again."
-        );
-
+        alert("Session expired. Please login again.");
         navigate("/login");
-
         return;
       }
-
-      // ==========================================
       // PAYLOAD
-      // ==========================================
 
       const submissionPayload = {
-
         activeForm,
-
-        manufacturer:
-          formData.manufacturer,
-
-        model:
-          formData.model,
-
-        drivingLicense:
-          formData.drivingLicense,
-
-        purchaseDate:
-          formData.purchaseDate,
-
-        registrationNumber:
-          formData.registrationNumber,
-
-        engineNumber:
-          formData.engineNumber,
-
-        chasisNumber:
-          formData.chasisNumber,
-
-        amount:
-          activeForm === "bike"
-            ? "₹1,850"
-            : "₹4,500",
-
-        paymentMethod:
-          "Razorpay / Digital Wallet",
-
-        transactionId:
-          "TXN-" +
-          Math.floor(
-            Math.random() * 10000000
-          )
+        manufacturer: formData.manufacturer,
+        model: formData.model,
+        drivingLicense: formData.drivingLicense,
+        purchaseDate: formData.purchaseDate,
+        registrationNumber: formData.registrationNumber,
+        engineNumber:  formData.engineNumber,
+        chasisNumber: formData.chasisNumber,
+        amount: activeForm === "bike" ? "₹1,850" : "₹4,500",
+        paymentMethod: "Razorpay / Digital Wallet",
+        transactionId: "TXN-" + Math.floor(Math.random() * 10000000)
       };
-
-      // ==========================================
-      // API CALL
-      // ==========================================
 
       const response = await fetch(
         "http://localhost:5000/api/insurance/create-policy",
@@ -230,59 +135,23 @@ const BuyInsurance = () => {
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
-      // ==========================================
-      // SUCCESS
-      // ==========================================
+      if (response.ok && data.success) {
 
-      if (
-        response.ok &&
-        data.success
-      ) {
-
-        console.log(
-          "POLICY RESPONSE:",
-          data
-        );
+        console.log("POLICY RESPONSE:",data);
 
         const localPayloadStaging = {
-
-          bikeModel:
-            formData.model,
-
-          regNo:
-            formData.registrationNumber,
-
-          vehicleType:
-            activeForm === "bike"
-              ? "Two Wheeler"
-              : "Four Wheeler",
-
-          insuredValue:
-            activeForm === "bike"
-              ? "₹2,85,000"
-              : "₹7,50,000",
-
-          insuranceType:
-            "vehicle"
+          bikeModel: formData.model,
+          regNo: formData.registrationNumber,
+          vehicleType: activeForm === "bike" ? "Two Wheeler": "Four Wheeler",
+          insuredValue: activeForm === "bike" ? "₹2,85,000": "₹7,50,000",
+          insuranceType: "vehicle"
         };
 
-        localStorage.setItem(
-          "vehicleDetails",
-          JSON.stringify(
-            localPayloadStaging
-          )
-        );
-
-        localStorage.setItem(
-          "activeFlow",
-          "vehicle"
-        );
-
-        navigate(
-          "/policy-type",
+        localStorage.setItem("vehicleDetails", JSON.stringify(localPayloadStaging));
+        localStorage.setItem("activeFlow","vehicle");
+        navigate("/policy-type",
           {
             state: {
               policy: data.policy
@@ -292,25 +161,15 @@ const BuyInsurance = () => {
 
       } else {
 
-        alert(
-          data.message ||
-          "Something went wrong."
-        );
+        alert(data.message ||"Something went wrong.");
       }
 
     } catch (error) {
 
-      console.error(
-        "BUY INSURANCE ERROR:",
-        error
-      );
-
-      alert(
-        "Backend connection failed."
-      );
+      console.error("BUY INSURANCE ERROR:",error);
+      alert("Backend connection failed.");
 
     } finally {
-
       setIsSubmitting(false);
     }
   };
@@ -321,71 +180,49 @@ const BuyInsurance = () => {
       <InnerHeader />
 
       <main className="buy-insurance-main">
-
         <div className="bg-shape shape-1"></div>
-
         <div className="bg-shape shape-2"></div>
-
         <section className="glass-container">
-
           <div className="header-content">
-
             <h1>
               Protect Your Journey
             </h1>
-
             <p>
               Get instant premium
               coverage in just a few steps.
             </p>
-
           </div>
 
           {/* VEHICLE SELECTOR */}
-
           <div className="visual-selector">
-
             <div
-              className={`selection-card ${
-                activeForm === "bike"
-                  ? "active"
-                  : ""
-              }`}
+              className={`selection-card ${activeForm === "bike"? "active" : ""}`}
               onClick={() => {
                 setActiveForm("bike");
                 setErrors({});
               }}
             >
-
               <div className="card-icon">
                 <i className="fa-solid fa-motorcycle"></i>
               </div>
-
               <div className="card-info">
                 <span>Two-Wheeler</span>
                 <small>
                   Bikes & Scooters
                 </small>
               </div>
-
               {activeForm === "bike" && (
                 <i className="fa-solid fa-circle-check checkmark"></i>
               )}
 
             </div>
-
             <div
-              className={`selection-card ${
-                activeForm === "car"
-                  ? "active"
-                  : ""
-              }`}
+              className={`selection-card ${activeForm === "car"? "active": ""}`}
               onClick={() => {
                 setActiveForm("car");
                 setErrors({});
               }}
             >
-
               <div className="card-icon">
                 <i className="fa-solid fa-car-side"></i>
               </div>
@@ -396,45 +233,33 @@ const BuyInsurance = () => {
                   Private Cars & SUVs
                 </small>
               </div>
-
               {activeForm === "car" && (
                 <i className="fa-solid fa-circle-check checkmark"></i>
               )}
-
             </div>
-
           </div>
 
           {/* FORM */}
 
           <div className="form-wrapper animated-fade">
-
             <div className="form-header">
-
               <h3>
                 <i className="fa-solid fa-file-invoice"></i>
-
                 {" "}
                 {activeForm === "bike"
                   ? "Bike"
                   : "Car"}{" "}
-
                 Details
               </h3>
-
               <div className="divider"></div>
-
             </div>
 
             <form
               onSubmit={handleSubmit}
               className="premium-form"
             >
-
               <div className="form-grid">
-
                 <div className={`input-box ${errors.manufacturer ? "error" : ""}`}>
-
                   <label>Manufacturer</label>
 
                   <input
@@ -455,7 +280,6 @@ const BuyInsurance = () => {
                 <div className={`input-box ${errors.model ? "error" : ""}`}>
 
                   <label>Model Name</label>
-
                   <input
                     type="text"
                     name="model"
@@ -476,7 +300,6 @@ const BuyInsurance = () => {
                   <label>
                     Registration Number
                   </label>
-
                   <input
                     type="text"
                     name="registrationNumber"
@@ -493,7 +316,6 @@ const BuyInsurance = () => {
                 </div>
 
                 <div className={`input-box ${errors.drivingLicense ? "error" : ""}`}>
-
                   <label>
                     Driving License
                   </label>
@@ -514,7 +336,6 @@ const BuyInsurance = () => {
                 </div>
 
                 <div className={`input-box ${errors.engineNumber ? "error" : ""}`}>
-
                   <label>Engine Number</label>
 
                   <input
@@ -531,9 +352,7 @@ const BuyInsurance = () => {
                   )}
 
                 </div>
-
                 <div className={`input-box ${errors.chasisNumber ? "error" : ""}`}>
-
                   <label>Chassis Number</label>
 
                   <input
@@ -552,7 +371,6 @@ const BuyInsurance = () => {
                 </div>
 
                 <div className={`input-box full-width ${errors.purchaseDate ? "error" : ""}`}>
-
                   <label>Date of Purchase</label>
 
                   <input
@@ -568,7 +386,6 @@ const BuyInsurance = () => {
                   )}
 
                 </div>
-
               </div>
 
               <button
@@ -584,17 +401,12 @@ const BuyInsurance = () => {
                 <i className="fa-solid fa-bolt-lightning"></i>
 
               </button>
-
             </form>
-
           </div>
-
         </section>
-
       </main>
 
       <Footer />
-
     </div>
   );
 };
