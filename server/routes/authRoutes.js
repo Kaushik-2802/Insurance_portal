@@ -70,7 +70,7 @@ router.post("/login", async (req, res) => {
         if (!isPasswordMatch) {
             return res.status(401).json({ msg: "Password does not match. Please enter correct password" });
         }
-        const token=jwt.sign({userId:user._id,email:user.email},"LTI_INSURANCE_IS_THE_BEST",{expiresIn:"7d"})
+        const token=jwt.sign({userId:user._id,email:user.email},process.env.JWT_SECRET,{expiresIn:"7d"})
 
         return res.status(200).json({ msg: "Successful login",token,userId: user._id });
 

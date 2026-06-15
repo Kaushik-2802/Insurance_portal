@@ -26,7 +26,7 @@ const authMiddleware = (req, res, next) => {
 
         const decoded = jwt.verify(
             token,
-            "LTI_INSURANCE_IS_THE_BEST"
+            process.env.JWT_SECRET
         );
 
         console.log("DECODED USER:");

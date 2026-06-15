@@ -9,12 +9,14 @@ import travelRoutes from "./routes/travelRoutes.js"
 import claimRoutes from "./routes/claimRoutes.js"
 import buyRoutes from "./routes/buyRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
+import dotenv from "dotenv"
 
 const app=express()
 app.use(express.json());
 app.use(cors())
+dotenv.config();
 
-mongoose.connect("mongodb+srv://kaushikkomaravolu_db_user:XWZZ9SaTrsMXFqcb@cluster0.xxozm0r.mongodb.net/?appName=Cluster0").then(console.log("mongodb connected successfully!!"));
+mongoose.connect(process.env.MONGO_URI).then(console.log("mongodb connected successfully!!"));
 
 app.use('/api/auth',authRoutes)
 app.use('/api',profileRoutes)
@@ -26,5 +28,5 @@ app.use("/api/claims",claimRoutes)
 app.use("/api/insurance",buyRoutes)
 app.use("/api/admin",adminRoutes)
 
-const port=5000;
+const port=process.env.PORT || 5000;
 app.listen(port,()=>console.log(`Server running at port ${port}`))

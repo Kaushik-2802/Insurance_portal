@@ -70,7 +70,7 @@ export default function VehiclePolicies() {
         icon: "⚖️",
         allowedTenures: [1, 2, 3, 5],
         basePremium: 1480,
-        insuredValue: 0, 
+        insuredValue: 50000, 
         details: {
           tenure: "Flexible options up to 5 Years",
           coverage: "Unlimited legal liability cover for physical injury or death to external third parties. Third-party property damage coverage up to ₹1,00,000.",
@@ -136,7 +136,7 @@ export default function VehiclePolicies() {
         icon: "⚖️",
         allowedTenures: [1, 3],
         basePremium: 3416,
-        insuredValue: 0,
+        insuredValue: 300000,
         details: {
           tenure: "Standard 1 or 3 Year Lock",
           coverage: "Total protection against financial impacts stemming from legal claims for bodily harm. Property damage limit capped at ₹7,500,000.",

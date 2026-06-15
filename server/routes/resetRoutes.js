@@ -11,12 +11,12 @@ const otpStore = new Map();
 
 const sendOtpEmail = async (targetEmail, otpCode) => {
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com", 
-    port:587,
+    host: process.env.SMTP_HOST, 
+    port:process.env.SMTP_PORT,
     secure:false,
     auth: {
-      user: "sheildgeneral01@gmail.com", 
-      pass: "njkgjuoafvmifkxg", 
+      user: process.env.SMTP_USER, 
+      pass: process.env.SMTP_PASS, 
     },
     tls:{
         rejectUnauthorized:false,
@@ -25,7 +25,7 @@ const sendOtpEmail = async (targetEmail, otpCode) => {
   });
 
   const mailOptions = {
-    from: `"CTS Secure Auth System" <ctsGeneral02@gmail.com>`,
+    from: `"CTS Secure Auth System" <${process.env.SMTP_FROM}>`,
     to: targetEmail,
     subject: "Your Password Reset OTP Code",
     html: `
