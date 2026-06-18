@@ -339,7 +339,7 @@ const response = await fetch(
                     </button>
                   </div>
                   <div className="health-card-image">
-                    <img src="/1.png" alt="Health travel illustration" />
+                    <img src="/health_img.png" alt="Health travel illustration" />
                   </div>
                 </div>
                 <div className="neo-health-header">
