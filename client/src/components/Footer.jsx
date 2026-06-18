@@ -42,7 +42,7 @@ export default function Footer() {
             </div>
             <div className="contact-item" style={{ margin: '15px 0' }}>
               <i className="fa-solid fa-envelope-open-text"></i>
-              <span> help@ltiinsurance.com</span>
+              <span> help@ctsinsurance.com</span>
             </div>
             <div className="contact-item">
               <i className="fa-solid fa-map-pin"></i>

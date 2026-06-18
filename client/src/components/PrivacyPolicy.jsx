@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
         At CTS Insurance, we value your privacy. This page outlines how we collect,
         use, and protect your personal information in compliance with IRDAI regulations.
       </p>
-      <button onClick={() => navigate("/")}>Back to Home</button>
+      <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
     </div>
   );
 }

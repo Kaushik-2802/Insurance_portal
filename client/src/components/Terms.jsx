@@ -11,7 +11,7 @@ export default function Terms() {
         These terms govern the use of our insurance services, including policy purchase,
         claims, and renewals. By using our platform, you agree to abide by these terms.
       </p>
-      <button onClick={() => navigate("/")}>Back to Home</button>
+      <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
     </div>
   );
 }

@@ -11,7 +11,7 @@ export default function Compliance() {
         CTS Insurance operates under strict compliance with IRDAI and other regulatory
         bodies to ensure transparency, fairness, and customer protection.
       </p>
-      <button onClick={() => navigate("/")}>Back to Home</button>
+      <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
     </div>
   );
 }

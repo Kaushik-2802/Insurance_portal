@@ -1,4 +1,3 @@
-// models/VehicleClaim.js
 import mongoose from "mongoose";
 
 const vehicleClaimSchema = new mongoose.Schema({

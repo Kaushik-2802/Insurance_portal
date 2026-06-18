@@ -71,7 +71,6 @@ router.post("/forgot-password", async (req, res) => {
       console.log("========================================\n");
     }
 
-    // Always return 200 so your frontend UI stays happy and moves to the verification screen
     return res.status(200).json({ message: "OTP code processed successfully" });
 
   } catch (error) {
