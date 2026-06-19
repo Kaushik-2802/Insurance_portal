@@ -389,7 +389,7 @@ const response = await fetch(
                     </button>
                   </div>
                   <div className="confirmation-card-image">
-                    <img src="/4.png" alt="Travel confirmation illustration" />
+                    <img src="img4.png" alt="Travel confirmation illustration" />
                   </div>
                 </div>
                 <div className="neo-confirmation-summary">
