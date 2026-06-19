@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import BuyInsurance from "../models/BuyInsurance.js"; 
 import InsuranceDetails from "../models/InsuranceDetails.js"; 
 import User from "../models/User.js";
-import authMiddleware from "../middleware/authMiddleware.js"
+import authMiddleware from "../middleware/authMiddleware.js";
+import TravelInsurance from "../models/TravelInsurance.js"
 
 const router = express.Router();
 
@@ -154,37 +155,59 @@ router.put("/renew-policy",authMiddleware, async (req, res) => {
 
 // POST: Verify Policy and Phone Compatibility For Filing Claims
 
-router.post("/verify-claim-eligibility",authMiddleware, async (req, res) => {
+router.post("/verify-claim-eligibility", authMiddleware, async (req, res) => {
   try {
-    const { policyNumber, linkedMobile } = req.body;
+    const { policyNumber } = req.body;
+    const userId = req.user.id; 
 
-    if (!policyNumber || !linkedMobile) {
+    if (!policyNumber) {
       return res.status(400).json({
         success: false,
-        message: "Both policy tracking token and registered mobile are required for validation."
+        message: "Policy tracking token is required for validation."
       });
     }
 
-    const activePolicy = await InsuranceDetails.findOne({
-      refNo: policyNumber.trim(),
-    });
-    
-    const mobileNo = await User.findOne({
-      mobile: linkedMobile
-    });
+    const cleanPolicyNum = policyNumber.trim();
+    const isTravelPolicy = cleanPolicyNum.toUpperCase().startsWith("TRV");
 
-    if (!activePolicy || !mobileNo) {
-      return res.status(404).json({
-        success: false,
-        message: "Incorrect policy number or mobile number. Please enter correct details."
+    if (isTravelPolicy) {
+      const activeTravelPolicy = await TravelInsurance.findOne({
+        policyNo: cleanPolicyNum,
+        userId: userId 
+      });
+
+      if (!activeTravelPolicy) {
+        return res.status(404).json({
+          success: false,
+          message: "No active travel policy found matching this profile setup."
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Travel security identity criteria successfully mapped.",
+        destination: activeTravelPolicy.destination || "Valid Travel Policy"
+      });
+
+    } else {
+      const activeVehiclePolicy = await InsuranceDetails.findOne({
+        refNo: cleanPolicyNum,
+      });
+      const userRecord = await User.findById(userId);
+
+      if (!activeVehiclePolicy || !userRecord) {
+        return res.status(404).json({
+          success: false,
+          message: "Incorrect policy number or profile link. Please enter correct details."
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Vehicle security identity criteria successfully mapped.",
+        vehicleType: activeVehiclePolicy.vehicleType 
       });
     }
-
-    return res.status(200).json({
-      success: true,
-      message: "Security identity criteria successfully mapped.",
-      vehicleType: activePolicy.vehicleType 
-    });
 
   } catch (error) {
     console.error("Claim eligibility tracking system fault:", error);
