@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import navigation hook
+import { useNavigate } from "react-router-dom"; 
 import InnerHeader from "../components/InnerHeader";
 import Footer from "../components/Footer";
 
-// Adjust this URL to point to your backend configuration setup
 const API_BASE_URL = "http://localhost:5000/api/claims";
 
 const TrackClaims = () => {
-  const navigate = useNavigate(); // Initialize routing engine
+  const navigate = useNavigate(); 
   const [claims, setClaims] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -19,13 +18,11 @@ const TrackClaims = () => {
   // 1. LIFECYCLE HOOK: Parse Local Storage & Initialize Claims Fetch
   // =========================================================================
   useEffect(() => {
-    // Target the specific policy identifier key used in your vehicle storage layer
     let activePolicy = localStorage.getItem("policyReferenceNumber") || 
                        localStorage.getItem("policyNo") || 
                        localStorage.getItem("policyNumber") || 
                        localStorage.getItem("registration") || "";
 
-    // If it's a vehicle flow and returned a plate registration sequence by accident, fallback to renewal code
     if (activePolicy.includes(" ") || activePolicy.startsWith("TS")) {
       const renewalTarget = localStorage.getItem("renewalPolicyNo");
       if (renewalTarget && renewalTarget.startsWith("POL")) {
@@ -33,15 +30,12 @@ const TrackClaims = () => {
       }
     }
 
-    // Attempt to scrape full phone strings safely from available storage variants
     let activeMobile = localStorage.getItem("userMobile") || 
                        localStorage.getItem("mobileNo") || 
                        localStorage.getItem("phone") || "";
 
-    // Deep structural fallback scanning if phone number is missing, null, or truncated to '304'
     if (!activeMobile || activeMobile.length < 5 || activeMobile === "304") {
       try {
-        // Look inside the travel insurance object metadata block
         const travelData = localStorage.getItem("travelInsuranceData");
         if (travelData) {
           const parsedTravel = JSON.parse(travelData);
@@ -50,7 +44,6 @@ const TrackClaims = () => {
           }
         }
 
-        // Fallback secondary check into admin claims array strings
         if (!activeMobile || activeMobile.length < 5) {
           const adminClaims = localStorage.getItem("adminClaimRequests");
           if (adminClaims) {
@@ -64,7 +57,6 @@ const TrackClaims = () => {
       }
     }
 
-    // Production Fallback Overrides: Force match your active database records if fields remain empty
     if (!activePolicy || activePolicy === "undefined" || activePolicy.startsWith("TS")) {
       activePolicy = "POL-XRD36TAM"; 
     }
@@ -84,85 +76,46 @@ const TrackClaims = () => {
   // =========================================================================
   // 2. NETWORK ENGINE: Fetch Unified Aggregate Array Streams
   // =========================================================================
-  const fetchUserClaims = async (
-  policyNum,
-  mobileNum
-) => {
+  const fetchUserClaims = async (policyNum, mobileNum) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Session expired. Please login again.");
+        navigate("/login");
+        return;
+      }
 
-    setLoading(true);
-
-    setError(null);
-
-    const token =
-      localStorage.getItem("token");
-
-    if (!token) {
-
-      alert(
-        "Session expired. Please login again."
-      );
-
-      navigate("/login");
-
-      return;
-    }
-
-    const queryParams =
-      new URLSearchParams({
+      const queryParams = new URLSearchParams({
         policyNo: policyNum,
         mobileNo: mobileNum
       }).toString();
 
-    console.log(
-      `[NETWORK PULL] /user-track?${queryParams}`
-    );
+      console.log(`[NETWORK PULL] /user-track?${queryParams}`);
 
-    const response = await fetch(
-      `${API_BASE_URL}/user-track?${queryParams}`,
-      {
+      const response = await fetch(`${API_BASE_URL}/user-track?${queryParams}`, {
         method: "GET",
-
         headers: {
-          "Content-Type":
-            "application/json",
-
-          Authorization:
-            `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
         }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-
-      throw new Error(
-        `Server error: ${response.status}`
-      );
+      const data = await response.json();
+      setClaims(data);
+    } catch (err) {
+      console.error("Unified claims pipeline error:", err);
+      setError(err.message || "Failed to load tracking data.");
+    } finally {
+      setLoading(false);
     }
-
-    const data =
-      await response.json();
-
-    setClaims(data);
-
-  } catch (err) {
-
-    console.error(
-      "Unified claims pipeline error:",
-      err
-    );
-
-    setError(
-      err.message ||
-      "Failed to load tracking data."
-    );
-
-  } finally {
-
-    setLoading(false);
-  }
-};
+  };
 
   // =========================================================================
   // 3. FILTERING REGISTRY: Split Dataset Based on Tab Configurations
@@ -172,7 +125,6 @@ const TrackClaims = () => {
     return claim.status?.toLowerCase() === activeTab.toLowerCase();
   });
 
-  // Helper mapping to generate color pills dynamically based on active claim states
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "settled":
@@ -203,7 +155,6 @@ const TrackClaims = () => {
             </p>
           </div>
 
-          {/* BACK TO DASHBOARD NAVIGATION BUTTON */}
           <button
             onClick={() => navigate("/dashboard")}
             style={{
@@ -230,7 +181,6 @@ const TrackClaims = () => {
               e.currentTarget.style.borderColor = "#d9d9d9";
             }}
           >
-            {/* SVG Left Arrow Icon */}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
@@ -286,6 +236,10 @@ const TrackClaims = () => {
             {filteredClaims.map((claim) => {
               const statusConfig = getStatusStyle(claim.status);
               
+              // Fallback checking to match both 'claimAmount' and 'requestedAmount'
+              const displayRequestedAmount = claim.claimAmount ?? claim.requestedAmount ?? 0;
+              const displayApprovedAmount = claim.approvedAmount ?? 0;
+
               return (
                 <div 
                   key={claim._id} 
@@ -310,10 +264,10 @@ const TrackClaims = () => {
                         textTransform: "uppercase",
                         padding: "4px 10px",
                         borderRadius: "50px",
-                        backgroundColor: claim.flowType === "travel" ? "#f3e8ff" : "#e0f2fe",
-                        color: claim.flowType === "travel" ? "#6b21a8" : "#0369a1"
+                        backgroundColor: claim.flowType === "travel" || claim.incidentType ? "#f3e8ff" : "#e0f2fe",
+                        color: claim.flowType === "travel" || claim.incidentType ? "#6b21a8" : "#0369a1"
                       }}>
-                        {claim.flowType} Flow
+                        {claim.flowType || (claim.incidentType ? "travel" : "insurance")}
                       </span>
                       
                       <span style={{
@@ -329,7 +283,9 @@ const TrackClaims = () => {
                     </div>
 
                     {/* Core Claims Metrics Metadata */}
-                    <h4 style={{ margin: "0 0 6px 0", fontSize: "18px", color: "#1e293b" }}>{claim.reason}</h4>
+                    <h4 style={{ margin: "0 0 6px 0", fontSize: "18px", color: "#1e293b" }}>
+                      {claim.incidentType || claim.reason || "Insurance Claim"}
+                    </h4>
                     <p style={{ margin: "0 0 14px 0", fontSize: "13px", color: "#64748b" }}>
                       Policy Tracking: <strong style={{ color: "#334155" }}>{claim.policyNo}</strong>
                     </p>
@@ -337,11 +293,15 @@ const TrackClaims = () => {
                     <div style={{ margin: "14px 0", padding: "12px", backgroundColor: "#f8fafc", borderRadius: "8px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px", fontSize: "13px" }}>
                         <span style={{ color: "#64748b" }}>Requested Amount:</span>
-                        <span style={{ fontWeight: "600", color: "#334155" }}>₹{claim.requestedAmount?.toLocaleString()}</span>
+                        <span style={{ fontWeight: "600", color: "#334155" }}>
+                          ₹{displayRequestedAmount.toLocaleString('en-IN')}
+                        </span>
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
                         <span style={{ color: "#64748b" }}>Settled Valuation:</span>
-                        <span style={{ fontWeight: "700", color: statusConfig.text }}>₹{claim.approvedAmount?.toLocaleString()}</span>
+                        <span style={{ fontWeight: "700", color: statusConfig.text }}>
+                          ₹{displayApprovedAmount.toLocaleString('en-IN')}
+                        </span>
                       </div>
                     </div>
                   </div>

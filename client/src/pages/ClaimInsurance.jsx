@@ -9,6 +9,7 @@ export default function ClaimForm() {
   const [policyNumber, setPolicyNumber] = useState("");
   const [linkedMobile, setLinkedMobile] = useState("");
   const [incidentDate, setIncidentDate] = useState("");
+  const [claimAmount, setClaimAmount] = useState("");
   const [files, setFiles] = useState([]);
   
   const [isVerifying, setIsVerifying] = useState(false);
@@ -183,6 +184,7 @@ export default function ClaimForm() {
   formData.append("mobileNo", linkedMobile.trim());
   formData.append("date", incidentDate);
   formData.append("incidentType", selectedReason);
+  formData.append("claimAmount", claimAmount);
 
   files.forEach((file) => {
     formData.append("supportDocs", file);
@@ -337,6 +339,17 @@ export default function ClaimForm() {
                       ))}
                     </div>
                   )}
+                </div>
+                <div className="floating-field">
+                  <input 
+                    type="number" 
+                    id="amount" 
+                    placeholder=" " 
+                    required 
+                    value={claimAmount} 
+                    onChange={(e) => setClaimAmount(e.target.value)} 
+                  />
+                  <label htmlFor="amount"><i className="fa-solid fa-indian-rupee-sign"></i> Estimated Claim Amount (₹)</label>
                 </div>
 
                 {selectedReason && (

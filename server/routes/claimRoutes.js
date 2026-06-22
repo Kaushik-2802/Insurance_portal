@@ -120,8 +120,8 @@ router.post("/verify-claim-eligibility",authMiddleware,async (req, res) => {
 
 router.post("/submit",authMiddleware,upload.array("supportDocs"),async (req, res) => {
         try {
-            const {policyNo,date,mobileNo,incidentType} = req.body;
-            if (!policyNo ||!date ||!mobileNo ||!incidentType) {
+            const {policyNo,date,mobileNo,incidentType,claimAmount} = req.body;
+            if (!policyNo ||!date ||!mobileNo ||!incidentType || !claimAmount) {
                 return res.status(400).json({
                     success: false,
                     message:"Missing mandatory parameters."
@@ -153,6 +153,7 @@ router.post("/submit",authMiddleware,upload.array("supportDocs"),async (req, res
                     date: new Date(date),
                     mobileNo: mobileNo.trim(),
                     incidentType,
+                    claimAmount: Number(claimAmount),
                     supportDocs:filePathString,
                     status: "Pending"
                 });
@@ -179,9 +180,9 @@ router.post("/submit",authMiddleware,upload.array("supportDocs"),async (req, res
 // 3. VEHICLE CLAIM SUBMIT
 router.post("/vehicle/submit",authMiddleware,upload.array("supportDocs"),async (req, res) => {
         try {
-            const {registration,date,mobileNo,incidentType} = req.body;
+            const {registration,date,mobileNo,incidentType,claimAmount} = req.body;
 
-            if (!registration ||!date ||!mobileNo ||!incidentType) {
+            if (!registration ||!date ||!mobileNo ||!incidentType || !claimAmount) {
                 return res.status(400).json({
                     success: false,
                     message:"Missing mandatory parameters."
@@ -214,6 +215,7 @@ router.post("/vehicle/submit",authMiddleware,upload.array("supportDocs"),async (
                     date: new Date(date),
                     mobileNo: mobileNo.trim(),
                     incidentType,
+                    claimAmount: Number(claimAmount),
                     supportDocs: filePathString,
                     status: "Pending"
                 });
@@ -284,7 +286,7 @@ router.get("/user-track",authMiddleware,async (req, res) => {
                     flowType: "travel",
                     reason: c.incidentType,
                     status: c.status || "Pending",
-                    requestedAmount: c.requestedAmount || c.amount || 15000,
+                    requestedAmount: c.claimAmount || c.amount || 15000,
                     approvedAmount: c.status?.toLowerCase() === "approved" ? ( c.requestedAmount ||c.amount ||15000) : 0,
                     txHash: null
                 })),
@@ -295,7 +297,7 @@ router.get("/user-track",authMiddleware,async (req, res) => {
                     flowType: "vehicle",
                     reason: c.incidentType,
                     status: c.status || "Pending",
-                    requestedAmount: c.requestedAmount || c.amount ||45000,
+                    requestedAmount: c.claimAmount || c.amount ||45000,
                     approvedAmount: c.status?.toLowerCase() === "approved" ? ( c.requestedAmount || c.amount || 45000) : 0,
                     txHash: null
                 })),

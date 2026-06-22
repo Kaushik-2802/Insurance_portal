@@ -7,10 +7,11 @@ export default function AdminDashboard() {
   const [claimRequests, setClaimRequests] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [txHash, setTxHash] = useState(null);
+  const [reducedAmount, setReducedAmount] = useState(0);
   
-  // Tracks which live claim document is currently staged inside the Smart Engine
+  // FIXED: Keeps tracking attributes grouped safely together inside a single persistent buffer state
   const [selectedClaim, setSelectedClaim] = useState(null); 
-  const [userQueries,setUserQueries]=useState([])
+  const [userQueries, setUserQueries] = useState([]);
   
   const navigate = useNavigate();
   
@@ -28,40 +29,47 @@ export default function AdminDashboard() {
       const response = await fetch(`${API_BASE_URL}/realtime-claims`);
       const data = await response.json();
       if (response.ok && data.success) {
-        // Exclude claims that have already been marked as 'Settled'
         const activeClaims = data.claims.filter(claim => claim.docs !== "Settled");
         setClaimRequests(activeClaims);
+        
+        // CRITICAL FIX: If the selected claim is currently staging, prevent background polling from resetting it
+        if (selectedClaim) {
+          const matchingUpdatedClaim = activeClaims.find(c => c.id === selectedClaim.id);
+          if (matchingUpdatedClaim) {
+            setSelectedClaim(prev => ({
+              ...matchingUpdatedClaim,
+              fixedPayout: prev.fixedPayout // Retain the one-time calculation securely in memory!
+            }));
+          }
+        }
       }
     } catch (error) {
       console.error("Critical dashboard synchronization mismatch error: ", error);
     }
   };
+
   useEffect(() => {
     fetchRealtimeClaims();
     const interval = setInterval(fetchRealtimeClaims, 10000);
     return () => clearInterval(interval);
+  }, [selectedClaim]); // Listens for state modifications safely
+
+  const queryData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user-message`);
+      const data = await response.json();
+      if (response.ok) {
+        setUserQueries(data.queries);
+      }
+    } catch (err) {
+      console.error("Error fetching user messages:", err);
+    }
+  };
+
+  useEffect(() => {
+    queryData();
   }, []);
 
-  const queryData=async(e)=>{
-    const response=await fetch(`${API_BASE_URL}/user-message`,{
-      method:"GET",
-      headers:{
-        "Content-Type":"application/json"
-      },
-    })
-    const data=await response.json()
-    if(!response.ok){
-      console.log("error fetching details");
-    }else{
-      setUserQueries(data.queries);
-    }
-  }
-
-  useEffect(()=>{
-    queryData();
-  },[])
-
-  // --- Automated System Logger Tracker ---
   const logSystemActivity = (message) => {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     setAuditLogs(prev => [{ id: Date.now(), time, msg: message }, ...prev]);
@@ -69,14 +77,28 @@ export default function AdminDashboard() {
 
   // --- Stage a Claim Into the Settlement Engine ---
   const handleStageForApproval = (claim) => {
-    setSelectedClaim(claim);
-    setSettlementStatus("Idle");
-    setTxHash(null);
-    setAiChecks({ identity: false, fraudScore: false, ledgerSync: false });
-    logSystemActivity(`ENGINE STAGING: Loaded Claim ID [${claim.id.slice(-6).toUpperCase()}] into active settlement buffer.`);
-  };
+  setSettlementStatus("Idle");
+  setTxHash(null);
+  setAiChecks({ identity: false, fraudScore: false, ledgerSync: false });
+  
+  // Calculate a strictly lower amount
+  const baseAmount = claim.amount ?? 0;
+  const reduction = baseAmount * (0.03 + Math.random() * 0.03); // 3% to 6% cut
+  let calculatedLowerValue = Math.floor(baseAmount - reduction - (150 + Math.random() * 200));
+  
+  // Safety floor check
+  if (calculatedLowerValue <= 0) {
+    calculatedLowerValue = Math.floor(baseAmount * 0.9);
+  }
+  
+  // Force state allocation
+  setReducedAmount(calculatedLowerValue);
+  setSelectedClaim(claim);
 
-  // --- Live State Transaction Action Handlers ---
+  const claimIdText = claim.id ? claim.id.slice(-6).toUpperCase() : "UNKNOWN";
+  logSystemActivity(`ENGINE STAGING: Loaded Claim ID [${claimIdText}]. Original: ₹${baseAmount.toLocaleString('en-IN')}, Reduced Target: ₹${calculatedLowerValue.toLocaleString('en-IN')}`);
+};
+
   const handleRejectStatus = async (id, userLabel) => {
     try {
       const response = await fetch(`${API_BASE_URL}/realtime-claims/${id}/status`, {
@@ -84,9 +106,7 @@ export default function AdminDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "Rejected" })
       });
-
       const data = await response.json();
-
       if (response.ok && data.success) {
         logSystemActivity(`DATABASE UPDATE: Claim ID [${id}] for ${userLabel} changed state to REJECTED.`);
         if (selectedClaim?.id === id) setSelectedClaim(null);
@@ -123,43 +143,44 @@ export default function AdminDashboard() {
     setTimeout(() => {
       setAiChecks(prev => ({ ...prev, ledgerSync: true }));
       setSettlementStatus("Ready");
-      logSystemActivity("LIQUIDITY DESK: Vault reconciliation synchronized. Ready to dispatch.");
+      logSystemActivity(`LIQUIDITY DESK: Vault reconciliation synchronized. Final calculated settlement payout locked at: ₹${selectedClaim.fixedPayout.toLocaleString('en-IN')}`);
     }, 2400);
   };
 
   const processFinalPayment = async () => {
-    if (!selectedClaim) return;
+  if (!selectedClaim) return;
 
-    const hash = "0x" + Math.random().toString(16).slice(2, 14).toUpperCase();
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/realtime-claims/${selectedClaim.id}/status`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "Settled",
-          txHash: hash
-        })
-      });
+  const hash = "0x" + Math.random().toString(16).slice(2, 14).toUpperCase();
+  const claimId = selectedClaim.id;
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/realtime-claims/${claimId}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        action: "Settled",
+        txHash: hash,
+        customPayout: reducedAmount // Sends the exact lower price displayed on your screen
+      })
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok && data.success) {
-        setTxHash(hash);
-        setSettlementStatus("Paid");
-        // FIX: Replaced $ with ₹ symbol in activity tracking stream
-        logSystemActivity(`FINANCE TRANSMISSION OUTBOUND: Dispatched ₹${selectedClaim.amount.toLocaleString('en-IN')}. Hash: ${hash}`);
-        
-        setSelectedClaim(null);
-        fetchRealtimeClaims();
-      } else {
-        window.alert(`Database transaction rejected: ${data.message}`);
-      }
-    } catch (err) {
-      console.error("Payment pipeline mutation execution exception failure:", err);
+    if (response.ok && data.success) {
+      setTxHash(hash);
+      setSettlementStatus("Paid");
+      logSystemActivity(`FINANCE TRANSMISSION: Dispatched adjusted settlement of ₹${reducedAmount.toLocaleString('en-IN')}. Hash: ${hash}`);
+      
+      setSelectedClaim(null);
+      setReducedAmount(0); // Reset buffer state
+      fetchRealtimeClaims();
+    } else {
+      window.alert(`Database transaction rejected: ${data.message}`);
     }
-  };
-
+  } catch (err) {
+    console.error("Payment pipeline mutation execution exception failure:", err);
+  }
+};
   return (
     <div className="arc-admin-wrapper">
       <nav className="arc-navbar">
@@ -176,7 +197,7 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="arc-main-grid">
-        {/* Left Column: Database Documents Rows */}
+        {/* Left Column */}
         <div className="arc-primary-col">
           <section className="arc-glass-panel">
             <div className="arc-panel-head">
@@ -186,45 +207,55 @@ export default function AdminDashboard() {
               {claimRequests.length === 0 ? (
                 <p className="arc-dim" style={{ padding: '20px', textAlign: 'center' }}>No pipeline insurance requests indexed inside database ledger files.</p>
               ) : (
-                claimRequests.map((claim) => (
-                  <div 
-                    key={claim.id} 
-                    className={`arc-verify-card arc-state-${claim.docs.toLowerCase()} ${selectedClaim?.id === claim.id ? "arc-staged-active" : ""}`}
-                  >
-                    <div className="arc-verify-info">
-                      <div className="arc-user-meta">
-                        <span className="arc-id-pill">{claim.id.slice(-6).toUpperCase()}</span>
-                        <h4>{claim.user}</h4>
+                claimRequests.map((claim) => {
+                  const currentClaimId = claim.id;
+                  const itemAmount = claim.amount ?? 0;
+                  const isStaged = selectedClaim?.id === currentClaimId;
+
+                  return (
+                    <div 
+                      key={currentClaimId} 
+                      className={`arc-verify-card arc-state-${claim.docs ? claim.docs.toLowerCase() : "pending"} ${isStaged ? "arc-staged-active" : ""}`}
+                    >
+                      <div className="arc-verify-info">
+                        <div className="arc-user-meta">
+                          <span className="arc-id-pill">
+                            {currentClaimId ? currentClaimId.slice(-6).toUpperCase() : "NEW"}
+                          </span>
+                          <h4>{claim.user || "Unknown Applicant"}</h4>
+                        </div>
+                        <div className="arc-missing-box">
+                          <p className="arc-label">Policy Reference: <strong>{claim.policyNo}</strong></p>
+                          <p className="arc-label">Classification: <span style={{ color: '#3498db', fontWeight: 'bold' }}>{claim.type}</span></p>
+                          <p className="arc-label">Incident Context: <em>{claim.incidentType}</em></p>
+                          
+                          {/* SHOWS THE EXACT USER CLAIMED AMOUNT IN QUEUE CARD */}
+                          <p className="arc-label">Stated Value Match: <strong style={{color: '#2ecc71'}}>₹{itemAmount.toLocaleString('en-IN')}</strong></p>
+                          
+                          <p className="arc-label" style={{ marginTop: '5px' }}>
+                            Status Ledger: <span className={`arc-txt-${claim.docs ? claim.docs.toLowerCase() : "pending"}`} style={{ fontWeight: 'bold' }}>{claim.docs || "Pending"}</span>
+                          </p>
+                        </div>
                       </div>
-                      <div className="arc-missing-box">
-                        <p className="arc-label">Policy Reference: <strong>{claim.policyNo}</strong></p>
-                        <p className="arc-label">Classification: <span style={{ color: '#3498db', fontWeight: 'bold' }}>{claim.type}</span></p>
-                        <p className="arc-label">Incident Context: <em>{claim.incidentType}</em></p>
-                        {/* FIX: Replaced $ with ₹ symbol here */}
-                        <p className="arc-label">Stated Value Match: <strong style={{color: '#2ecc71'}}>₹{claim.amount.toLocaleString('en-IN')}</strong></p>
-                        <p className="arc-label" style={{ marginTop: '5px' }}>
-                          Status Ledger: <span className={`arc-txt-${claim.docs.toLowerCase()}`} style={{ fontWeight: 'bold' }}>{claim.docs}</span>
-                        </p>
+                      <div className="arc-verify-actions">
+                        <button 
+                          onClick={() => handleStageForApproval(claim)} 
+                          className="arc-action-btn arc-confirm"
+                          disabled={isStaged}
+                        >
+                          <i className="fa-solid fa-microchip"></i> {isStaged ? "Staged" : "Auto-Approve"}
+                        </button>
+                        <button 
+                          onClick={() => handleRejectStatus(currentClaimId, claim.user || "Applicant")} 
+                          className="arc-action-btn arc-deny"
+                          disabled={claim.docs === "Rejected"}
+                        >
+                          <i className="fa-solid fa-bell"></i> Flag Rejected
+                        </button>
                       </div>
                     </div>
-                    <div className="arc-verify-actions">
-                      <button 
-                        onClick={() => handleStageForApproval(claim)} 
-                        className="arc-action-btn arc-confirm"
-                        disabled={selectedClaim?.id === claim.id}
-                      >
-                        <i className="fa-solid fa-microchip"></i> {selectedClaim?.id === claim.id ? "Staged" : "Auto-Approve"}
-                      </button>
-                      <button 
-                        onClick={() => handleRejectStatus(claim.id, claim.user)} 
-                        className="arc-action-btn arc-deny"
-                        disabled={claim.docs === "Rejected"}
-                      >
-                        <i className="fa-solid fa-bell"></i> Flag Rejected
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </section>
@@ -243,7 +274,7 @@ export default function AdminDashboard() {
           </section>
         </div>
 
-        {/* Right Column: Settlement Audit Box */}
+        {/* Right Column */}
         <div className="arc-secondary-col">
           <section className="arc-glass-panel arc-settlement-engine">
             <div className="arc-panel-head">
@@ -282,8 +313,12 @@ export default function AdminDashboard() {
                 </div>
                 <div className="arc-data-row">
                   <label>Settlement Capital Target</label>
-                  {/* FIX: Replaced $ with ₹ symbol here and implemented Indian numeric formatting standard */}
-                  <span className="arc-price">₹{selectedClaim ? selectedClaim.amount.toLocaleString('en-IN') : "0.00"}</span>
+                  <span className="arc-price">
+                    {selectedClaim 
+                      ? `₹${reducedAmount.toLocaleString('en-IN')}`
+                      : "₹0.00"
+                    }
+                  </span>
                 </div>
                 {txHash && (
                   <div className="arc-data-row arc-hash-row">
@@ -306,27 +341,21 @@ export default function AdminDashboard() {
               </button>
             </div>
           </section>
-          {/* User Queries Section */}
+
+          {/* User Queries Inbox */}
           <section className="arc-glass-panel">
             <div className="arc-panel-head">
-              <h3>
-                <i className="fa-solid fa-envelope-open-text"></i> User Queries Inbox
-              </h3>
+              <h3><i className="fa-solid fa-envelope-open-text"></i> User Queries Inbox</h3>
             </div>
-
             <div className="arc-log-container">
               {userQueries.length === 0 ? (
                 <p className="arc-dim">No user queries available.</p>
               ) : (
                 userQueries.map((q) => (
                   <div key={q._id} className="arc-log-entry">
-                    <div>
-                      <strong>{q.fullName}</strong> ({q.email})
-                    </div>
+                    <div><strong>{q.fullName}</strong> ({q.email})</div>
                     <p style={{ margin: "5px 0" }}>{q.textContent}</p>
-                    <small className="arc-timestamp">
-                      {new Date(q.createdAt).toLocaleString()}
-                    </small>
+                    <small className="arc-timestamp">{new Date(q.createdAt).toLocaleString()}</small>
                   </div>
                 ))
               )}

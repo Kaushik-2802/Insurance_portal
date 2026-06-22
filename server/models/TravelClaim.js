@@ -20,6 +20,7 @@ const travelClaimSchema = new mongoose.Schema(
       enum: ["Medical Emergency", "Trip Delay", "Lost Baggage", "Passport Loss"],
       required: true
     },
+    claimAmount: { type: Number, required: true },
     supportDocs: {
       type: String,
       required: true

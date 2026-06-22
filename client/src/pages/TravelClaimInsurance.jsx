@@ -9,9 +9,9 @@ export default function TravelClaimInsurance() {
   const [policyNumber, setPolicyNumber] = useState("");
   const [linkedMobile, setLinkedMobile] = useState("");
   const [incidentDate, setIncidentDate] = useState("");
+  const [claimAmount, setClaimAmount] = useState(""); // <-- ADDED STATE
   const [files, setFiles] = useState([]);
   
-  // Verification states
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [validationError, setValidationError] = useState("");
@@ -94,7 +94,6 @@ export default function TravelClaimInsurance() {
 
       if (response.ok && data.success) {
         setIsVerified(true);
-        // Displaying destination context if available from database validation return
         setDetectedDestination(data.destination || "Valid Travel Policy");
         setValidationError("");
       } else {
@@ -117,7 +116,8 @@ export default function TravelClaimInsurance() {
       return;
     }
 
-    if (!policyNumber || !selectedReason || !incidentDate) {
+    // Include claimAmount validation rule check
+    if (!policyNumber || !selectedReason || !incidentDate || !claimAmount) {
       window.alert("Please complete all fields before submitting your travel claim.");
       return;
     }
@@ -132,6 +132,7 @@ export default function TravelClaimInsurance() {
     formData.append("mobileNo", linkedMobile.trim());
     formData.append("date", incidentDate);
     formData.append("incidentType", selectedReason);
+    formData.append("claimAmount", claimAmount); // <-- APPEND AMOUNT
 
     files.forEach((file) => {
       formData.append("supportDocs", file);
@@ -218,7 +219,6 @@ export default function TravelClaimInsurance() {
               </div>
             </div>
 
-            {/* Policy verification action region */}
             <div style={{ marginBottom: '25px' }}>
               {!isVerified ? (
                 <button 
@@ -250,7 +250,6 @@ export default function TravelClaimInsurance() {
               )}
             </div>
 
-            {/* Render secondary fields only when policy validation succeeds */}
             {isVerified && (
               <>
                 <div className="reason-grid-section">
@@ -283,6 +282,19 @@ export default function TravelClaimInsurance() {
                       ))}
                     </div>
                   )}
+                </div>
+
+                {/* ADDED FLOATING FIELD FOR CLAIM AMOUNT */}
+                <div className="floating-field" style={{ marginTop: '20px' }}>
+                  <input 
+                    type="number" 
+                    id="amount" 
+                    placeholder=" " 
+                    required 
+                    value={claimAmount} 
+                    onChange={(e) => setClaimAmount(e.target.value)} 
+                  />
+                  <label htmlFor="amount"><i className="fa-solid fa-indian-rupee-sign"></i> Estimated Claim Amount (₹)</label>
                 </div>
 
                 {selectedReason && (
