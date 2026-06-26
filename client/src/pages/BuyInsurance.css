@@ -187,3 +187,39 @@
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
 }
+
+@media (min-width: 600px) {
+  .glass-container {
+    padding: 2.5rem;
+  }
+
+  .header-content h1 {
+    font-size: 2.25rem;
+  }
+
+  .visual-selector {
+    grid-template-columns: 1fr 1fr; /* Toggle cards split neatly side-by-side */
+    gap: 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr 1fr; /* Splitting data fields into two clear columns */
+    gap: 1.5rem;
+  }
+
+  /* Target specific elements to take full width of the split row */
+  .form-grid .full-width {
+    grid-column: span 2;
+  }
+}
+
+/* --- Large Desktops (Min-Width: 1024px) --- */
+@media (min-width: 1024px) {
+  .buy-insurance-main {
+    padding: 4rem 2rem;
+  }
+
+  .glass-container {
+    max-width: 900px;
+  }
+}

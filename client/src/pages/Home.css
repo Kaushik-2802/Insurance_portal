@@ -242,3 +242,169 @@ html {
   font-size: 1.2rem;
   filter: drop-shadow(0 0 6px rgba(255, 204, 0, 0.4));
 }
+
+@media (min-width: 480px) {
+  .custom-caption h1 {
+    font-size: 2.25rem;
+  }
+  
+  .stats-bar {
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: -3.5rem;
+    padding: 2rem 1rem;
+  }
+  
+  .stat-item {
+    border-right: 1px solid #f1f5f9;
+  }
+  
+  .stat-item:last-child {
+    border-right: none;
+  }
+}
+
+/* --- Tablets & Medium Screens (Min-Width: 768px) --- */
+@media (min-width: 768px) {
+  .hero-img {
+    height: 70vh;
+  }
+
+  .custom-caption {
+    left: 5% !important;
+    bottom: 15% !important;
+    max-width: 600px;
+  }
+
+  .custom-caption h1 {
+    font-size: 3rem;
+  }
+  
+  .custom-caption p {
+    font-size: 1rem;
+  }
+
+  .control-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .stats-bar {
+    margin-left: 5%;
+    margin-right: 5%;
+    padding: 2.5rem 2rem;
+  }
+
+  .stat-item strong {
+    font-size: 2.25rem;
+  }
+
+  .about-grid {
+    padding: 5rem 5%;
+  }
+
+  .about-image-box {
+    height: 380px;
+    margin-bottom: 0;
+  }
+
+  .glass-card {
+    width: 280px;
+    bottom: -1.5rem;
+    left: -1.5rem;
+    right: auto;
+  }
+
+  .help-section {
+    padding: 3.5rem;
+    margin: 4rem auto;
+  }
+
+  .help-section ul {
+    flex-direction: row;
+    justify-content: center;
+    gap: 2.5rem;
+  }
+
+  .contact-wrap {
+    padding: 4rem 5%;
+  }
+
+  .contact-container {
+    grid-template-columns: 1fr 1.2fr;
+  }
+
+  .contact-info {
+    padding: 3.5rem;
+  }
+
+  .contact-form-premium {
+    padding: 3.5rem;
+  }
+
+  .input-group-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+}
+
+/* --- Wide Desktop Layout Systems (Min-Width: 1024px) --- */
+@media (min-width: 1024px) {
+  .desktop-only {
+    display: inline;
+  }
+
+  .hero-img {
+    height: 75vh;
+  }
+
+  .overlay-gradient {
+    background: linear-gradient(to right, rgba(0, 51, 102, 0.85) 20%, transparent 80%);
+  }
+
+  .custom-caption {
+    left: 10% !important;
+    bottom: 22% !important;
+    max-width: 520px;
+  }
+
+  .custom-caption h1 {
+    font-size: 3.5rem;
+  }
+
+  .stats-bar {
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: -50px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    padding: 6rem 10%;
+  }
+
+  .about-content h2 {
+    font-size: 2.5rem;
+  }
+
+  .glass-card {
+    bottom: -30px;
+    left: -30px;
+  }
+
+  .contact-wrap {
+    padding: 6rem 10%;
+  }
+
+  .contact-container {
+    grid-template-columns: 1fr 1.5fr;
+  }
+
+  .contact-info {
+    padding: 60px;
+  }
+
+  .contact-form-premium {
+    padding: 60px;
+  }
+}

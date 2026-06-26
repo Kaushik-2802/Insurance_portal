@@ -61,3 +61,29 @@ body{
 .cta .quote-btn:hover {
   background: #e6b800;
 }
+
+@media (max-width: 767px) {
+  .header {
+    flex-direction: column;   /* Stacks Logo, Nav, and CTA Button vertically */
+    text-align: center;
+    gap: 15px;                /* Creates uniform vertical spacing on mobile */
+    padding: 20px 15px;
+  }
+
+  .nav {
+    margin-left: 0;           /* Removes the desktop push layout override */
+    width: 100%;
+  }
+
+  .nav ul {
+    flex-wrap: wrap;          /* Allows links to wrap to line 2 on tiny screens */
+    justify-content: center;  /* Center-aligns the link items horizontally */
+    gap: 12px 20px;           /* Adds a vertical gap safety net if links wrap */
+    font-size: 16px;          /* Optimizes font scaling for small displays */
+  }
+
+  .cta {
+    margin-left: 0;           /* Eliminates the rigid 40px left-push overlap */
+    margin-top: 5px;          /* Adds breathing room under the navigation link list */
+  }
+}

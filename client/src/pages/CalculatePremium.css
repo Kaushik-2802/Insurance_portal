@@ -117,6 +117,51 @@
   cursor: pointer;
 }
 
-@media (max-width: 800px) {
+/* @media (max-width: 800px) {
   .premium-card { flex-direction: column; }
+} */
+
+@media (min-width: 600px) {
+  .form-side {
+    padding: 2.5rem;
+  }
+  
+  .result-side {
+    padding: 3.5rem 2.5rem;
+  }
+
+  /* Split form elements into an aligned 2-column format grid */
+  .grid-inputs {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* --- Desktops & Monitors (Min-Width: 900px) --- */
+@media (min-width: 900px) {
+  .premium-wrapper {
+    padding: 3rem 2rem;
+  }
+
+  /* Snap the full app into an aesthetic side-by-side presentation view */
+  .premium-card {
+    flex-direction: row;
+    min-height: 520px;
+  }
+
+  .form-side {
+    padding: 3rem;
+  }
+
+  .result-side {
+    padding: 3rem;
+  }
+
+  .title-navy {
+    font-size: 2rem;
+  }
+  
+  .amount-yellow {
+    font-size: 2.85rem;
+  }
 }

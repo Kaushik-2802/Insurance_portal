@@ -176,3 +176,19 @@
     position: static;
   }
 }
+
+@media (min-width: 768px) {
+  .dashboard-container {
+    padding: 2.5rem;
+  }
+}
+
+/* Large Desktops (Side-by-Side Split Layout) */
+@media (min-width: 1024px) {
+  .dashboard-container {
+    grid-template-columns: 2fr 1fr; /* Left section takes up 2/3, right section takes 1/3 */
+    gap: 3rem;
+    align-items: start;
+    padding: 3rem 1.5rem;
+  }
+}
