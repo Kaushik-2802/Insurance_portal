@@ -219,3 +219,123 @@
   .footer-desc { margin: 0 auto; }
   .footer-bottom { flex-direction: column; gap: 20px; }
 }
+
+/* --- Tablet / Medium Screen Optimization (Max-Width: 1024px) --- */
+@media (max-width: 1024px) {
+  .footer {
+    padding: 80px 0 40px;
+  }
+
+  /* Structural adjustment for 2x2 grid matrix layouts */
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 30px;
+    margin-bottom: 60px;
+  }
+
+  /* Prevent the decorative text from forcing horizontal page overflows */
+  .footer::before {
+    font-size: 10rem;
+    top: -20px;
+    right: -10px;
+    width: 100%;
+    overflow: hidden;
+    text-align: right;
+  }
+}
+
+/* --- Compact Screen Layout Fixes (Max-Width: 768px) --- */
+@media (max-width: 768px) {
+  .footer-legal {
+    gap: 15px; /* Safely tightens space between links on small tablets */
+  }
+}
+
+/* --- Handset / Smartphone Screen Optimization (Max-Width: 600px) --- */
+@media (max-width: 600px) {
+  .footer {
+    padding: 60px 0 30px;
+  }
+
+  /* Drops down to clean centralized vertical stacks */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 45px;
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  /* Hides the massive background text on phones to keep pages clean and fast */
+  .footer::before {
+    display: none;
+  }
+
+  /* Centralize descriptions and social icons wrappers */
+  .footer-desc {
+    margin: 0 auto;
+    max-width: 100%;
+  }
+
+  .social-icons {
+    justify-content: center;
+    margin-top: 15px;
+  }
+
+  /* Clear implicit padding margins from global UL lists */
+  .footer-section ul {
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Strip hover transformations off touch screens to prevent sticky-state link animations */
+  .footer-section ul li a:hover {
+    transform: none;
+  }
+
+  /* Responsive layout for input elements */
+  .newsletter-box {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .newsletter-input-group {
+    flex-direction: column;
+    background: transparent;
+    padding: 0;
+    gap: 10px;
+  }
+
+  .newsletter-input-group input {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 12px 15px;
+    width: 100%;
+  }
+
+  .newsletter-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Enterprise footer bottom segment splits cleanly */
+  .footer-bottom {
+    flex-direction: column-reverse; /* Puts the copyright below legal items */
+    gap: 20px;
+    text-align: center;
+    padding-top: 25px;
+  }
+
+  .footer-legal {
+    justify-content: center;
+    flex-wrap: wrap; /* Wraps items cleanly to avoid overlapping text on thin devices */
+    gap: 10px 20px;
+  }
+}
+
+/* --- Micro Devices Optimization (Max-Width: 360px) --- */
+@media (max-width: 360px) {
+  .footer-logo-box h2 {
+    font-size: 1.8rem; /* Drops font-size slightly to fit on small displays */
+  }
+}
